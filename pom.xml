@@ -1,0 +1,32 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.jmsc.app</groupId>
+  <artifactId>jmsc</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <packaging>pom</packaging>
+  <name>jmsc</name>
+  
+  
+  <properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<java.source.version>11.0.11</java.source.version>
+		<java.target.version>11.0.11</java.target.version>
+	</properties>
+
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.5.0</version>
+	</parent>
+  
+  
+  <modules>
+  	<module>jmsc-app</module>
+  	<module>jmsc-config</module>
+  	<module>jmsc-entity</module>
+  	<module>jmsc-persistence</module>
+  	<module>jmsc-rest</module>
+  	<module>jmsc-service</module>
+  	<module>jmsc-common</module>
+  </modules>
+</project>
