@@ -4,6 +4,13 @@
 
 plugins {
     id 'com.jmsc.app.java-conventions'
+    id 'org.springframework.boot' version '2.6.2'
+	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+	id 'java'
+}
+
+plugins {
+	
 }
 
 dependencies {
@@ -11,13 +18,18 @@ dependencies {
     implementation project(':jmsc-rest')
     
     compileOnly 'org.springframework.boot:spring-boot-starter-data-jpa:2.5.0'
-    //annotationProcessor 'org.springframework.boot:spring-boot-starter-data-jpa:2.5.0'
-    
+    annotationProcessor 'org.springframework.boot:spring-boot-starter-data-jpa:2.5.0'
+   
     compileOnly 'org.springframework.boot:spring-boot-starter-web:2.5.0'
-    //annotationProcessor 'org.springframework.boot:spring-boot-starter-web:2.5.0'
+    annotationProcessor 'org.springframework.boot:spring-boot-starter-web:2.5.0'
     
     compileOnly 'org.springframework.boot:spring-boot-starter-actuator:2.5.0'
-    //annotationProcessor 'org.springframework.boot:spring-boot-starter-actuator:2.5.0'
+    annotationProcessor 'org.springframework.boot:spring-boot-starter-actuator:2.5.0'
 }
 
 description = 'jmsc-app'
+
+
+
+
+
