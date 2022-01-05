@@ -3,6 +3,9 @@
  */
 package com.jmsc.app.repository;
 
+import java.util.Date;
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.jmsc.app.entity.users.PaymentDraft;
@@ -12,5 +15,7 @@ import com.jmsc.app.entity.users.PaymentDraft;
  *
  */
 public interface PaymentDraftRepository extends JpaRepository<PaymentDraft, Long>{
+	
+	List<PaymentDraft> findAllByUpdatedTimestampBetween(Date updatedTimestampStart, Date updatedTimestampEnd);
 
 }
