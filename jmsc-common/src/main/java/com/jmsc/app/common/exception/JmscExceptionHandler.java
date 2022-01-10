@@ -45,7 +45,7 @@ public class JmscExceptionHandler extends ResponseEntityExceptionHandler{
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<Object> handleAllException(Exception ex, WebRequest request) {
 
-		System.out.println("***************** WorklyExceptionHandler handleAllException***************** ");
+		log.debug("***************** WorklyExceptionHandler handleAllException***************** ");
 		ex.printStackTrace();
 		ExceptionResponse exceptionResponse = new ExceptionResponse(ex.getMessage(), request.getDescription(false),
 				new Date());

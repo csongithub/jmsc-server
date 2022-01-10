@@ -1,0 +1,10 @@
+rootProject.name = 'jmsc-server'
+
+
+include(':jmsc-app')
+include(':jmsc-common')
+include(':jmsc-config')
+include(':jmsc-entity')
+include(':jmsc-persistence')
+include(':jmsc-rest')
+include(':jmsc-service')

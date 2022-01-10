@@ -21,4 +21,24 @@ public class SwaggerConfig implements WebMvcConfigurer {
         											  .paths(PathSelectors.any())                          
         											  .build();                                           
     }
+    
+//    /**
+//     * Accessing static resources
+//     */
+//    @Override
+//    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+//        /**
+//         * SpringBoot autoconfiguration itself does not map the /swagger-ui.html
+//         * This path is mapped to the corresponding directory META-INF/resources/
+//         * Use WebMvcConfigurerAdapter to publish the static files of swagger;
+//         */
+//        registry.addResourceHandler("swagger-ui.html")
+//                .addResourceLocations("classpath:/META-INF/resources/");
+//
+//        registry.addResourceHandler("/webjars/**")
+//                .addResourceLocations("classpath:/META-INF/resources/webjars/");
+//        //Map all /static/** accesses to the classpath:/static/ directory
+//        registry.addResourceHandler("/static/**").addResourceLocations(ResourceUtils.CLASSPATH_URL_PREFIX +"/static/");
+//        super.addResourceHandlers(registry);
+//    }
 }

@@ -1,0 +1,18 @@
+description = 'jmsc-persistence'
+
+bootJar {
+	enabled = false
+}
+
+jar{
+	enabled = true
+}
+
+dependencies {
+    implementation project(':jmsc-config')
+    implementation project(':jmsc-entity')
+   
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+}
+
+

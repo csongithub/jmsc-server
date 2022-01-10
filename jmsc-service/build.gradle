@@ -1,0 +1,19 @@
+description = 'jmsc-service'
+
+bootJar {
+	enabled = false
+}
+
+jar{
+	enabled = true
+}
+
+dependencies {
+	implementation project(':jmsc-common')
+    implementation project(':jmsc-entity')
+    implementation project(':jmsc-persistence')
+    
+    implementation 'org.apache.poi:poi-ooxml:5.1.0'
+}
+
+

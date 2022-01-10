@@ -1,0 +1,18 @@
+description = 'jmsc-config'
+
+bootJar {
+	enabled = false
+}
+
+jar{
+	enabled = true
+}
+
+dependencies {
+    implementation 'com.zaxxer:HikariCP:2.6.1'
+    implementation group: 'com.google.guava', name: 'guava', version: '11.0.2'
+    implementation 'com.amazonaws:aws-java-sdk:1.11.133'
+    
+    compileOnly 'org.springframework.plugin:spring-plugin-core'
+    runtimeOnly 'org.postgresql:postgresql:42.2.20'
+}

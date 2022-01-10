@@ -8,7 +8,6 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.google.common.base.Strings;
 import com.jmsc.app.common.dto.Credentials;
 import com.jmsc.app.common.dto.UserDTO;
 import com.jmsc.app.common.exception.ResourceNotFoundException;
@@ -16,6 +15,7 @@ import com.jmsc.app.common.rqrs.LoginResponse;
 import com.jmsc.app.common.rqrs.UpdatePasswordRequest;
 import com.jmsc.app.common.rqrs.UpdatePasswordResponse;
 import com.jmsc.app.common.util.ObjectMapperUtil;
+import com.jmsc.app.common.util.Strings;
 import com.jmsc.app.entity.users.User;
 import com.jmsc.app.repository.UserRepository;
 
