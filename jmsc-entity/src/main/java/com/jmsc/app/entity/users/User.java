@@ -10,6 +10,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import com.jmsc.app.entity.users.BaseEntity;
 import com.sun.istack.NotNull;
 
 import lombok.Data;
