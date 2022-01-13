@@ -12,16 +12,13 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
-import org.apache.poi.hssf.usermodel.HSSFSheet;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -126,11 +123,17 @@ public class PartyBankAccountService {
 	}
 	
 	public PartyBankAccountDTO addAccount(PartyBankAccountDTO bankAccountDTO){
-		PartyBankAccount bankAccount = ObjectMapperUtil.map(bankAccountDTO, PartyBankAccount.class);
-		PartyBankAccount savedAccount = repository.save(bankAccount);
-		PartyBankAccountDTO savedAccountDTO = ObjectMapperUtil.map(savedAccount, PartyBankAccountDTO.class);
-		log.debug("New Bank Account Added: " + savedAccountDTO.toString());
-		return savedAccountDTO;
+		Optional<PartyBankAccount> optional = repository.findByAccountNumber(bankAccountDTO.getAccountNumber());
+		if(!optional.isPresent())
+		{
+			PartyBankAccount bankAccount = ObjectMapperUtil.map(bankAccountDTO, PartyBankAccount.class);
+			
+			PartyBankAccount savedAccount = repository.save(bankAccount);
+			PartyBankAccountDTO savedAccountDTO = ObjectMapperUtil.map(savedAccount, PartyBankAccountDTO.class);
+			log.debug("New Bank Account Added: " + savedAccountDTO.toString());
+			return savedAccountDTO;
+		}
+		return null;
 	}
 	
 	
