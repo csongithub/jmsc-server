@@ -49,7 +49,10 @@ public class PartyBankAccountService {
 	
 	 public String storeFile(MultipartFile file) throws Exception {
 		 String fileName = StringUtils.cleanPath(file.getOriginalFilename());
-	     try {
+	     if(fileName.contains(" ")){
+	    	 throw new RuntimeException("File name contains empty space.");
+	     }
+		 try {
 	        Path fileStorageLocation = Paths.get("C:\\Users\\Chandan\\Downloads\\").toAbsolutePath().normalize();
 	        Path targetLocation =	fileStorageLocation.resolve(new Timestamp(System.currentTimeMillis()).getTime() + "_" + fileName);
 	        Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
