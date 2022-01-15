@@ -60,7 +60,7 @@ public class BankAccountDTO implements Serializable{
 	private String displayName; 
 	
 	
-	public void toUppercase() {
+	public BankAccountDTO toUppercase() {
 		if(accountHolder != null)
 			accountHolder = accountHolder.toUpperCase();
 		
@@ -90,5 +90,7 @@ public class BankAccountDTO implements Serializable{
 		
 		if(status != null)
 			status = status.toUpperCase();
+		
+		return this;
 	}
 }

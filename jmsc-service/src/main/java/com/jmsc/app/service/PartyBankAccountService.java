@@ -129,7 +129,7 @@ public class PartyBankAccountService {
 		Optional<PartyBankAccount> optional = repository.findByAccountNumber(bankAccountDTO.getAccountNumber());
 		if(!optional.isPresent())
 		{
-			PartyBankAccount bankAccount = ObjectMapperUtil.map(bankAccountDTO, PartyBankAccount.class);
+			PartyBankAccount bankAccount = ObjectMapperUtil.map(bankAccountDTO.toUppercase(), PartyBankAccount.class);
 			
 			PartyBankAccount savedAccount = repository.save(bankAccount);
 			PartyBankAccountDTO savedAccountDTO = ObjectMapperUtil.map(savedAccount, PartyBankAccountDTO.class);
