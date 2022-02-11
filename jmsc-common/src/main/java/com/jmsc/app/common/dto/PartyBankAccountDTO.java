@@ -48,6 +48,8 @@ public class PartyBankAccountDTO implements Serializable{
 	@ApiModelProperty(name = "address", example = "Aurngabad, Bazar, Bihar-824101", notes = "Address of the bank", required = false)
 	private String address;
 	
+	private Boolean update;
+	
 	public PartyBankAccountDTO toUppercase() {
 		if(partyName != null)
 			partyName = partyName.toUpperCase();

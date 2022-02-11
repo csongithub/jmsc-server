@@ -125,12 +125,14 @@ public class PartyBankAccountService {
 		return dto;
 	}
 	
+	
+	
 	public PartyBankAccountDTO addAccount(PartyBankAccountDTO bankAccountDTO){
 		Optional<PartyBankAccount> optional = repository.findByAccountNumber(bankAccountDTO.getAccountNumber());
-		if(!optional.isPresent())
+		
+		if((!optional.isPresent()) || (optional.isPresent() && bankAccountDTO.getUpdate()))
 		{
 			PartyBankAccount bankAccount = ObjectMapperUtil.map(bankAccountDTO.toUppercase(), PartyBankAccount.class);
-			
 			PartyBankAccount savedAccount = repository.save(bankAccount);
 			PartyBankAccountDTO savedAccountDTO = ObjectMapperUtil.map(savedAccount, PartyBankAccountDTO.class);
 			log.debug("New Bank Account Added: " + savedAccountDTO.toString());
@@ -138,6 +140,8 @@ public class PartyBankAccountService {
 		}
 		return null;
 	}
+	
+	
 	
 	
 	public List<PartyBankAccountDTO> getAllAccounts(){
