@@ -18,7 +18,8 @@ import lombok.NoArgsConstructor;
 @Data
 @EqualsAndHashCode(callSuper=false)
 @NoArgsConstructor
-public class LoginResponse implements Serializable{/**
+public class LoginResponse implements Serializable{
+	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 5371443882125747783L;
@@ -28,4 +29,6 @@ public class LoginResponse implements Serializable{/**
 	private ClientDTO clientDTO;
 	
 	private String message;
+	
+	private String token;
 }

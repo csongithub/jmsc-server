@@ -14,10 +14,8 @@ import com.jmsc.app.common.rqrs.UpdatePasswordResponse;
 import com.jmsc.app.common.util.ObjectMapperUtil;
 import com.jmsc.app.common.util.Strings;
 import com.jmsc.app.entity.users.Client;
-import com.jmsc.app.repository.ClientRepository;
 
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.Response;
 
 /**
  * @author Chandan
