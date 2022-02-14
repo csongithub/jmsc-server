@@ -16,15 +16,15 @@ import lombok.NoArgsConstructor;
 @Data
 @EqualsAndHashCode(callSuper=false)
 @NoArgsConstructor
-public class UpdatePasswordRequest implements Serializable{
+public class LoginRequest implements Serializable{
+
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 122839155873733705L;
+	private static final long serialVersionUID = 9159086766840594818L;
 	
 	private String logonId;
 	
-	private String currentPassword;
-	
-	private String newPassword;
+	private String password;
+
 }

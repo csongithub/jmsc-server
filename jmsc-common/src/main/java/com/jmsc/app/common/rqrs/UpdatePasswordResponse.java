@@ -7,6 +7,7 @@ import java.io.Serializable;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 /**
  * @author Chandan
@@ -14,24 +15,13 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper=false)
-public class UpdatePasswordResponse implements Serializable{
-
-	/**
+@NoArgsConstructor
+public class UpdatePasswordResponse implements Serializable{/**
 	 * 
 	 */
-	private static final long serialVersionUID = 3586529216810656702L;
-	
-	private boolean status;
+	private static final long serialVersionUID = -4832307813057169600L;
+
+	private boolean updateSuccess;
 	
 	private String message;
-
-	public UpdatePasswordResponse() {
-	}
-	
-	public UpdatePasswordResponse(boolean status, String message) {
-		this.status = status;
-		this.message = message;
-	}
-
-	
 }
