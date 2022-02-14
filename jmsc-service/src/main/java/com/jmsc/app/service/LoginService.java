@@ -33,7 +33,7 @@ public class LoginService {
 	
 	public LoginResponse login(LoginRequest request) {
 		
-		if(Strings.isNotNullOrEmpty(request.getLogonId()) || Strings.isNotNullOrEmpty(request.getPassword())){
+		if(Strings.isNullOrEmpty(request.getLogonId()) || Strings.isNullOrEmpty(request.getPassword())){
 			LoginResponse response = new LoginResponse();
 			response.setLoginSuccess(false);
 			response.setMessage("Insufficient Data");
@@ -44,6 +44,7 @@ public class LoginService {
 		if(client != null) {
 			LoginResponse response = new LoginResponse();
 			if(request.getPassword().equals(client.getPassword())) {
+				client.removePassword();
 				response.setLoginSuccess(true);
 				response.setClientDTO(client);
 				response.setMessage("Login Successful"); 
@@ -63,7 +64,7 @@ public class LoginService {
 	
 	
 	public UpdatePasswordResponse updatePassword(UpdatePasswordRequest request) {
-		if(Strings.isNotNullOrEmpty(request.getLogonId()) || Strings.isNotNullOrEmpty(request.getCurrentPassword()) || Strings.isNotNullOrEmpty(request.getNewPassword())){
+		if(Strings.isNullOrEmpty(request.getLogonId()) || Strings.isNullOrEmpty(request.getCurrentPassword()) || Strings.isNullOrEmpty(request.getNewPassword())){
 			UpdatePasswordResponse response = new UpdatePasswordResponse();
 			response.setUpdateSuccess(false);
 			response.setMessage("Insufficient Data");
@@ -82,12 +83,14 @@ public class LoginService {
 			client.setPassword(request.getNewPassword());
 			ClientDTO clientDTO = ObjectMapperUtil.map(client, ClientDTO.class);
 			ClientDTO dto = service.addClient(clientDTO);
-			
+			dto.removePassword();
 			response.setUpdateSuccess(true);
 			response.setMessage("Password Updated Successfully");
+		} else {
+			response.setUpdateSuccess(false);
+			response.setMessage(loginResponse.getMessage());
 		}
 		return response;
 	}
-	
 
 }

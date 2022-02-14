@@ -3,6 +3,8 @@
  */
 package com.jmsc.app.entity.users;
 
+import java.io.Serializable;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -21,7 +23,7 @@ import lombok.Data;
 @Data
 @Entity
 @Table(name = "CLIENT")
-public class Client extends BaseEntity{
+public class Client implements Serializable{
 	
 	/**
 	 * 

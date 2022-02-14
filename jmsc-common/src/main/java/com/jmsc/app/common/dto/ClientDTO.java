@@ -27,5 +27,8 @@ public class ClientDTO implements Serializable {
 	private String password;
 	
 	
+	public void removePassword() {
+		this.password = "";
+	}
 
 }
