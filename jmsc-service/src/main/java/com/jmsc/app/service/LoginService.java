@@ -31,6 +31,10 @@ public class LoginService {
 	private ClientService service;
 	
 	
+	@Autowired
+	private EncryptionService encService;
+	
+	
 	public LoginResponse login(LoginRequest request) {
 		
 		if(Strings.isNullOrEmpty(request.getLogonId()) || Strings.isNullOrEmpty(request.getPassword())){
@@ -43,7 +47,8 @@ public class LoginService {
 		ClientDTO client = service.getClientByLogonId(request.getLogonId());
 		if(client != null) {
 			LoginResponse response = new LoginResponse();
-			if(request.getPassword().equals(client.getPassword())) {
+			String encryptedPassword = encService.getEncryptedPassword(request.getPassword());
+			if(encryptedPassword.equals(client.getPassword())) {
 				client.removePassword();
 				response.setLoginSuccess(true);
 				response.setClientDTO(client);
@@ -80,10 +85,10 @@ public class LoginService {
 		
 		if(loginResponse.isLoginSuccess()) {
 			Client client = ObjectMapperUtil.map(loginResponse.getClientDTO(), Client.class);
-			client.setPassword(request.getNewPassword());
+			String encryptedPassword = encService.getEncryptedPassword(request.getNewPassword());
+			client.setPassword(encryptedPassword);
 			ClientDTO clientDTO = ObjectMapperUtil.map(client, ClientDTO.class);
-			ClientDTO dto = service.addClient(clientDTO);
-			dto.removePassword();
+			ClientDTO dto = service.updateClient(clientDTO);
 			response.setUpdateSuccess(true);
 			response.setMessage("Password Updated Successfully");
 		} else {

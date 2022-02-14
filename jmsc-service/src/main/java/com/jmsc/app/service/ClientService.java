@@ -26,10 +26,26 @@ public class ClientService {
 	@Autowired
 	private ClientRepository repository;
 	
+	@Autowired
+	private EncryptionService encService;
+	
 	public ClientDTO addClient(ClientDTO clientDTO) {
+		String encryptedPassword = encService.getEncryptedPassword(clientDTO.getPassword());
+		clientDTO.setPassword(encryptedPassword);
 		Client client = ObjectMapperUtil.map(clientDTO, Client.class);
 		Client entity = repository.save(client);
 		ClientDTO dto = ObjectMapperUtil.map(entity, ClientDTO.class);
+		dto.removePassword();
+		return dto;
+	}
+	
+	
+	
+	public ClientDTO updateClient(ClientDTO clientDTO) {
+		Client client = ObjectMapperUtil.map(clientDTO, Client.class);
+		Client entity = repository.save(client);
+		ClientDTO dto = ObjectMapperUtil.map(entity, ClientDTO.class);
+		dto.removePassword();
 		return dto;
 	}
 	
