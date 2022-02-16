@@ -40,6 +40,14 @@ public class Client implements Serializable{
 	private String name;
 	
 	@NotNull
+	@Column(name = "DISP_NAME")
+	private String displayName;
+	
+	@NotNull
+	@Column(name = "STATUS")
+	private String status;
+	
+	@NotNull
 	@Column(name = "LOGON_ID")
 	private String logonId;
 	

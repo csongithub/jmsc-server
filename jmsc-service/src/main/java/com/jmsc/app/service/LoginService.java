@@ -14,6 +14,7 @@ import com.jmsc.app.common.rqrs.UpdatePasswordResponse;
 import com.jmsc.app.common.util.ObjectMapperUtil;
 import com.jmsc.app.common.util.Strings;
 import com.jmsc.app.entity.users.Client;
+import com.jmsc.app.service.jwt.JwtProvider;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -33,6 +34,9 @@ public class LoginService {
 	private EncryptionService encService;
 	
 	
+	@Autowired
+	private JwtProvider jwtProvider;
+	
 	public LoginResponse login(LoginRequest request) {
 		
 		if(Strings.isNullOrEmpty(request.getLogonId()) || Strings.isNullOrEmpty(request.getPassword())){
@@ -44,13 +48,23 @@ public class LoginService {
 		
 		ClientDTO client = service.getClientByLogonId(request.getLogonId());
 		if(client != null) {
+			
+			if(!"ACTIVE".equalsIgnoreCase(client.getStatus())) {
+				throw new RuntimeException("Use has been blocked, Kindly contact admin");
+			}
+			
 			LoginResponse response = new LoginResponse();
 			String encryptedPassword = encService.getEncryptedPassword(request.getPassword());
 			if(encryptedPassword.equals(client.getPassword())) {
 				client.removePassword();
 				response.setLoginSuccess(true);
 				response.setClientDTO(client);
-				response.setMessage("Login Successful"); 
+				
+				final String token = jwtProvider.generateToken(client.getLogonId());
+				log.debug("Issued token: {} for logon request by: {}",token,request.getLogonId());
+				
+				response.setToken(token);
+				response.setMessage("Login Successful");
 			} else {
 				response.setLoginSuccess(false);
 				response.setMessage("Incorrect Password, Please Try Again");

@@ -22,7 +22,9 @@ CREATE TABLE jmsc.CLIENT
 (
     ID 				integer NOT NULL DEFAULT nextval('jmsc.client_sequence'::regclass),
     NAME 			character varying(200) NOT NULL,
-    LOGON_ID 		character varying(200) NOT NULL,
+    DISP_NAME 		character varying(200) NOT NULL,
+    STATUS 			character varying(200) NOT NULL,
+    LOGON_ID 		character varying(200) NOT NULL UNIQUE,
     PASSWORD		character varying(200) NOT NULL,
     CONSTRAINT client_key PRIMARY KEY (ID)
 )

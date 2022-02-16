@@ -12,6 +12,8 @@ import com.jmsc.app.common.dto.ClientDTO;
 import com.jmsc.app.common.util.ObjectMapperUtil;
 import com.jmsc.app.entity.users.Client;
 import com.jmsc.app.repository.ClientRepository;
+import com.jmsc.app.service.jwt.JwtClientDetailsService;
+import com.jmsc.app.service.jwt.JwtTokenUtil;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -29,6 +31,13 @@ public class ClientService {
 	@Autowired
 	private EncryptionService encService;
 	
+	@Autowired
+	private JwtClientDetailsService jwtClientService;
+	
+	
+	@Autowired
+	private JwtTokenUtil jwtUtil;
+	
 	public ClientDTO addClient(ClientDTO clientDTO) {
 		String encryptedPassword = encService.getEncryptedPassword(clientDTO.getPassword());
 		clientDTO.setPassword(encryptedPassword);
@@ -38,6 +47,17 @@ public class ClientService {
 		dto.removePassword();
 		return dto;
 	}
+	
+	
+	 public ClientDTO getClient(String logonId) {
+		 Optional<Client> optionalClient= repository.findByLogonId(logonId);
+			if(optionalClient.isPresent()) {
+				ClientDTO dto = ObjectMapperUtil.map(optionalClient.get(), ClientDTO.class);
+				dto.removePassword();
+				return dto;
+			} else 
+				return null;
+	 }
 	
 	
 	
@@ -57,5 +77,47 @@ public class ClientService {
 			return dto;
 		} else 
 			return null;
+	}
+	
+	
+	public String blockClient(String logonId, String authorization) {
+		
+		String userName = jwtUtil.getUsernameFromToken(authorization.substring(7));
+		if(!"Admin".equalsIgnoreCase(userName)) {
+			throw new RuntimeException("Insufficient Permission");
+		}
+		
+		if("Admin".equalsIgnoreCase(logonId)) {
+			throw new RuntimeException("Sorry, Admin can not be blocked");
+		}
+		
+		Optional<Client> optional= repository.findByLogonId(logonId);
+		if(optional.isPresent()) {
+			Client client = optional.get();
+			client.setStatus("BLOCKED");
+			repository.save(client);
+			jwtClientService.clearCache(client.getLogonId());
+			return "Client has been blocked";
+		} else 
+			return "Client Not Found";
+	}
+	
+	
+	public String unblockClient(String logonId, String authorization) {
+		
+		String userName = jwtUtil.getUsernameFromToken(authorization.substring(7));
+		if(!"Admin".equalsIgnoreCase(userName)) {
+			throw new RuntimeException("Insufficient Permission");
+		}
+		
+		Optional<Client> optional= repository.findByLogonId(logonId);
+		if(optional.isPresent()) {
+			Client client = optional.get();
+			client.setStatus("ACTIVE");
+			repository.save(client);
+			jwtClientService.clearCache(client.getLogonId());
+			return "Client has been unblocked";
+		} else 
+			return "Client Not Found";
 	}
 }

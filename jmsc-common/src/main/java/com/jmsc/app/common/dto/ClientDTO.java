@@ -20,6 +20,12 @@ public class ClientDTO implements Serializable {
 	@ApiModelProperty(name = "name", example = "JMSC", notes = "Name of the client", required = true)
 	private String name;
 	
+	@ApiModelProperty(name = "displayName", example = "JMSC", notes = "Display name of the client", required = true)
+	private String displayName;
+	
+	@ApiModelProperty(name = "status", example = "ACTIVE", notes = "Status of the client", required = true)
+	private String status;
+	
 	@ApiModelProperty(name = "logonId", example = "jmsc001", notes = "Login id for the client", required = true)
 	private String logonId;
 	

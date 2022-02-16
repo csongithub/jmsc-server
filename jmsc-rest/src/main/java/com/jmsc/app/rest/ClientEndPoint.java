@@ -5,11 +5,15 @@ package com.jmsc.app.rest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.amazonaws.services.waf.model.HTTPRequest;
 import com.jmsc.app.common.dto.ClientDTO;
 import com.jmsc.app.service.ClientService;
 
@@ -28,8 +32,29 @@ public class ClientEndPoint {
 	private ClientService service;
 
 	@PostMapping("/addClient")
-	public ResponseEntity<ClientDTO> addBankAccount(@RequestBody ClientDTO clientDTO){
+	public ResponseEntity<ClientDTO> addClient(@RequestBody ClientDTO clientDTO){
 		ClientDTO client = service.addClient(clientDTO);
 		return ResponseEntity.ok(client);
+	}
+	
+	
+	@GetMapping("/getClient/{logonId}")
+	public ResponseEntity<ClientDTO> getClient(@PathVariable("logonId") String logonId){
+		ClientDTO client = service.getClient(logonId);
+		return ResponseEntity.ok(client);
+	}
+	
+	
+	@PostMapping("/block/{logonId}")
+	public ResponseEntity<String> block(@PathVariable("logonId") String logonId, @RequestHeader("Authorization") String authorization){
+		service.blockClient(logonId, authorization);
+		return ResponseEntity.ok("Client has been blocked");
+	}
+	
+	
+	@PostMapping("/unblock/{logonId}")
+	public ResponseEntity<String> makeActive(@PathVariable("logonId") String logonId, @RequestHeader("Authorization") String authorization){
+		service.unblockClient(logonId, authorization);
+		return ResponseEntity.ok("Client has been unblocked");
 	}
 }

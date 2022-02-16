@@ -23,7 +23,7 @@ import io.swagger.annotations.Api;
  *
  */
 @RestController
-@RequestMapping("/v1/login")
+@RequestMapping("/v1/auth")
 @Api(value = "APIs to handle login services")
 public class LoginEndPoint {
 	
