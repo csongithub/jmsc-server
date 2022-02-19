@@ -24,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Service
 @Slf4j
-public class LoginService {
+public class AuthService {
 	
 	@Autowired
 	private ClientService service;

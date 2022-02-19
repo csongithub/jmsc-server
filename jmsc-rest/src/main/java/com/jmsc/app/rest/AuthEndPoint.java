@@ -14,7 +14,7 @@ import com.jmsc.app.common.rqrs.LoginRequest;
 import com.jmsc.app.common.rqrs.LoginResponse;
 import com.jmsc.app.common.rqrs.UpdatePasswordRequest;
 import com.jmsc.app.common.rqrs.UpdatePasswordResponse;
-import com.jmsc.app.service.LoginService;
+import com.jmsc.app.service.AuthService;
 
 import io.swagger.annotations.Api;
 
@@ -25,10 +25,10 @@ import io.swagger.annotations.Api;
 @RestController
 @RequestMapping("/v1/auth")
 @Api(value = "APIs to handle login services")
-public class LoginEndPoint {
+public class AuthEndPoint {
 	
 	@Autowired
-	private LoginService service;
+	private AuthService service;
 
 	@PostMapping("/login")
 	 public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request)throws Throwable {
