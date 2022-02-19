@@ -21,6 +21,7 @@ DROP TABLE IF EXISTS jmsc.PARTY_BANK_ACCOUNT CASCADE;
 CREATE TABLE jmsc.PARTY_BANK_ACCOUNT
 (
     ID 					integer NOT NULL DEFAULT nextval('jmsc.party_bnk_acc_seq'::regclass),
+    CLIENT_ID			integer NOT NULL
     PARTY_NAME			character varying(200) NOT NULL,
 	ACCOUNT_HOLDER 		character varying(200) NOT NULL,
     ACCOUNT_NO 			character varying(200) NOT NULL,

@@ -21,7 +21,8 @@ DROP TABLE IF EXISTS jmsc.BANK_ACCOUNT CASCADE;
 CREATE TABLE jmsc.BANK_ACCOUNT
 (
     ID 					integer NOT NULL DEFAULT nextval('jmsc.bank_acccount_seq'::regclass),
-	ACCOUNT_HOLDER 		character varying(50) NOT NULL,
+	CLIENT_ID			integer NOT NULL,
+    ACCOUNT_HOLDER 		character varying(50) NOT NULL,
     ACCOUNT_NO 			character varying(50) NOT NULL,
     IFSC_CODE			character varying(50) NOT NULL,
 	BANK_NAME			character varying(50),

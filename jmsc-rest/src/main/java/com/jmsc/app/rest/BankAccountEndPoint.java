@@ -3,11 +3,13 @@ package com.jmsc.app.rest;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jmsc.app.common.dto.BankAccountDTO;
@@ -37,16 +39,16 @@ public class BankAccountEndPoint {
 	
 	
 	@GetMapping("/getAllAccounts")
-	public ResponseEntity<List<BankAccountDTO>> getAllAccounts(){
-		List<BankAccountDTO> accounts = service.getAllAccounts();
+	public ResponseEntity<List<BankAccountDTO>> getAllAccounts(@RequestParam("clientId") Long clientId){
+		List<BankAccountDTO> accounts = service.getAllAccounts(clientId);
 		return ResponseEntity.ok(accounts);
 	}
 	
 	
 	
 	@GetMapping("/getActiveAccounts")
-	public ResponseEntity<List<BankAccountDTO>> getActiveAccounts(){
-		List<BankAccountDTO> accounts = service.getActiveAccounts();
+	public ResponseEntity<List<BankAccountDTO>> getActiveAccounts(@RequestParam("clientId") Long clientId){
+		List<BankAccountDTO> accounts = service.getActiveAccounts(clientId);
 		return ResponseEntity.ok(accounts);
 	}
 }

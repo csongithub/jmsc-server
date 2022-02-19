@@ -24,6 +24,9 @@ public class PartyBankAccountDTO implements Serializable{
 	@ApiModelProperty(name = "id", example = "1", notes = "Unique Id (Primary Key) of bank account", required = false)
 	private Long id;
 	
+	@ApiModelProperty(name = "clientId", example = "1", notes = "Client ID", required = true)
+	private Long clientId;
+	
 	@ApiModelProperty(name = "partyName", example = "Siddhivinayak Fuel Center", notes = "Name of party", required = true)
 	private String partyName;
 

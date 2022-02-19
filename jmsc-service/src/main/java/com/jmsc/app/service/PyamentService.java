@@ -35,22 +35,29 @@ public class PyamentService {
 	private PaymentDraftRepository repository;
 	
 	public String createPaymentDraft(PaymentDraftDTO dto) {
+		
+		if(dto.getClientId() == null) {
+			throw new RuntimeException("Insufficient Data");
+		}
+		
 		PaymentDraft draft = new PaymentDraft();
 		draft.setId(dto.getId());
+		draft.setClientId(dto.getClientId());
 		draft.setStatus(dto.getStatus());
 		draft.setDraft(dto.getDraftJson().getBytes(StandardCharsets.UTF_8));
 		return repository.save(draft).getStatus();
 	}
 	
 	
-	public List<PaymentDraftDTO> getAllDrafts(){
-		List<PaymentDraft> list = repository.findAll();
+	public List<PaymentDraftDTO> getAllDrafts(Long clientId){
+		List<PaymentDraft> list = repository.findAllByClientId(clientId);
 		List<PaymentDraftDTO> dtoList = new ArrayList<PaymentDraftDTO>();
 		for(PaymentDraft draft: list) {
 			if("CREATED".equalsIgnoreCase(draft.getStatus()))
 			{
 				PaymentDraftDTO dto = new PaymentDraftDTO();
 				dto.setId(draft.getId());
+				dto.setClientId(draft.getClientId());
 				dto.setStatus(draft.getStatus());
 				dto.setDraftJson(new String(draft.getDraft(), StandardCharsets.UTF_8));
 				
@@ -76,14 +83,15 @@ public class PyamentService {
 	
 	
 	
-	public List<PaymentDraftDTO> getAllPrinted(){
-		List<PaymentDraft> list = repository.findAll();
+	public List<PaymentDraftDTO> getAllPrinted(Long clientId){
+		List<PaymentDraft> list = repository.findAllByClientId(clientId);
 		List<PaymentDraftDTO> dtoList = new ArrayList<PaymentDraftDTO>();
 		for(PaymentDraft draft: list) {
 			if("PRINTED".equalsIgnoreCase(draft.getStatus()))
 			{
 				PaymentDraftDTO dto = new PaymentDraftDTO();
 				dto.setId(draft.getId());
+				dto.setClientId(draft.getClientId());
 				dto.setStatus(draft.getStatus());
 				dto.setDraftJson(new String(draft.getDraft(), StandardCharsets.UTF_8));
 				
@@ -96,7 +104,7 @@ public class PyamentService {
 	
 	
 	
-	public List<PaymentDraftDTO> getAllPrintedByRange(GetPaymentsByDateRequest req) {
+	public List<PaymentDraftDTO> getAllPrintedByRange(Long clientId, GetPaymentsByDateRequest req) {
 		Range range = req.getRange();
 		Date fromDate = null;
 		Date toDate = null;
@@ -122,13 +130,14 @@ public class PyamentService {
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
-		List<PaymentDraft> list = repository.findAllByUpdatedTimestampBetween(fromDate, toDate);
+		List<PaymentDraft> list = repository.findAllByClientIdAndUpdatedTimestampBetween(clientId, fromDate, toDate);
 		List<PaymentDraftDTO> dtoList = new ArrayList<PaymentDraftDTO>();
 		for(PaymentDraft draft: list) {
 			if("PRINTED".equalsIgnoreCase(draft.getStatus()))
 			{
 				PaymentDraftDTO dto = new PaymentDraftDTO();
 				dto.setId(draft.getId());
+				dto.setClientId(draft.getClientId());
 				dto.setStatus(draft.getStatus());
 				dto.setDraftJson(new String(draft.getDraft(), StandardCharsets.UTF_8));
 				dtoList.add(dto);

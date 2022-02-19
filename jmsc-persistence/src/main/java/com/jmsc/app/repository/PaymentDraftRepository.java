@@ -16,6 +16,7 @@ import com.jmsc.app.entity.users.PaymentDraft;
  */
 public interface PaymentDraftRepository extends JpaRepository<PaymentDraft, Long>{
 	
-	List<PaymentDraft> findAllByUpdatedTimestampBetween(Date updatedTimestampStart, Date updatedTimestampEnd);
-
+	List<PaymentDraft> findAllByClientId(Long clientId);
+	
+	List<PaymentDraft> findAllByClientIdAndUpdatedTimestampBetween(Long clientId, Date updatedTimestampStart, Date updatedTimestampEnd);
 }

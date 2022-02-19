@@ -33,6 +33,10 @@ public class PaymentDraft extends BaseEntity {
 	private Long id;
 	
 	@NotNull
+	@Column(name = "CLIENT_ID")
+	private Long clientId;
+	
+	@NotNull
 	@Column(name = "STATUS")
 	private String status;
 	

@@ -26,6 +26,9 @@ public class BankAccountDTO implements Serializable{
 	@ApiModelProperty(name = "id", example = "1", notes = "Unique Id (Primary Key) of bank account", required = false)
 	private Long id;
 
+	@ApiModelProperty(name = "clientId", example = "Client", notes = "ID of the client", required = true)
+	private Long clientId;
+	
 	@ApiModelProperty(name = "accountHolder", example = "Siddhivinayak Fuel Center", notes = "Name of bank account holder", required = true)
 	private String accountHolder;
 	

@@ -4,6 +4,7 @@
 package com.jmsc.app.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,18 @@ public class BankAccountService {
 	
 	
 	public BankAccountDTO addBankAccount(BankAccountDTO bankAccountDTO) {
+		
+		if(bankAccountDTO.getClientId() == null) {
+			throw new RuntimeException("Insufficient Data");
+		}
+		
+		if(bankAccountDTO.getId() == null) {
+			Optional<BankAccount> optional = repository.findByClientIdAndAccountNumber(bankAccountDTO.getClientId(), bankAccountDTO.getAccountNumber().trim());
+			if(optional.isPresent()) {
+				throw new RuntimeException("Account number already exists");
+			}
+		}
+		
 		bankAccountDTO.toUppercase();
 		BankAccount bankAccount = ObjectMapperUtil.map(bankAccountDTO, BankAccount.class);
 		BankAccount entity = repository.save(bankAccount);
@@ -36,15 +49,15 @@ public class BankAccountService {
 	}
 	
 	
-	public List<BankAccountDTO> getAllAccounts(){
-		List<BankAccount> bankAccouns = repository.findAll();
+	public List<BankAccountDTO> getAllAccounts(Long clientId){
+		List<BankAccount> bankAccouns = repository.findByClientId(clientId);
 		List<BankAccountDTO> dtos = ObjectMapperUtil.mapAll(bankAccouns, BankAccountDTO.class);
 		return dtos;
 	}
 	
 	
-	public List<BankAccountDTO> getActiveAccounts(){
-		List<BankAccount> bankAccouns = repository.findByStatus("ACTIVE");
+	public List<BankAccountDTO> getActiveAccounts(Long clientId){
+		List<BankAccount> bankAccouns = repository.findByClientIdAndStatus(clientId, "ACTIVE");
 		List<BankAccountDTO> dtos = ObjectMapperUtil.mapAll(bankAccouns, BankAccountDTO.class);
 		dtos.stream().forEach(account -> {
 			account.setDisplayName(account.getAccountNumber()+"-"+account.getAccountHolder()+"-"+account.getBankName());

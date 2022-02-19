@@ -63,8 +63,8 @@ public class PartyBankAccountEndPoint {
 	
 	
 	@GetMapping("/allAccounts")
-	public ResponseEntity<List<PartyBankAccountDTO>> getAllAccounts() {
-		List<PartyBankAccountDTO> accounts = service.getAllAccounts();
+	public ResponseEntity<List<PartyBankAccountDTO>> getAllAccounts(@RequestParam("clientId") Long clientId) {
+		List<PartyBankAccountDTO> accounts = service.getAllAccounts(clientId);
 		return ResponseEntity.ok(accounts);
 	}
 }

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jmsc.app.common.dto.PaymentDraftDTO;
@@ -44,8 +45,8 @@ public class PaymentEndPoint {
 	
 	
 	@GetMapping("/getAllDrafts")
-	public ResponseEntity<List<PaymentDraftDTO>> getAllDrafts(){
-		List<PaymentDraftDTO> list = service.getAllDrafts();
+	public ResponseEntity<List<PaymentDraftDTO>> getAllDrafts(@RequestParam("clientId") Long clientId){
+		List<PaymentDraftDTO> list = service.getAllDrafts(clientId);
 		return ResponseEntity.ok(list);
 	}
 	
@@ -59,9 +60,9 @@ public class PaymentEndPoint {
 	
 	
 	
-	@GetMapping("/getAllPrinted")
-	public ResponseEntity<List<PaymentDraftDTO>> getAllPrinted(){
-		List<PaymentDraftDTO> list= service.getAllPrinted();
+	@GetMapping("/getAllPrinted/{clientId}")
+	public ResponseEntity<List<PaymentDraftDTO>> getAllPrinted(@PathVariable("clientId") Long clientId){
+		List<PaymentDraftDTO> list= service.getAllPrinted(clientId);
 		return ResponseEntity.ok(list);
 	}
 	
@@ -69,8 +70,8 @@ public class PaymentEndPoint {
 	
 	
 	@PutMapping("/getAllPrintedByRange")
-	public ResponseEntity<List<PaymentDraftDTO>> getAllPrintedByRange(@RequestBody GetPaymentsByDateRequest req){
-		List<PaymentDraftDTO> list= service.getAllPrintedByRange(req);
+	public ResponseEntity<List<PaymentDraftDTO>> getAllPrintedByRange(@RequestParam("clientId")Long clientId, @RequestBody GetPaymentsByDateRequest req){
+		List<PaymentDraftDTO> list= service.getAllPrintedByRange(clientId, req);
 		return ResponseEntity.ok(list);
 	}
 	

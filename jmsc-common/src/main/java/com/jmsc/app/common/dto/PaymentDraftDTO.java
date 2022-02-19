@@ -25,6 +25,9 @@ public class PaymentDraftDTO implements Serializable{
 	@ApiModelProperty(name = "id", example = "1", notes = "Unique Id (Primary Key) for draft", required = false)
 	private Long id;
 	
+	@ApiModelProperty(name = "id", example = "1", notes = "Client ID", required = false)
+	private Long clientId;
+	
 	@ApiModelProperty(name = "status", example = "Printed", notes = "status of draft", required = true)
 	private String status;
 	

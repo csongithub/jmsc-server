@@ -22,6 +22,7 @@ DROP TABLE IF EXISTS jmsc.PAYMENT_DRAFT CASCADE;
 CREATE TABLE jmsc.PAYMENT_DRAFT
 (
     ID 					integer NOT NULL DEFAULT nextval('jmsc.payment_draft_seq'::regclass),
+    CLIENT_ID			integer NOT NULL
     STATUS				character varying(50) NOT NULL,
 	DRAFT 				bytea NOT NULL,
 	CREATED_TS 			timestamp with time zone NOT NULL,

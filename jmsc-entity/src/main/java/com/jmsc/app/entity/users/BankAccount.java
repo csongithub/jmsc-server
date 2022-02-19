@@ -34,6 +34,10 @@ public class BankAccount extends BaseEntity{
 	private Long id;
 	
 	@NotNull
+	@Column(name = "CLIENT_ID")
+	private Long clientId;
+	
+	@NotNull
 	@Column(name = "ACCOUNT_HOLDER")
 	private String accountHolder;
 	

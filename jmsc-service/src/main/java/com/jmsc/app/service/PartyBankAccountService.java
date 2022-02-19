@@ -128,24 +128,30 @@ public class PartyBankAccountService {
 	
 	
 	public PartyBankAccountDTO addAccount(PartyBankAccountDTO bankAccountDTO){
-		Optional<PartyBankAccount> optional = repository.findByAccountNumber(bankAccountDTO.getAccountNumber());
 		
-		if((!optional.isPresent()) || (optional.isPresent() && bankAccountDTO.getUpdate()))
-		{
-			PartyBankAccount bankAccount = ObjectMapperUtil.map(bankAccountDTO.toUppercase(), PartyBankAccount.class);
-			PartyBankAccount savedAccount = repository.save(bankAccount);
-			PartyBankAccountDTO savedAccountDTO = ObjectMapperUtil.map(savedAccount, PartyBankAccountDTO.class);
-			log.debug("New Bank Account Added: " + savedAccountDTO.toString());
-			return savedAccountDTO;
+		if(bankAccountDTO.getClientId() == null) {
+			throw new RuntimeException("Insufficient Data");
 		}
-		return null;
+		
+		if(bankAccountDTO.getId() == null) {
+			Optional<PartyBankAccount> optional = repository.findByClientIdAndAccountNumber(bankAccountDTO.getClientId(), bankAccountDTO.getAccountNumber());
+			if(optional.isPresent()) {
+				throw new RuntimeException("Part Account Already Exists with Name: " + optional.get().getPartyName());
+			}
+		}
+		
+		PartyBankAccount bankAccount = ObjectMapperUtil.map(bankAccountDTO.toUppercase(), PartyBankAccount.class);
+		PartyBankAccount savedAccount = repository.save(bankAccount);
+		PartyBankAccountDTO savedAccountDTO = ObjectMapperUtil.map(savedAccount, PartyBankAccountDTO.class);
+		log.debug("New Bank Account Added: " + savedAccountDTO.toString());
+		return savedAccountDTO;
 	}
 	
 	
 	
 	
-	public List<PartyBankAccountDTO> getAllAccounts(){
-		List<PartyBankAccount> accounts = repository.findAll();
+	public List<PartyBankAccountDTO> getAllAccounts(Long clientId){
+		List<PartyBankAccount> accounts = repository.findByClientId(clientId);
 		List<PartyBankAccountDTO> accountsDTO = ObjectMapperUtil.mapAll(accounts, PartyBankAccountDTO.class);
 		return accountsDTO;
 	}
