@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jmsc.app.common.dto.ClientDTO;
+import com.jmsc.app.common.rqrs.UpdateClientBasicInfoRequest;
 import com.jmsc.app.service.ClientService;
 
 import io.swagger.annotations.Api;
@@ -55,5 +56,10 @@ public class ClientEndPoint {
 	public ResponseEntity<String> makeActive(@PathVariable("logonId") String logonId, @RequestHeader("Authorization") String authorization){
 		service.unblockClient(logonId, authorization);
 		return ResponseEntity.ok("Client has been unblocked");
+	}
+	
+	@PostMapping("/update_basic_info")
+	public ResponseEntity<ClientDTO> updateBasicInfo(@RequestBody UpdateClientBasicInfoRequest request){
+		return ResponseEntity.ok(service.updateBasicInfo(request));
 	}
 }

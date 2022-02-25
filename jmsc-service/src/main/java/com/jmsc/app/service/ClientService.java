@@ -9,7 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.jmsc.app.common.dto.ClientDTO;
+import com.jmsc.app.common.rqrs.UpdateClientBasicInfoRequest;
 import com.jmsc.app.common.util.ObjectMapperUtil;
+import com.jmsc.app.common.util.Strings;
 import com.jmsc.app.entity.users.Client;
 import com.jmsc.app.repository.ClientRepository;
 import com.jmsc.app.service.jwt.JwtClientDetailsService;
@@ -119,5 +121,23 @@ public class ClientService {
 			return "Client has been unblocked";
 		} else 
 			return "Client Not Found";
+	}
+	
+	
+	public ClientDTO updateBasicInfo(UpdateClientBasicInfoRequest request) {
+		Optional<Client> optional= repository.findByLogonId(request.getLogonId());
+		if(optional.isPresent()) {
+			Client client = optional.get();
+			if(Strings.isNotNullOrEmpty(request.getName())) {
+				client.setName(request.getName());
+			}
+			if(Strings.isNotNullOrEmpty(request.getDisplayName())) {
+				client.setDisplayName(request.getDisplayName());
+			}
+			Client savedClient = repository.save(client);
+			ClientDTO dto = ObjectMapperUtil.map(savedClient, ClientDTO.class);
+			return dto;
+		}
+		return null;
 	}
 }
