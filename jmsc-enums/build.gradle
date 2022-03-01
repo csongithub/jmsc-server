@@ -1,0 +1,15 @@
+description = 'jmsc-enums'
+
+
+bootJar {
+	enabled = false
+}
+
+jar{
+	enabled = true
+}
+
+dependencies {
+}
+
+
