@@ -10,6 +10,7 @@ jar{
 
 dependencies {
 	implementation project(':jmsc-config')
+	implementation project(':jmsc-enums')
 }
 
 
