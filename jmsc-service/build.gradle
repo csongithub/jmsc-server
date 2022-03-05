@@ -13,7 +13,7 @@ dependencies {
     implementation project(':jmsc-entity')
     implementation project(':jmsc-persistence')
     
-    compileOnly project(':jmsc-enums')
+    implementation project(':jmsc-enums')
     
     implementation 'org.apache.poi:poi-ooxml:5.1.0'
     implementation 'com.squareup.okhttp3:okhttp:3.14.6'

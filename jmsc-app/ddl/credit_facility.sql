@@ -22,7 +22,7 @@ CREATE TABLE jmsc.CREDIT_FACILITY
 (
     ID 					integer NOT NULL DEFAULT nextval('jmsc.cf_seq'::regclass),
 	CLIENT_ID			integer NOT NULL,
-    ACCOUNT_NO 			character varying(25) NOT NULL,
+    ACCOUNT_NO 			character varying(25) NOT NULL UNIQUE,
     AMOUNT 				numeric NOT NULL,
     OPEN_DATE 			date NOT NULL,
     MATURITY_DATE 		date NOT NULL,

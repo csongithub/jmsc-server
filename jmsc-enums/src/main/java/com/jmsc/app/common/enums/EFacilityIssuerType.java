@@ -8,6 +8,5 @@ package com.jmsc.app.common.enums;
  *
  */
 public enum EFacilityIssuerType {
-	Bank,
-	Post_Office
+	BANK, PO;
 }

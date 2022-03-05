@@ -6,9 +6,9 @@ package com.jmsc.app.common.dto;
 import java.io.Serializable;
 import java.util.Date;
 
+import com.jmsc.app.common.enums.EFacility;
 import com.jmsc.app.common.enums.EFacilityIssuerType;
 import com.jmsc.app.common.enums.EPledgedType;
-import com.jmsc.app.common.enums.EFacilityType;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -45,7 +45,7 @@ public class CreditFacilityDTO implements Serializable{
 	
 	private String issuerBranch;
 
-	private EFacilityType facilityType;
+	private EFacility facilityType;
 
 	private Boolean isPledged;
 

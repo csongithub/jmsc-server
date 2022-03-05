@@ -17,8 +17,8 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import com.jmsc.app.common.enums.EFacilityIssuerType;
+import com.jmsc.app.common.enums.EFacility;
 import com.jmsc.app.common.enums.EPledgedType;
-import com.jmsc.app.common.enums.EFacilityType;
 import com.sun.istack.NotNull;
 import com.sun.istack.Nullable;
 
@@ -80,7 +80,7 @@ public class CreditFacility extends BaseEntity{
 	@Enumerated(EnumType.STRING)
 	@NotNull
 	@Column(name = "FACILITY_TYPE")
-	private EFacilityType facilityType;
+	private EFacility facilityType;
 	
 	@Nullable
 	@Column(name = "IS_PLEDGED")
