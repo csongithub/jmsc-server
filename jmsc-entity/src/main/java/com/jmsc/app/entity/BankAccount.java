@@ -1,9 +1,7 @@
 /**
  * 
  */
-package com.jmsc.app.entity.users;
-
-import java.io.Serializable;
+package com.jmsc.app.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -22,39 +20,55 @@ import lombok.Data;
  */
 @Data
 @Entity
-@Table(name = "CLIENT")
-public class Client implements Serializable{
-	
+@Table(name = "BANK_ACCOUNT")
+public class BankAccount extends BaseEntity{
+
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 7602159515398294803L;
-
+	private static final long serialVersionUID = 4318031963046510465L;
+	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "ID")
 	private Long id;
 	
 	@NotNull
-	@Column(name = "NAME")
-	private String name;
+	@Column(name = "CLIENT_ID")
+	private Long clientId;
 	
 	@NotNull
-	@Column(name = "DISP_NAME")
-	private String displayName;
+	@Column(name = "ACCOUNT_HOLDER")
+	private String accountHolder;
+	
+	@Column(name = "BANK_NAME")
+	private String bankName;
+	
+	@Column(name = "BRANCH_NAME")
+	private String branchName;
+	
+	@Column(name = "BRANCH_CODE")
+	private String branchCode;
 	
 	@NotNull
+	@Column(name = "ACCOUNT_NO")
+	private String accountNumber;
+	
+	@NotNull
+	@Column(name = "IFSC_CODE")
+	private String ifscCode;
+	
+	@Column(name = "ADDRESS")
+	private String address;
+	
+	@Column(name = "MOBILE")
+	private String mobileNo;
+	
+	@Column(name = "ACC_TYPE")
+	private String acccountType;
+	
 	@Column(name = "STATUS")
 	private String status;
-	
-	@NotNull
-	@Column(name = "LOGON_ID")
-	private String logonId;
-	
-	@NotNull
-	@Column(name = "PASSWORD")
-	private String password;
-	
 	
 	
 	@Override
@@ -73,7 +87,7 @@ public class Client implements Serializable{
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Client other = (Client) obj;
+		BankAccount other = (BankAccount) obj;
 		if (id == null) {
 			if (other.id != null)
 				return false;

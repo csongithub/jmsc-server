@@ -5,6 +5,7 @@
 package com.jmsc.app.rest;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -53,5 +54,11 @@ public class CreditFacilityEndPoint {
 	ResponseEntity<List<CreditFacilityDTO>> getAllByFacilityType(@RequestParam("clientId") Long clientId, @RequestParam("facilityType") EFacility facilityType){
 		List<CreditFacilityDTO> list = service.getAllByFacilityType(clientId, facilityType);
 		return ResponseEntity.ok(list);
+	}
+	
+	
+	@GetMapping("/expiry")
+	ResponseEntity<Map<Long, List<CreditFacilityDTO>>> expiry(){
+		return ResponseEntity.ok(service.evaluateExpiry());
 	}
 }

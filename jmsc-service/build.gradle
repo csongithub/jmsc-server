@@ -12,11 +12,13 @@ dependencies {
 	implementation project(':jmsc-common')
     implementation project(':jmsc-entity')
     implementation project(':jmsc-persistence')
-    
     implementation project(':jmsc-enums')
+    implementation project(':jmsc-config')
     
     implementation 'org.apache.poi:poi-ooxml:5.1.0'
     implementation 'com.squareup.okhttp3:okhttp:3.14.6'
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+    implementation 'org.apache.velocity:velocity:1.7'
 }
 
 

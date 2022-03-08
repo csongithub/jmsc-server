@@ -52,5 +52,11 @@ public class CreditFacilityDTO implements Serializable{
 	private Long pledgedId;
 	
 	private EPledgedType pledgedType;
+	
+	private Long expiringInDays;
+	
+	private boolean hasExpired;
+	
+	private String alertMessage;
 
 }

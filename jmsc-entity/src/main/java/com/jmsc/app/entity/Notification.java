@@ -1,15 +1,18 @@
 /**
  * 
  */
-package com.jmsc.app.entity.users;
+package com.jmsc.app.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import com.jmsc.app.common.enums.ENotificationType;
 import com.sun.istack.NotNull;
 
 import lombok.Data;
@@ -20,13 +23,11 @@ import lombok.Data;
  */
 @Data
 @Entity
-@Table(name = "BANK_ACCOUNT")
-public class BankAccount extends BaseEntity{
-
-	/**
+@Table(name = "NOTIFICATION")
+public class Notification extends BaseEntity{/**
 	 * 
 	 */
-	private static final long serialVersionUID = 4318031963046510465L;
+	private static final long serialVersionUID = 1591809442603739257L;
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,38 +39,9 @@ public class BankAccount extends BaseEntity{
 	private Long clientId;
 	
 	@NotNull
-	@Column(name = "ACCOUNT_HOLDER")
-	private String accountHolder;
-	
-	@Column(name = "BANK_NAME")
-	private String bankName;
-	
-	@Column(name = "BRANCH_NAME")
-	private String branchName;
-	
-	@Column(name = "BRANCH_CODE")
-	private String branchCode;
-	
-	@NotNull
-	@Column(name = "ACCOUNT_NO")
-	private String accountNumber;
-	
-	@NotNull
-	@Column(name = "IFSC_CODE")
-	private String ifscCode;
-	
-	@Column(name = "ADDRESS")
-	private String address;
-	
-	@Column(name = "MOBILE")
-	private String mobileNo;
-	
-	@Column(name = "ACC_TYPE")
-	private String acccountType;
-	
-	@Column(name = "STATUS")
-	private String status;
-	
+	@Enumerated(EnumType.STRING)
+	@Column(name = "TYPE")
+	private ENotificationType type;
 	
 	@Override
 	public int hashCode() {
@@ -87,7 +59,7 @@ public class BankAccount extends BaseEntity{
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		BankAccount other = (BankAccount) obj;
+		Notification other = (Notification) obj;
 		if (id == null) {
 			if (other.id != null)
 				return false;

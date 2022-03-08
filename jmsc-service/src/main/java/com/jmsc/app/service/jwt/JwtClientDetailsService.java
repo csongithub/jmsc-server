@@ -19,7 +19,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
-import com.jmsc.app.entity.users.Client;
+import com.jmsc.app.entity.Client;
 import com.jmsc.app.repository.ClientRepository;
 
 import lombok.extern.slf4j.Slf4j;

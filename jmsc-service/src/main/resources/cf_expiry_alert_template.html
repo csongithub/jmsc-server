@@ -1,0 +1,48 @@
+<html>
+<head>
+<style>
+table, th, td {
+  border: 1px solid black;
+  border-collapse: collapse;
+  text-align: center;
+}
+th {
+  background-color: green;
+  color: white
+}
+</style>
+</head>
+
+<body>
+
+<h3><p style="color:red;">Attention !</p></h3>
+<br>
+
+<b><p>$MESSAGE</p></b>
+
+<table style="width:100%">
+	<thead>
+		<th>Account Number</th>
+		<th>Value</th>
+		<th>Open Date</th>
+		<th>Matyrity Date</th>
+		<th>FacilityType</th>
+		<th>Issuer</th>
+		<th>Branch</th>
+	</thead>
+	<tbody>
+		<tr>
+			<td>$ACCOUNT_NUMBER</td>
+			<td>$VALUE</td>
+			<td>$OPEN_DATE</td>
+			<td>$MATURITY_DATE</td>
+			<td>$TYPE</td>
+			<td>$ISSUER</td>
+			<td>$BRANCH</td>
+		</tr>
+	</tbody>
+</table>
+<br>
+<p><i>This is a system generated mail, kindly do not reply.</i></p>
+</html>
+</body>

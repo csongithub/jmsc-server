@@ -79,7 +79,4 @@ public class PrimaryDataSourceConfig extends DataSourceConfig {
 	public void setConnectionTestQuery(String connectionTestQuery) {
 		this.connectionTestQuery = connectionTestQuery;
 	}
-
-	
-	
 }

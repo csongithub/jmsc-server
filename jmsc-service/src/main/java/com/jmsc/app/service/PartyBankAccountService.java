@@ -29,7 +29,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.jmsc.app.common.dto.PartyBankAccountDTO;
 import com.jmsc.app.common.util.ObjectMapperUtil;
-import com.jmsc.app.entity.users.PartyBankAccount;
+import com.jmsc.app.entity.PartyBankAccount;
 import com.jmsc.app.repository.PartyBankAccountRepository;
 
 import lombok.extern.slf4j.Slf4j; 

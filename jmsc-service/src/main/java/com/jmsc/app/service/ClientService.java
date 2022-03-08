@@ -12,7 +12,7 @@ import com.jmsc.app.common.dto.ClientDTO;
 import com.jmsc.app.common.rqrs.UpdateClientBasicInfoRequest;
 import com.jmsc.app.common.util.ObjectMapperUtil;
 import com.jmsc.app.common.util.Strings;
-import com.jmsc.app.entity.users.Client;
+import com.jmsc.app.entity.Client;
 import com.jmsc.app.repository.ClientRepository;
 import com.jmsc.app.service.jwt.JwtClientDetailsService;
 import com.jmsc.app.service.jwt.JwtTokenUtil;
@@ -76,6 +76,19 @@ public class ClientService {
 		Optional<Client> optionalClient= repository.findByLogonId(logonId);
 		if(optionalClient.isPresent()) {
 			ClientDTO dto = ObjectMapperUtil.map(optionalClient.get(), ClientDTO.class);
+			//Do not ever call below method, it will block login
+			//dto.removePassword();
+			return dto;
+		} else 
+			return null;
+	}
+	
+	
+	public ClientDTO getClientById(Long id) {
+		Optional<Client> optionalClient= repository.findById(id);
+		if(optionalClient.isPresent()) {
+			ClientDTO dto = ObjectMapperUtil.map(optionalClient.get(), ClientDTO.class);
+			dto.removePassword();
 			return dto;
 		} else 
 			return null;

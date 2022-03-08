@@ -1,7 +1,9 @@
 /**
  * 
  */
-package com.jmsc.app.entity.users;
+package com.jmsc.app.entity;
+
+import java.io.Serializable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -20,30 +22,41 @@ import lombok.Data;
  */
 @Data
 @Entity
-@Table(name = "PAYMENT_DRAFT")
-public class PaymentDraft extends BaseEntity {
+@Table(name = "CLIENT")
+public class Client implements Serializable{
+	
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -6703228999839709912L;
-	
+	private static final long serialVersionUID = 7602159515398294803L;
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "ID")
 	private Long id;
 	
 	@NotNull
-	@Column(name = "CLIENT_ID")
-	private Long clientId;
+	@Column(name = "NAME")
+	private String name;
+	
+	@NotNull
+	@Column(name = "DISP_NAME")
+	private String displayName;
 	
 	@NotNull
 	@Column(name = "STATUS")
 	private String status;
 	
 	@NotNull
-	@Column(name = "DRAFT")
-	private byte[] draft;
+	@Column(name = "LOGON_ID")
+	private String logonId;
 	
+	@NotNull
+	@Column(name = "PASSWORD")
+	private String password;
+	
+	@Column(name = "RECIPIENTS")
+	private String recipients;
 	
 	
 	
@@ -64,7 +77,7 @@ public class PaymentDraft extends BaseEntity {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		PaymentDraft other = (PaymentDraft) obj;
+		Client other = (Client) obj;
 		if (id == null) {
 			if (other.id != null)
 				return false;

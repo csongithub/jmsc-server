@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.jmsc.app.common.dto.BankAccountDTO;
 import com.jmsc.app.common.util.ObjectMapperUtil;
-import com.jmsc.app.entity.users.BankAccount;
+import com.jmsc.app.entity.BankAccount;
 import com.jmsc.app.repository.BankAccountRepository;
 
 import lombok.extern.slf4j.Slf4j;

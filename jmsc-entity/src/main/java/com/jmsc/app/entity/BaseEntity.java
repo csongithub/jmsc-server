@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.jmsc.app.entity.users;
+package com.jmsc.app.entity;
 
 import java.io.Serializable;
 import java.util.Date;

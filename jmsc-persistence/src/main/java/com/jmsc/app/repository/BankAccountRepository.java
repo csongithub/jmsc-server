@@ -9,7 +9,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 //import org.springframework.data.jpa.repository.Query;
 
-import com.jmsc.app.entity.users.BankAccount;
+import com.jmsc.app.entity.BankAccount;
 
 /**
  * @author Chandan

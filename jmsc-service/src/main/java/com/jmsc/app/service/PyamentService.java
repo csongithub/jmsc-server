@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 import com.jmsc.app.common.dto.PaymentDraftDTO;
 import com.jmsc.app.common.rqrs.GetPaymentsByDateRequest;
 import com.jmsc.app.common.rqrs.Range;
-import com.jmsc.app.entity.users.PaymentDraft;
+import com.jmsc.app.entity.PaymentDraft;
 import com.jmsc.app.repository.PaymentDraftRepository;
 
 import lombok.extern.slf4j.Slf4j;

@@ -8,7 +8,7 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.jmsc.app.entity.users.PaymentDraft;
+import com.jmsc.app.entity.PaymentDraft;
 
 /**
  * @author Chandan

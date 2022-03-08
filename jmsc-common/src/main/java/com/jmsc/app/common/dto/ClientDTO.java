@@ -32,6 +32,9 @@ public class ClientDTO implements Serializable {
 	@ApiModelProperty(name = "password", example = "1", notes = "Password of the client", required = true)
 	private String password;
 	
+	@ApiModelProperty(name = "recipients", example = "jaimaa072@gmail.com", notes = "Email recipients of the client", required = false)
+	private String recipients;
+	
 	
 	public void removePassword() {
 		this.password = "";
