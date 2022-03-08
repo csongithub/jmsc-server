@@ -30,7 +30,7 @@ import com.jmsc.app.service.ClientService;
 import com.jmsc.app.service.CreditFacilityService;
 import com.jmsc.app.service.email.Body;
 import com.jmsc.app.service.email.Envelop;
-import com.jmsc.app.service.email.JMSCEMailServcies;
+import com.jmsc.app.service.email.JMSCEMailServices;
 import com.jmsc.app.service.resource.JMSCResource;
 
 import lombok.extern.slf4j.Slf4j;
@@ -52,7 +52,7 @@ public class CreditFacilityScheduler {
 	private CreditFacilityService cfService;
 	
 	@Autowired
-	private JMSCEMailServcies emailService;
+	private JMSCEMailServices emailService;
 	
 	@Autowired
 	private ClientService clientService;

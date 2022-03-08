@@ -21,7 +21,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Service
-public class JMSCEMailServcies {
+public class JMSCEMailServices {
 	
 	@Autowired
 	private JavaMailSender javaMailSender;
