@@ -147,6 +147,9 @@ public class ClientService {
 			if(Strings.isNotNullOrEmpty(request.getDisplayName())) {
 				client.setDisplayName(request.getDisplayName());
 			}
+			if(Strings.isNotNullOrEmpty(request.getRecipients())) {
+				client.setRecipients(request.getRecipients());
+			}
 			Client savedClient = repository.save(client);
 			ClientDTO dto = ObjectMapperUtil.map(savedClient, ClientDTO.class);
 			return dto;

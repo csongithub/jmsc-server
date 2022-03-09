@@ -26,5 +26,7 @@ public class UpdateClientBasicInfoRequest implements Serializable{/**
 	private String name;
 	
 	private String displayName;
+	
+	private String recipients;
 
 }
