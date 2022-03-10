@@ -26,7 +26,8 @@ CREATE TABLE jmsc.CLIENT
     STATUS 			character varying(200) NOT NULL,
     LOGON_ID 		character varying(200) NOT NULL UNIQUE,
     PASSWORD		character varying(200) NOT NULL,
-    RECIPIENTS		character varying(200)
+    RECIPIENTS		character varying(200),
+    
     CONSTRAINT client_key PRIMARY KEY (ID)
 )
 WITH (
