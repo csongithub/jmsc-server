@@ -34,6 +34,7 @@ CREATE TABLE jmsc.BID
     BC_PAYBLE_AT		character varying(50) NOT NULL,
     EMD_AMOUNT			integer NOT NULL,
     EMD_IN_FAVOUR		character varying(100) NOT NULL,
+    EMD_PAYBLE_AT		character varying(50) NOT NULL,
     BANK_CERTIFICATE	integer,
     WORK_PERIOD			integer NOT NULL,
     BID_VALIDITY		integer NOT NULL,

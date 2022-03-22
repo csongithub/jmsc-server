@@ -93,6 +93,10 @@ public class Bid extends BaseEntity {
 	@Column(name = "EMD_IN_FAVOUR")
 	private String 	emdInFavourOf;
 	
+	@NotNull
+	@Column(name = "EMD_PAYBLE_AT")
+	private String emdPaybleAt;
+	
 	@Column(name = "BANK_CERTIFICATE")
 	private Long 	bankCertificate;
 	

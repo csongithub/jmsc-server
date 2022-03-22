@@ -32,7 +32,7 @@ public class BidEndPoint {
 	private BidService service;
 	
 	@PostMapping("/create_bid")
-	public ResponseEntity<BidDTO> addClient(@RequestBody BidDTO bidDTO){
+	public ResponseEntity<BidDTO> createBid(@RequestBody BidDTO bidDTO){
 		BidDTO dto = service.createBid(bidDTO);
 		return ResponseEntity.ok(dto);
 	}

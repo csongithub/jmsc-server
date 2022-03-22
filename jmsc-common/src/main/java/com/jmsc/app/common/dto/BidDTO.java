@@ -56,7 +56,8 @@ public class BidDTO implements Serializable{
 
 	private String 	emdInFavourOf;
 	
-
+	private String emdPaybleAt;
+	
 	private Long 	bankCertificate;
 	
 
