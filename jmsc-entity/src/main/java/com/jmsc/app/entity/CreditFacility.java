@@ -86,13 +86,18 @@ public class CreditFacility extends BaseEntity{
 	@Column(name = "IS_PLEDGED")
 	private Boolean isPledged;
 	
+	/**
+	 * Linked BID ID
+	 */
 	@Nullable
 	@Column(name = "PLEDGED_ID")
 	private Long pledgedId;
 	
 	@Nullable
+	@Enumerated(EnumType.STRING)
 	@Column(name = "PLEDGED_TYPE")
 	private EPledgedType pledgedType;
+	
 	
 	
 	

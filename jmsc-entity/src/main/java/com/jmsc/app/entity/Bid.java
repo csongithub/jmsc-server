@@ -109,17 +109,17 @@ public class Bid extends BaseEntity {
 	private Long	bidValidity;
 	
 	@NotNull
-	@Temporal(TemporalType.TIMESTAMP)
+	@Temporal(TemporalType.DATE)
 	@Column(name = "BID_START_DATE")
 	private Date	bidStartDate;
 	
 	@NotNull
-	@Temporal(TemporalType.TIMESTAMP)
+	@Temporal(TemporalType.DATE)
 	@Column(name = "BID_END_DATE")
 	private Date	bidEndDate;
 	
 	@NotNull
-	@Temporal(TemporalType.TIMESTAMP)
+	@Temporal(TemporalType.DATE)
 	@Column(name = "BID_OPENING_DATE")
 	private Date	bidOpeningDate;
 	

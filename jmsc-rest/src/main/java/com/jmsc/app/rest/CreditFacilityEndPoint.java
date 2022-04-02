@@ -50,6 +50,14 @@ public class CreditFacilityEndPoint {
 	}
 	
 	
+	
+	@GetMapping("/free_facilities/{client_id}")
+	ResponseEntity<List<CreditFacilityDTO>> getFreeFacilities(@PathVariable("client_id") Long clientId){
+		List<CreditFacilityDTO> list = service.getFreeFacilities(clientId);
+		return ResponseEntity.ok(list);
+	}
+	
+	
 	@GetMapping("/all_by_facility_type")
 	ResponseEntity<List<CreditFacilityDTO>> getAllByFacilityType(@RequestParam("clientId") Long clientId, @RequestParam("facilityType") EFacility facilityType){
 		List<CreditFacilityDTO> list = service.getAllByFacilityType(clientId, facilityType);

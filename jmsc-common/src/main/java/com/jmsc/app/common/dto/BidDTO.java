@@ -44,7 +44,6 @@ public class BidDTO implements Serializable{
 
 	private Long 	workValue;
 	
-
 	private Long 	biddingCost;
 	
 	private String 	bcInFavourOf;
@@ -53,10 +52,9 @@ public class BidDTO implements Serializable{
 	
 	private Long 	emdAmount;
 	
-
 	private String 	emdInFavourOf;
 	
-	private String emdPaybleAt;
+	private String 	emdPaybleAt;
 	
 	private Long 	bankCertificate;
 	

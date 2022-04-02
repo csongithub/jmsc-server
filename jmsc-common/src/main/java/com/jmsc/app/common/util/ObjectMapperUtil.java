@@ -12,6 +12,11 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.modelmapper.convention.MatchingStrategies;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 /**
  * @author chandan
  *
@@ -57,6 +62,33 @@ public class ObjectMapperUtil {
     public static final <T> List<T> mapListType(T dtoType, List<? extends Object> sourceType)
     {
     	return  new ModelMapper().map(sourceType,createListType(dtoType));
+    }
+ 
+    
+    
+    
+    public static <D> D object(String json, Class<D> outClass) {
+    	if(json == null)
+    		return null;
+		try {
+			return new ObjectMapper().readValue(json, outClass);
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+    
+    
+    
+    public static String json(Object object) {
+    	if(object == null)
+    		return null;
+    	try {
+			return new ObjectMapper().writeValueAsString(object);
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+		return null;
     }
 
 }

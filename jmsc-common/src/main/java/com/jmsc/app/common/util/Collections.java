@@ -11,6 +11,11 @@ import java.util.List;
  */
 public class Collections {
 	
+	public static final boolean isNotNullOrEmpty(List list) {
+		return !isNullOrEmpty(list);
+	}
+	
+	
 	public static final boolean isNullOrEmpty(List list) {
 		if(list == null || list.isEmpty()) {
 			return true;

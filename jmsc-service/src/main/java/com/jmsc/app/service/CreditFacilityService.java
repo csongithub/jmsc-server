@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.map.HashedMap;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,6 @@ import com.jmsc.app.common.enums.EFacilityIssuerType;
 import com.jmsc.app.common.util.Collections;
 import com.jmsc.app.common.util.ObjectMapperUtil;
 import com.jmsc.app.config.jmsc.JmscProperties;
-import com.jmsc.app.entity.BankAccount;
 import com.jmsc.app.entity.Client;
 import com.jmsc.app.entity.CreditFacility;
 import com.jmsc.app.repository.ClientRepository;
@@ -109,6 +109,21 @@ public class CreditFacilityService {
 			return new ArrayList<CreditFacilityDTO>();
 		}else {
 			List<CreditFacilityDTO> cfDTOList =  ObjectMapperUtil.mapAll(cfList, CreditFacilityDTO.class);
+			return cfDTOList;
+		}
+	}
+	
+	
+	
+	public List<CreditFacilityDTO> getFreeFacilities(Long clientId){
+		List<CreditFacility> cfList = repository.findAllByClientId(clientId);
+		if(Collections.isNullOrEmpty(cfList)) {
+			return new ArrayList<CreditFacilityDTO>();
+		}else {
+			List<CreditFacilityDTO> cfDTOList =  ObjectMapperUtil.mapAll(cfList, CreditFacilityDTO.class)
+																	.stream().map(cf -> !cf.getIsPledged() ? cf : null)
+																	.collect(Collectors.toList());
+			cfDTOList.removeAll(java.util.Collections.singletonList(null));
 			return cfDTOList;
 		}
 	}
