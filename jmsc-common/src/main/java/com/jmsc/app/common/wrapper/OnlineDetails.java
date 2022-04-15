@@ -28,5 +28,12 @@ public class OnlineDetails implements Serializable {
 	 */
 	private String paymentMode;
 	
+	/**
+	 * detail of account from which payment has been made
+	 */
+	private String accountDetail;
+	/**
+	 * Value {SUBMITTED, RETURNED}
+	 */
 	private String status; 
 }

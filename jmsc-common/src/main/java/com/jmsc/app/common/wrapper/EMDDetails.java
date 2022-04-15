@@ -18,6 +18,7 @@ public class EMDDetails implements Serializable{
 	 */
 	private String emdMode;
 	
+	//Offline EMD Details 
 	List<EMDWrapper> emdList;
 	
 	private OnlineDetails onlineDetails;

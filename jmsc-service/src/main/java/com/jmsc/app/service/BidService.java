@@ -89,6 +89,12 @@ public class BidService {
 			bidCost.setClientId(bidCostDTO.getClientId());
 		}
 		
+		if(bidCostDTO.getEmdDetails() != null && "online".equalsIgnoreCase(bidCostDTO.getEmdDetails().getEmdMode()))
+			bidCostDTO.getEmdDetails().setEmdList(null);
+		
+		if(bidCostDTO.getEmdDetails() != null && "offline".equalsIgnoreCase(bidCostDTO.getEmdDetails().getEmdMode()))
+			bidCostDTO.getEmdDetails().setOnlineDetails(null);
+		
 		String feeDetailsJson = ObjectMapperUtil.json(bidCostDTO.getFeeDetails());
 		String emdDetsilsJson = ObjectMapperUtil.json(bidCostDTO.getEmdDetails());
 		String otherBiddingCost = bidCostDTO.getOtherCost();
@@ -102,7 +108,7 @@ public class BidService {
 		bidCostDTO.setId(bidCost.getId());
 		
 		//TODO: Mark EMD as pleased
-		if(bidCostDTO.getEmdDetails() != null)
+		if(bidCostDTO.getEmdDetails() != null && "offline".equalsIgnoreCase(bidCostDTO.getEmdDetails().getEmdMode()))
 			markEMDSubmitted(bidCostDTO.getEmdDetails(), EPledgedType.BID_SECURITY, bidCostDTO.getBidId());
 			
 		return bidCostDTO;
