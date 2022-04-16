@@ -24,4 +24,9 @@ public class EMDDetails implements Serializable{
 	private OnlineDetails onlineDetails;
 	
 	private String comments;
+	
+	/**
+	 * {SUBMITTED, RETURNED}
+	 */
+	private String status;
 }

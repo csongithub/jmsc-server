@@ -5,11 +5,14 @@ package com.jmsc.app.service;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import com.jmsc.app.common.dto.BidCostDTO;
 import com.jmsc.app.common.dto.BidDTO;
@@ -17,10 +20,12 @@ import com.jmsc.app.common.dto.CreditFacilityDTO;
 import com.jmsc.app.common.enums.EBidStatus;
 import com.jmsc.app.common.enums.EPledgedType;
 import com.jmsc.app.common.util.Collections;
+import com.jmsc.app.common.util.DateUtils;
 import com.jmsc.app.common.util.ObjectMapperUtil;
 import com.jmsc.app.common.wrapper.EMDDetails;
 import com.jmsc.app.common.wrapper.EMDWrapper;
 import com.jmsc.app.common.wrapper.FeeDetails;
+import com.jmsc.app.common.wrapper.OtherBidCost;
 import com.jmsc.app.entity.Bid;
 import com.jmsc.app.entity.BidCost;
 import com.jmsc.app.entity.CreditFacility;
@@ -161,7 +166,7 @@ public class BidService {
 		}
 		return Boolean.TRUE;
 	}
-	
+
 	
 	
 	
@@ -195,4 +200,66 @@ public class BidService {
 		return bidCostDTO;
 	}
 	
+	
+	
+	public FeeDetails saveBidFee(@RequestBody FeeDetails  feeDetails, Long clientId, Long bidId) {
+
+		BidCost bidCost = new BidCost();
+		
+		Optional<BidCost> optional = bidCostRepository.findByBidId(bidId);
+		
+		if(optional.isPresent()) {
+			bidCost  = optional.get();
+		} else {
+			bidCost.setBidId(bidId);
+			bidCost.setClientId(clientId);
+		}
+		
+		if(feeDetails != null && "online".equalsIgnoreCase(feeDetails.getFeeMode()))
+			feeDetails.setOfflineFeeDetails(null);
+		
+		if(feeDetails != null && "offline".equalsIgnoreCase(feeDetails.getFeeMode())) {
+			feeDetails.setOnlineFeeDetails(null);
+		}
+			
+		
+		String feeDetailsJson = ObjectMapperUtil.json(feeDetails);
+		
+		bidCost.setFeeDetails(feeDetailsJson != null ? feeDetailsJson.getBytes(StandardCharsets.UTF_8) : null);
+		
+		bidCost = bidCostRepository.save(bidCost);
+		
+		return feeDetails;
+	}
+	
+	public boolean clearFee(Long bidId) {
+		Optional<BidCost> optional = bidCostRepository.findByBidId(bidId);
+		
+		if(optional.isPresent()) {
+			//First Release All EMD (Credit Facility
+			BidCost bidCost = optional.get();
+			bidCost.setFeeDetails(null);
+			bidCostRepository.save(bidCost);
+		}
+		return Boolean.TRUE;
+	}
+	
+	public boolean saveOtherCost(OtherBidCost otherCost) {
+		BidCost bidCost = new BidCost();
+		
+		Optional<BidCost> optional = bidCostRepository.findByBidId(otherCost.getBidId());
+		
+		if(optional.isPresent()) {
+			bidCost  = optional.get();
+		} else {
+			bidCost.setBidId(otherCost.getBidId());
+			bidCost.setClientId(otherCost.getClientId());
+		}
+		
+		String otherCostJson = otherCost.getOtherCostJson();
+		
+		bidCost.setOtherBiddingCost(otherCostJson != null ? otherCostJson.getBytes(StandardCharsets.UTF_8) : null);
+		bidCost = bidCostRepository.save(bidCost);
+		return Boolean.TRUE;
+	}
 }

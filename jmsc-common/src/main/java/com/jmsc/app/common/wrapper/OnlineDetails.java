@@ -20,7 +20,9 @@ public class OnlineDetails implements Serializable {
 	private static final long serialVersionUID = 4715255836356988772L;
 	
 	private Long amount;
-	
+	/**
+	 * UTR or any transaction reference number
+	 */
 	private String transactionNumber;
 	
 	/**
