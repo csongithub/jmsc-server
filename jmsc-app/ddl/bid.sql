@@ -22,6 +22,8 @@ CREATE TABLE jmsc.BID
 (
     ID 					integer NOT NULL DEFAULT nextval('jmsc.bid_seq'::regclass),
     CLIENT_ID 			integer NOT NULL,
+    DISPLAY_NAME		character varying(200) NOT NULL,
+    SOURCE_SITE			character varying(100) NOT NULL,
     AUTHORITY			character varying(200) NOT NULL,
     NIT					character varying(200) NOT NULL,
     NIT_DATE			date NOT NULL,

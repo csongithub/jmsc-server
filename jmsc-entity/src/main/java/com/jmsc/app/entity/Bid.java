@@ -16,6 +16,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import com.jmsc.app.common.enums.EBidSourceSite;
 import com.jmsc.app.common.enums.EBidStatus;
 import com.sun.istack.NotNull;
 
@@ -43,6 +44,15 @@ public class Bid extends BaseEntity {
 	@NotNull
 	@Column(name = "CLIENT_ID")
 	private Long clientId;
+	
+	@NotNull
+	@Column(name = "DISPLAY_NAME")
+	private String displayName;
+	
+	@NotNull
+	@Column(name = "SOURCE_SITE")
+	@Enumerated(EnumType.STRING)
+	private EBidSourceSite sourceSite;
 	
 	@NotNull
 	@Column(name = "AUTHORITY")

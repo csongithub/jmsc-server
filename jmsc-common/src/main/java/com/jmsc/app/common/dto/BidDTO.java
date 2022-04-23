@@ -6,6 +6,7 @@ package com.jmsc.app.common.dto;
 import java.io.Serializable;
 import java.util.Date;
 
+import com.jmsc.app.common.enums.EBidSourceSite;
 import com.jmsc.app.common.enums.EBidStatus;
 
 import lombok.Data;
@@ -27,6 +28,10 @@ public class BidDTO implements Serializable{
 	private Long id;
 	
 	private Long clientId;
+	
+	private String displayName;
+	
+	private EBidSourceSite sourceSite;
 	
 	private String bidAuthority;
 	
