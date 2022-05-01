@@ -161,13 +161,9 @@ public class BidService {
 		if(bidCostDTO.getEmdDetails() != null && "offline".equalsIgnoreCase(bidCostDTO.getEmdDetails().getEmdMode()))
 			bidCostDTO.getEmdDetails().setOnlineDetails(null);
 		
-		String feeDetailsJson = ObjectMapperUtil.json(bidCostDTO.getFeeDetails());
 		String emdDetsilsJson = ObjectMapperUtil.json(bidCostDTO.getEmdDetails());
-		String otherBiddingCost = bidCostDTO.getOtherCost();
 		
-		bidCost.setFeeDetails(feeDetailsJson != null ? feeDetailsJson.getBytes(StandardCharsets.UTF_8) : null);
 		bidCost.setEmdDetails(emdDetsilsJson != null ? emdDetsilsJson.getBytes(StandardCharsets.UTF_8) : null);
-		bidCost.setOtherBiddingCost(otherBiddingCost != null ? otherBiddingCost.getBytes(StandardCharsets.UTF_8) : null);
 		
 		bidCost = bidCostRepository.save(bidCost);
 		
@@ -360,11 +356,13 @@ public class BidService {
 			Optional<BidCost> optionalCost = bidCostRepository.findByBidId(bidId);
 			if(optionalCost.isPresent()) {
 				BidCost bidCost = optionalCost.get();
-				String emdDetailsJson = new String(bidCost.getEmdDetails(), StandardCharsets.UTF_8);
-				EMDDetails eMDDetails = ObjectMapperUtil.object(emdDetailsJson, EMDDetails.class);
+				String emdDetailsJson = bidCost.getEmdDetails() != null ? new String(bidCost.getEmdDetails(), StandardCharsets.UTF_8) : null;
 				
-				this.releaseEMD(eMDDetails);
-				
+				if(Strings.isNotNullOrEmpty(emdDetailsJson)) {
+					EMDDetails eMDDetails = ObjectMapperUtil.object(emdDetailsJson, EMDDetails.class);
+					
+					this.releaseEMD(eMDDetails);
+				}
 				bidCostRepository.delete(bidCost);
 			}
 			repository.delete(optional.get());
