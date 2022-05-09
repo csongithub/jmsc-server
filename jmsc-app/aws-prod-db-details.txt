@@ -1,0 +1,9 @@
+instance name:		jmsc-postgres-prod-db
+master username:	jmscprod
+master password:	welcome1
+databae:			jmscproddb
+vpc group:			jmsc-vpc-security-group
+
+
+connection url:		jmsc-postgres-prod-db.c3rzkh5dq4pn.ap-south-1.rds.amazonaws.com
+port:				5432
