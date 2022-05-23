@@ -7,7 +7,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
+
+import com.jmsc.app.config.jmsc.ServiceLocator;
 
 
 
@@ -25,6 +28,7 @@ public class JMSCApplication {
 	public static void main(String[] args) {
 		System.out.println("Java Version- " + System.getProperty("java.version"));
 		System.setProperty("spring.devtools.restart.enabled", "false");
-		SpringApplication.run(JMSCApplication.class, args);
+		ConfigurableApplicationContext ctx = SpringApplication.run(JMSCApplication.class, args);
+		ServiceLocator.getInstance().initialize(ctx);
 	}
 }
