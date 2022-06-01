@@ -21,6 +21,7 @@ import com.jmsc.app.common.enums.EFacility;
 import com.jmsc.app.common.enums.EFacilityIssuerType;
 import com.jmsc.app.common.util.Collections;
 import com.jmsc.app.common.util.ObjectMapperUtil;
+import com.jmsc.app.common.wrapper.CreditFacilityWrapper;
 import com.jmsc.app.config.jmsc.JmscProperties;
 import com.jmsc.app.entity.Client;
 import com.jmsc.app.entity.CreditFacility;
@@ -127,6 +128,92 @@ public class CreditFacilityService {
 			return cfDTOList;
 		}
 	}
+	
+	
+	/**
+	 * Gives available Fix Deposit(s) list that can be used or hold against in a Bank Guarantee Group.
+	 * There are two Special Conditions for these deposits.
+	 * 1. FD should not be pledged in any bid as security or agreement
+	 * 2. FD should not be already linked to any other BG Group
+	 * @param clientId
+	 * @return
+	 */
+	public List<CreditFacilityDTO> getApplicableDepositForBgGroup(Long clientId){
+		List<CreditFacility> all = repository.findAllByClientIdAndFacilityType(clientId, EFacility.FD);
+		if(Collections.isNullOrEmpty(all)) {
+			return new ArrayList<CreditFacilityDTO>();
+		}else {
+			//Filter and remove all pledged Fix Deposits from list
+			all = all.stream().map(cf -> !cf.getIsPledged() ? cf : null).collect(Collectors.toList());
+			all.removeAll(java.util.Collections.singletonList(null));
+			
+			//Now from the remaining list filter and remove all those Fix Deposits which are already linked to some other or same BG Group
+			all = all.stream().map(cf -> cf.getBgGroupId() == null ? cf : null).collect(Collectors.toList());
+			all.removeAll(java.util.Collections.singletonList(null));
+			
+			List<CreditFacilityDTO> depositList = ObjectMapperUtil.mapAll(all, CreditFacilityDTO.class);
+			
+			return depositList;
+		}
+	}
+	
+	
+	/**
+	 * Gives available Bank Guarantee(s) list that is issued from a Bank Guarantee Group.
+	 * There is only one Special Conditions for these guarantees that the BG should not be 
+	 * already linked to any BG Group.
+	 * @param clientId
+	 * @return
+	 */
+	public List<CreditFacilityDTO> getApplicableBankGuaranteeBgGroup(Long clientId){
+		List<CreditFacility> all = repository.findAllByClientIdAndFacilityType(clientId, EFacility.BG);
+		if(Collections.isNullOrEmpty(all)) {
+			return new ArrayList<CreditFacilityDTO>();
+		}else {
+			
+			//Filter and remove all those Bank Guarantee which are already linked to some other or same BG Group
+			all = all.stream().map(cf -> cf.getBgGroupId() == null ? cf : null).collect(Collectors.toList());
+			all.removeAll(java.util.Collections.singletonList(null));
+			
+			List<CreditFacilityDTO> depositList = ObjectMapperUtil.mapAll(all, CreditFacilityDTO.class);
+			
+			return depositList;
+		}
+	}
+	
+	
+	/**
+	 * This method is used to get the list of deposits & guarantees that are linked to a specific bank 
+	 * guarantee group.
+	 * 
+	 * All deposits which are hold against/in a BG Group
+	 * All guarantees that are issued in this BG Group
+	 * 
+	 * @param clientId
+	 * @param groupId
+	 * @return
+	 */
+	public CreditFacilityWrapper getLinkedFacilitiesForBankGuaranteeGroup(Long clientId, Long groupId) {
+		
+		List<CreditFacility> allEntity = repository.findAllByClientIdAndBgGroupId(clientId, groupId);
+		
+		List<CreditFacilityDTO> all = ObjectMapperUtil.mapAll(allEntity, CreditFacilityDTO.class);
+		
+		List<CreditFacilityDTO> deposits = all.stream().map(cf -> cf.getFacilityType().equals(EFacility.FD) ? cf : null).collect(Collectors.toList());
+		
+		List<CreditFacilityDTO> guarantees = all.stream().map(cf -> cf.getFacilityType().equals(EFacility.BG) ? cf : null).collect(Collectors.toList());
+		
+		CreditFacilityWrapper wrapper = new CreditFacilityWrapper();
+		wrapper.setDepositList(Collections.isNotNullOrEmpty(deposits) ? deposits : new ArrayList<CreditFacilityDTO>());
+		wrapper.setGuaranteeList(Collections.isNotNullOrEmpty(guarantees) ? guarantees : new ArrayList<CreditFacilityDTO>());
+		
+		return wrapper;
+	}
+	
+	
+	
+	
+	
 	
 	public Map<Long, List<CreditFacilityDTO>> evaluateExpiry(){
 		log.debug("Evaluating CF Expiry");

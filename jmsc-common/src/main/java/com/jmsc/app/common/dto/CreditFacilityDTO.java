@@ -58,5 +58,6 @@ public class CreditFacilityDTO implements Serializable{
 	private boolean hasExpired;
 	
 	private String alertMessage;
-
+	
+	private Long bgGroupId;
 }

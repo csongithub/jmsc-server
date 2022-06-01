@@ -8,5 +8,5 @@ package com.jmsc.app.common.enums;
  *
  */
 public enum EPledgedType {
-	BID_SECURITY, AGREEMENT
+	BID_SECURITY, AGREEMENT, BG_GROUP
 }

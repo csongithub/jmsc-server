@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.jmsc.app.common.dto.CreditFacilityDTO;
 import com.jmsc.app.common.enums.EFacility;
+import com.jmsc.app.common.wrapper.CreditFacilityWrapper;
 import com.jmsc.app.service.CreditFacilityService;
 
 import io.swagger.annotations.Api;
@@ -56,6 +57,7 @@ public class CreditFacilityEndPoint {
 		List<CreditFacilityDTO> list = service.getFreeFacilities(clientId);
 		return ResponseEntity.ok(list);
 	}
+
 	
 	
 	@GetMapping("/all_by_facility_type")
@@ -65,8 +67,43 @@ public class CreditFacilityEndPoint {
 	}
 	
 	
+	
 	@GetMapping("/expiry")
 	ResponseEntity<Map<Long, List<CreditFacilityDTO>>> expiry(){
 		return ResponseEntity.ok(service.evaluateExpiry());
+	}
+	
+	
+	
+	@GetMapping("/deposits_for_bg_group/{client_id}")
+	ResponseEntity<List<CreditFacilityDTO>> getApplicableDepositForBgGroup(@PathVariable("client_id") Long clientId){
+		List<CreditFacilityDTO> list = service.getApplicableDepositForBgGroup(clientId);
+		return ResponseEntity.ok(list);
+	}
+	
+	
+	
+	@GetMapping("/guarantees_for_bg_group/{client_id}")
+	ResponseEntity<List<CreditFacilityDTO>> getApplicableBankGuaranteeBgGroup(@PathVariable("client_id") Long clientId){
+		List<CreditFacilityDTO> list = service.getApplicableBankGuaranteeBgGroup(clientId);
+		return ResponseEntity.ok(list);
+	}
+	
+	
+	/**
+	 * This method is used to get the list of deposits & guarantees that are linked to a specific bank 
+	 * guarantee group.
+	 * 
+	 * All deposits which are hold against/in a BG Group
+	 * All guarantees that are issued in this BG Group
+	 * 
+	 * @param clientId
+	 * @param groupId
+	 * @return
+	 */
+	@GetMapping("/linked_facilities_for_bg_group/{client_id}/{group_id}")
+	ResponseEntity<CreditFacilityWrapper> getApplicableBankGuaranteeBgGroup(@PathVariable("client_id") Long clientId, @PathVariable("group_id")Long groupId){
+		CreditFacilityWrapper response = service.getLinkedFacilitiesForBankGuaranteeGroup(clientId, groupId);
+		return ResponseEntity.ok(response);
 	}
 }

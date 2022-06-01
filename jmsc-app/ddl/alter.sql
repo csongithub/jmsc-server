@@ -4,3 +4,6 @@ alter table jmsc.PAYMENT_DRAFT add column CLIENT_ID integer NOT NULL DEFAULT 1;
 
 --bid-
 alter table jmsc.CREDIT_FACILITY add column BID_ID integer;
+
+--bg-group-
+alter table jmsc.CREDIT_FACILITY add column BG_GROUP_ID integer;

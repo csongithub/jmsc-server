@@ -82,6 +82,9 @@ public class CreditFacility extends BaseEntity{
 	@Column(name = "FACILITY_TYPE")
 	private EFacility facilityType;
 	
+	/**
+	 * This is 
+	 */
 	@Nullable
 	@Column(name = "IS_PLEDGED")
 	private Boolean isPledged;
@@ -97,6 +100,14 @@ public class CreditFacility extends BaseEntity{
 	@Enumerated(EnumType.STRING)
 	@Column(name = "PLEDGED_TYPE")
 	private EPledgedType pledgedType;
+	
+	/**
+	 * For a Fix Deposit, this is the BG Group Id, in which the FixDeposit is linked/hold
+	 * For a BankGuarantee this is the BG Group in which a bank guarantee belongs to
+	 */
+	@Nullable
+	@Column(name = "BG_GROUP_ID")
+	private Long bgGroupId;
 	
 	
 	
