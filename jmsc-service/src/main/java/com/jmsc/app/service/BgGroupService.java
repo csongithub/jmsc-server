@@ -16,8 +16,8 @@ import com.jmsc.app.common.util.ObjectMapperUtil;
 import com.jmsc.app.common.util.Strings;
 import com.jmsc.app.common.wrapper.BgGroupWrapper;
 import com.jmsc.app.common.wrapper.CreditFacilityWrapper;
-import com.jmsc.app.common.wrapper.LinkBankGuaranteeRequest;
-import com.jmsc.app.common.wrapper.LinkFixDepositRequest;
+import com.jmsc.app.common.wrapper.ManageBankGuaranteeRequest;
+import com.jmsc.app.common.wrapper.ManagerBGGroupDepositRequest;
 import com.jmsc.app.config.jmsc.ServiceLocator;
 import com.jmsc.app.entity.BgGroup;
 import com.jmsc.app.entity.CreditFacility;
@@ -98,9 +98,16 @@ public class BgGroupService {
 	}
 	
 	
-	
-	public BgGroupDTO linkFixDeposit(LinkFixDepositRequest request) throws Throwable {
-		if(!Collections.isNullOrEmpty(request.getFixDeposits())) {
+	/**
+	 * 
+	 * To link a list of fix deposit to a bg group
+	 * 
+	 * @param request
+	 * @return
+	 * @throws Throwable
+	 */
+	public BgGroupDTO manageDeposits(ManagerBGGroupDepositRequest request) throws Throwable {
+		if(Collections.isNullOrEmpty(request.getFixDeposits())) {
 			log.debug("Insufficient Data");
 			throw new Exception("No Fix Deposit(s) Found");
 		}
@@ -110,11 +117,22 @@ public class BgGroupService {
 			throw new Exception("Invalid BG Group");
 		}
 		
+		if(request.getLink() == null) {
+			log.debug("Insufficient Data");
+			throw new Exception("Linking information is not there");
+		}
+		
 		for(CreditFacilityDTO fixDeposit: request.getFixDeposits()) {
 			Optional<CreditFacility> optional = ServiceLocator.getService(CreditFacilityRepository.class).findAllByClientIdAndAccountNumber(request.getBgGroupDTO().getClientId(), fixDeposit.getAccountNumber());
 			if(optional.isPresent()) {
 				CreditFacility cf = optional.get();
-				cf.setBgGroupId(request.getBgGroupDTO().getId());
+				if(request.getLink()) {
+					//Link deposit
+					cf.setBgGroupId(request.getBgGroupDTO().getId());
+				} else{
+					//de-link deposit
+					cf.setBgGroupId(null);
+				}
 				ServiceLocator.getService(CreditFacilityRepository.class).save(cf);
 			}
 		}
@@ -123,9 +141,16 @@ public class BgGroupService {
 	
 	
 	
-	
-	public BgGroupDTO linkBankGuarantee(LinkBankGuaranteeRequest request) throws Throwable {
-		if(!Collections.isNullOrEmpty(request.getBankGuarantees())) {
+	/**
+	 * 
+	 * To link a bank guarantee to a bg group
+	 * 
+	 * @param request
+	 * @return
+	 * @throws Throwable
+	 */
+	public BgGroupDTO manageBankGuarantees(ManageBankGuaranteeRequest request) throws Throwable {
+		if(Collections.isNullOrEmpty(request.getBankGuarantees())) {
 			log.debug("Insufficient Data");
 			throw new Exception("No Bank Guarantee(s) Found");
 		}
@@ -139,7 +164,13 @@ public class BgGroupService {
 			Optional<CreditFacility> optional = ServiceLocator.getService(CreditFacilityRepository.class).findAllByClientIdAndAccountNumber(request.getBgGroupDTO().getClientId(), fixDeposit.getAccountNumber());
 			if(optional.isPresent()) {
 				CreditFacility cf = optional.get();
-				cf.setBgGroupId(request.getBgGroupDTO().getId());
+				if(request.getLink()) {
+					//Link deposit
+					cf.setBgGroupId(request.getBgGroupDTO().getId());
+				} else{
+					//de-link deposit
+					cf.setBgGroupId(null);
+				}
 				ServiceLocator.getService(CreditFacilityRepository.class).save(cf);
 			}
 		}

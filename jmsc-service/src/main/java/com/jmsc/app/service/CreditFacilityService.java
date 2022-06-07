@@ -200,8 +200,10 @@ public class CreditFacilityService {
 		List<CreditFacilityDTO> all = ObjectMapperUtil.mapAll(allEntity, CreditFacilityDTO.class);
 		
 		List<CreditFacilityDTO> deposits = all.stream().map(cf -> cf.getFacilityType().equals(EFacility.FD) ? cf : null).collect(Collectors.toList());
+		deposits.removeAll(java.util.Collections.singletonList(null));
 		
 		List<CreditFacilityDTO> guarantees = all.stream().map(cf -> cf.getFacilityType().equals(EFacility.BG) ? cf : null).collect(Collectors.toList());
+		guarantees.removeAll(java.util.Collections.singletonList(null));
 		
 		CreditFacilityWrapper wrapper = new CreditFacilityWrapper();
 		wrapper.setDepositList(Collections.isNotNullOrEmpty(deposits) ? deposits : new ArrayList<CreditFacilityDTO>());

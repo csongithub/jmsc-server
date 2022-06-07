@@ -18,7 +18,7 @@ import lombok.Data;
  *
  */
 @Data
-public class LinkBankGuaranteeRequest implements Serializable{
+public class ManageBankGuaranteeRequest implements Serializable{
 	
 	/**
 	 * 
@@ -28,4 +28,6 @@ public class LinkBankGuaranteeRequest implements Serializable{
 	private BgGroupDTO bgGroupDTO;
 	
 	private List<CreditFacilityDTO>  bankGuarantees;
+	
+	private Boolean link;
 }
