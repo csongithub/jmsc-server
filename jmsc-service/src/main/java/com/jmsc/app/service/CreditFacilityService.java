@@ -131,20 +131,32 @@ public class CreditFacilityService {
 	
 	
 	/**
-	 * Gives available Fix Deposit(s) list that can be used or hold against in a Bank Guarantee Group.
+	 * Gives available Fix Deposit(s) & NSCs list that can be used or hold against in a Bank Guarantee Group.
 	 * There are two Special Conditions for these deposits.
-	 * 1. FD should not be pledged in any bid as security or agreement
-	 * 2. FD should not be already linked to any other BG Group
+	 * 1. FD/NSc should not be pledged in any bid as security or agreement
+	 * 2. FD/NSC should not be already linked to any other BG Group
+	 * 3. FD/NSC should not be already linked to any other Loan
 	 * @param clientId
 	 * @return
 	 */
 	public List<CreditFacilityDTO> getApplicableDepositForBgGroup(Long clientId){
-		List<CreditFacility> all = repository.findAllByClientIdAndFacilityType(clientId, EFacility.FD);
+		List<CreditFacility> all = repository.findAllByClientId(clientId);
+		
+		//Filter for FD, NSC
+		all = all.stream().map(cf -> (cf.getFacilityType().equals(EFacility.FD) 
+												|| cf.getFacilityType().equals(EFacility.NSC)) ? cf : null).collect(Collectors.toList());
+		
+		all.removeAll(java.util.Collections.singletonList(null));
+		
 		if(Collections.isNullOrEmpty(all)) {
 			return new ArrayList<CreditFacilityDTO>();
 		}else {
 			//Filter and remove all pledged Fix Deposits from list
 			all = all.stream().map(cf -> !cf.getIsPledged() ? cf : null).collect(Collectors.toList());
+			all.removeAll(java.util.Collections.singletonList(null));
+			
+			//filter all deposit that are linked to any loan
+			all = all.stream().map(cf -> cf.getLoanId() == null ? cf : null).collect(Collectors.toList());
 			all.removeAll(java.util.Collections.singletonList(null));
 			
 			//Now from the remaining list filter and remove all those Fix Deposits which are already linked to some other or same BG Group
@@ -199,7 +211,8 @@ public class CreditFacilityService {
 		
 		List<CreditFacilityDTO> all = ObjectMapperUtil.mapAll(allEntity, CreditFacilityDTO.class);
 		
-		List<CreditFacilityDTO> deposits = all.stream().map(cf -> cf.getFacilityType().equals(EFacility.FD) ? cf : null).collect(Collectors.toList());
+		List<CreditFacilityDTO> deposits = all.stream().map(cf -> (cf.getFacilityType().equals(EFacility.FD)
+																					|| cf.getFacilityType().equals(EFacility.NSC) )? cf : null).collect(Collectors.toList());
 		deposits.removeAll(java.util.Collections.singletonList(null));
 		
 		List<CreditFacilityDTO> guarantees = all.stream().map(cf -> cf.getFacilityType().equals(EFacility.BG) ? cf : null).collect(Collectors.toList());

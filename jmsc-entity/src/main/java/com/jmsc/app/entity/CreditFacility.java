@@ -110,6 +110,15 @@ public class CreditFacility extends BaseEntity{
 	private Long bgGroupId;
 	
 	
+	/**
+	 * For a Fix Deposit, this is the Loan Id, in which the FixDeposit is linked/hold
+	 * 
+	 */
+	@Nullable
+	@Column(name = "LOAN_ID")
+	private Long loanId;
+	
+	
 	
 	
 	@Override

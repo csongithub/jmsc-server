@@ -60,4 +60,6 @@ public class CreditFacilityDTO implements Serializable{
 	private String alertMessage;
 	
 	private Long bgGroupId;
+	
+	private Long loanId;
 }
