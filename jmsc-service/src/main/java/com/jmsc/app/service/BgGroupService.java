@@ -11,13 +11,13 @@ import org.springframework.stereotype.Service;
 
 import com.jmsc.app.common.dto.BgGroupDTO;
 import com.jmsc.app.common.dto.CreditFacilityDTO;
+import com.jmsc.app.common.rqrs.ManageBankGuaranteeRequest;
+import com.jmsc.app.common.rqrs.ManagerBGGroupDepositRequest;
 import com.jmsc.app.common.util.Collections;
 import com.jmsc.app.common.util.ObjectMapperUtil;
 import com.jmsc.app.common.util.Strings;
 import com.jmsc.app.common.wrapper.BgGroupWrapper;
 import com.jmsc.app.common.wrapper.CreditFacilityWrapper;
-import com.jmsc.app.common.wrapper.ManageBankGuaranteeRequest;
-import com.jmsc.app.common.wrapper.ManagerBGGroupDepositRequest;
 import com.jmsc.app.config.jmsc.ServiceLocator;
 import com.jmsc.app.entity.BgGroup;
 import com.jmsc.app.entity.CreditFacility;
@@ -188,7 +188,7 @@ public class BgGroupService {
 			BgGroup group = optional.get();
 			
 			CreditFacilityService cfService = ServiceLocator.getService(CreditFacilityService.class);
-			CreditFacilityWrapper facilityWrapper = cfService.getLinkedFacilitiesForBankGuaranteeGroup(clientId, groupId);
+			CreditFacilityWrapper facilityWrapper = cfService.getCollateralAndBGForBgGroup(clientId, groupId);
 			
 			BgGroupDTO groupDTO = ObjectMapperUtil.map(group, BgGroupDTO.class);
 			

@@ -17,9 +17,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jmsc.app.common.dto.BgGroupDTO;
+import com.jmsc.app.common.rqrs.ManageBankGuaranteeRequest;
+import com.jmsc.app.common.rqrs.ManagerBGGroupDepositRequest;
 import com.jmsc.app.common.wrapper.BgGroupWrapper;
-import com.jmsc.app.common.wrapper.ManageBankGuaranteeRequest;
-import com.jmsc.app.common.wrapper.ManagerBGGroupDepositRequest;
 import com.jmsc.app.service.BgGroupService;
 
 import io.swagger.annotations.Api;

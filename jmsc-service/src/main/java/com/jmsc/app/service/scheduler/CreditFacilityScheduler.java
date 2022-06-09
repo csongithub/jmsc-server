@@ -66,8 +66,10 @@ public class CreditFacilityScheduler {
 	private Map<Long, ClientDTO> clientMap = new HashMap<Long, ClientDTO>();
 	
 	
+	//TODO: Uncomment Below @Scheduled annotation line to start sending mail
+	//Commented this because google mail stopped working on gsmtp
 	
-	@Scheduled(fixedRate = CREDIT_FACILITY_EXPIRY_INTERVAL)
+	//@Scheduled(fixedRate = CREDIT_FACILITY_EXPIRY_INTERVAL)
 	public void alertCreditFacilityExpiry() {
 		Map<Long, List<CreditFacilityDTO>> expiringCf = cfService.evaluateExpiry();
 		Set<Long> clients = expiringCf.keySet();

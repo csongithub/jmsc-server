@@ -131,15 +131,15 @@ public class CreditFacilityService {
 	
 	
 	/**
-	 * Gives available Fix Deposit(s) & NSCs list that can be used or hold against in a Bank Guarantee Group.
-	 * There are two Special Conditions for these deposits.
+	 * Gives available collateral (Fix Deposit(s) & NSCs) that can be used or hold against in a Bank Guarantee Group and Loans.
+	 * There are three Special Conditions for these deposits.
 	 * 1. FD/NSc should not be pledged in any bid as security or agreement
 	 * 2. FD/NSC should not be already linked to any other BG Group
 	 * 3. FD/NSC should not be already linked to any other Loan
 	 * @param clientId
 	 * @return
 	 */
-	public List<CreditFacilityDTO> getApplicableDepositForBgGroup(Long clientId){
+	public List<CreditFacilityDTO> getFreeCollateral(Long clientId){
 		List<CreditFacility> all = repository.findAllByClientId(clientId);
 		
 		//Filter for FD, NSC
@@ -195,17 +195,17 @@ public class CreditFacilityService {
 	
 	
 	/**
-	 * This method is used to get the list of deposits & guarantees that are linked to a specific bank 
-	 * guarantee group.
 	 * 
-	 * All deposits which are hold against/in a BG Group
+	 * This service gives the collateral along with the issued bank guarantees for a bg group
+	 * 
+	 * All deposits, NSC(s) which are hold against/in a BG Group
 	 * All guarantees that are issued in this BG Group
 	 * 
 	 * @param clientId
 	 * @param groupId
 	 * @return
 	 */
-	public CreditFacilityWrapper getLinkedFacilitiesForBankGuaranteeGroup(Long clientId, Long groupId) {
+	public CreditFacilityWrapper getCollateralAndBGForBgGroup(Long clientId, Long groupId) {
 		
 		List<CreditFacility> allEntity = repository.findAllByClientIdAndBgGroupId(clientId, groupId);
 		
@@ -226,6 +226,24 @@ public class CreditFacilityService {
 	}
 	
 	
+	
+
+	/**
+	 * 
+	 * This service gives all collateral that are hold against a loan
+	 * 
+	 * @param clientId
+	 * @param loanId
+	 * @return
+	 */
+	public List<CreditFacilityDTO> getCollateralForLoan(Long clientId, Long loanId){
+		
+		List<CreditFacility> allEntity = repository.findAllByClientIdAndLoanId(clientId, loanId);
+		
+		List<CreditFacilityDTO> all = ObjectMapperUtil.mapAll(allEntity, CreditFacilityDTO.class);
+		
+		return all;
+	}
 	
 	
 	

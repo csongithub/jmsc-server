@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.jmsc.app.common.wrapper;
+package com.jmsc.app.common.rqrs;
 
 import java.io.Serializable;
 import java.util.List;

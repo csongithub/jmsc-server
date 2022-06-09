@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.jmsc.app.common.dto.CreditFacilityDTO;
 import com.jmsc.app.common.enums.EFacility;
-import com.jmsc.app.common.wrapper.CreditFacilityWrapper;
 import com.jmsc.app.service.CreditFacilityService;
 
 import io.swagger.annotations.Api;
@@ -74,36 +73,32 @@ public class CreditFacilityEndPoint {
 	}
 	
 	
-	
-	@GetMapping("/deposits_for_bg_group/{client_id}")
-	ResponseEntity<List<CreditFacilityDTO>> getApplicableDepositForBgGroup(@PathVariable("client_id") Long clientId){
-		List<CreditFacilityDTO> list = service.getApplicableDepositForBgGroup(clientId);
-		return ResponseEntity.ok(list);
-	}
-	
-	
-	
-	@GetMapping("/guarantees_for_bg_group/{client_id}")
-	ResponseEntity<List<CreditFacilityDTO>> getApplicableBankGuaranteeBgGroup(@PathVariable("client_id") Long clientId){
-		List<CreditFacilityDTO> list = service.getApplicableBankGuaranteeBgGroup(clientId);
+	/**
+	 * Gives available collateral (Fix Deposit(s) & NSCs) that can be used or hold against in a Bank Guarantee Group and Loans.
+	 * There are three Special Conditions for these deposits.
+	 * 1. FD/NSc should not be pledged in any bid as security or agreement
+	 * 2. FD/NSC should not be already linked to any other BG Group
+	 * 3. FD/NSC should not be already linked to any other Loan
+	 * @param clientId
+	 * @return
+	 */
+	@GetMapping("/free_collateral/{client_id}")
+	ResponseEntity<List<CreditFacilityDTO>> getFreeCollateral(@PathVariable("client_id") Long clientId){
+		List<CreditFacilityDTO> list = service.getFreeCollateral(clientId);
 		return ResponseEntity.ok(list);
 	}
 	
 	
 	/**
-	 * This method is used to get the list of deposits & guarantees that are linked to a specific bank 
-	 * guarantee group.
-	 * 
-	 * All deposits which are hold against/in a BG Group
-	 * All guarantees that are issued in this BG Group
-	 * 
+	 * Gives available Bank Guarantee(s) list that is issued from a Bank Guarantee Group.
+	 * There is only one Special Conditions for these guarantees that the BG should not be 
+	 * already linked to any BG Group.
 	 * @param clientId
-	 * @param groupId
 	 * @return
 	 */
-	@GetMapping("/linked_facilities_for_bg_group/{client_id}/{group_id}")
-	ResponseEntity<CreditFacilityWrapper> getApplicableBankGuaranteeBgGroup(@PathVariable("client_id") Long clientId, @PathVariable("group_id")Long groupId){
-		CreditFacilityWrapper response = service.getLinkedFacilitiesForBankGuaranteeGroup(clientId, groupId);
-		return ResponseEntity.ok(response);
+	@GetMapping("/guarantees_for_bg_group/{client_id}")
+	ResponseEntity<List<CreditFacilityDTO>> getApplicableBankGuaranteeBgGroup(@PathVariable("client_id") Long clientId){
+		List<CreditFacilityDTO> list = service.getApplicableBankGuaranteeBgGroup(clientId);
+		return ResponseEntity.ok(list);
 	}
 }
