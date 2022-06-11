@@ -129,9 +129,11 @@ public class BgGroupService {
 				if(request.getLink()) {
 					//Link deposit
 					cf.setBgGroupId(request.getBgGroupDTO().getId());
+					cf.setIsLien(true);
 				} else{
 					//de-link deposit
 					cf.setBgGroupId(null);
+					cf.setIsLien(false);
 				}
 				ServiceLocator.getService(CreditFacilityRepository.class).save(cf);
 			}

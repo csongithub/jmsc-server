@@ -119,6 +119,14 @@ public class CreditFacility extends BaseEntity{
 	private Long loanId;
 	
 	
+	/**
+	 * This is set to true is a facility is hold against a Loan, BG or BG Group, or BID
+	 */
+	@Nullable
+	@Column(name = "IS_LIEN")
+	private Boolean isLien;
+	
+	
 	
 	
 	@Override

@@ -112,9 +112,11 @@ public class LoanService {
 				if(request.getLink()) {
 					//Link deposit
 					cf.setLoanId(request.getLoan().getId());
+					cf.setIsLien(true);
 				} else{
 					//de-link deposit
 					cf.setLoanId(null);
+					cf.setIsLien(false);
 				}
 				ServiceLocator.getService(CreditFacilityRepository.class).save(cf);
 			}

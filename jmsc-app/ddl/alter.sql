@@ -8,3 +8,4 @@ alter table jmsc.CREDIT_FACILITY add column BID_ID integer;
 --bg-group, loan-group
 alter table jmsc.CREDIT_FACILITY add column BG_GROUP_ID integer;
 alter table jmsc.CREDIT_FACILITY add column LOAN_ID integer;
+alter table jmsc.CREDIT_FACILITY add column	IS_LIEN boolean  NOT NULL default false;

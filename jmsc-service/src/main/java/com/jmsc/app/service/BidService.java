@@ -188,6 +188,7 @@ public class BidService {
 					cf.setIsPledged(true);
 					cf.setPledgedType(type);
 					cf.setPledgedId(bidId);
+					cf.setIsLien(true);
 					creditFacilityRespository.save(cf);
 				}
 			});
@@ -247,6 +248,7 @@ public class BidService {
 					cf.setIsPledged(false);
 					cf.setPledgedType(null);
 					cf.setPledgedId(null);
+					cf.setIsLien(false);
 					creditFacilityRespository.save(cf);
 				}
 			}

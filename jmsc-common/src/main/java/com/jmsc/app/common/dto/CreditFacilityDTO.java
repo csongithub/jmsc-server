@@ -62,4 +62,6 @@ public class CreditFacilityDTO implements Serializable{
 	private Long bgGroupId;
 	
 	private Long loanId;
+	
+	private Boolean isLien;
 }
