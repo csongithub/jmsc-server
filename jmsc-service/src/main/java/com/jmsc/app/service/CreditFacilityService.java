@@ -115,18 +115,47 @@ public class CreditFacilityService {
 	}
 	
 	
-	
-	public List<CreditFacilityDTO> getFreeFacilities(Long clientId){
-		List<CreditFacility> cfList = repository.findAllByClientId(clientId);
-		if(Collections.isNullOrEmpty(cfList)) {
+	/**
+	 * Gives available collateral (Fix Deposit(s), NSC(s) and Bank Guarantees) that can be use as Bid Security in a Bid.
+	 * There are three Special Conditions for these deposits.
+	 * 1. FD/NSc should not be pledged in any bid as security or agreement
+	 * 2. FD/NSC should not be already linked to any other BG Group
+	 * 3. FD/NSC should not be already linked to any other Loan
+	 * @param clientId
+	 * @return
+	 */
+	public List<CreditFacilityDTO> getCollateralsForBid(Long clientId){
+		
+		List<CreditFacilityDTO> result = new ArrayList<CreditFacilityDTO>();
+		
+		List<CreditFacility> all = repository.findAllByClientId(clientId);
+		
+		if(Collections.isNullOrEmpty(all)) {
 			return new ArrayList<CreditFacilityDTO>();
-		}else {
-			List<CreditFacilityDTO> cfDTOList =  ObjectMapperUtil.mapAll(cfList, CreditFacilityDTO.class)
-																	.stream().map(cf -> !cf.getIsPledged() ? cf : null)
-																	.collect(Collectors.toList());
-			cfDTOList.removeAll(java.util.Collections.singletonList(null));
-			return cfDTOList;
 		}
+		
+		all.removeAll(java.util.Collections.singletonList(null));
+		
+		if(Collections.isNotNullOrEmpty(all)) {
+			//Filter and remove all pledged Fix Deposits from list
+			all = all.stream().map(cf -> !cf.getIsPledged() ? cf : null).collect(Collectors.toList());
+			all.removeAll(java.util.Collections.singletonList(null));
+			
+			//filter all deposit that are linked to any loan
+			all = all.stream().map(cf -> cf.getLoanId() == null ? cf : null).collect(Collectors.toList());
+			all.removeAll(java.util.Collections.singletonList(null));
+			
+			//Now from the remaining list filter and remove all those Fix Deposits which are already linked to some other or same BG Group
+			all = all.stream().map(cf -> cf.getBgGroupId() == null
+									? cf : cf.getFacilityType().equals(EFacility.BG) ? cf : null).collect(Collectors.toList());
+			all.removeAll(java.util.Collections.singletonList(null));
+			
+			List<CreditFacilityDTO> depositList = ObjectMapperUtil.mapAll(all, CreditFacilityDTO.class);
+			
+			if(Collections.isNotNullOrEmpty(depositList))
+				result.addAll(depositList);
+		}
+		return result;
 	}
 	
 	
@@ -236,7 +265,7 @@ public class CreditFacilityService {
 	 * @param loanId
 	 * @return
 	 */
-	public List<CreditFacilityDTO> getCollateralForLoan(Long clientId, Long loanId){
+	public List<CreditFacilityDTO> loanCollateral(Long clientId, Long loanId){
 		
 		List<CreditFacility> allEntity = repository.findAllByClientIdAndLoanId(clientId, loanId);
 		

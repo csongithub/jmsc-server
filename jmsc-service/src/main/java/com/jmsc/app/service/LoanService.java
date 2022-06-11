@@ -75,9 +75,9 @@ public class LoanService {
 	 * @param loanId
 	 * @return
 	 */
-	public List<CreditFacilityDTO> getCollateralForLoan(Long clientId, Long loanId){
+	public List<CreditFacilityDTO> loanCollateral(Long clientId, Long loanId){
 		CreditFacilityService service = ServiceLocator.getService(CreditFacilityService.class);
-		return service.getCollateralForLoan(clientId, loanId);
+		return service.loanCollateral(clientId, loanId);
 	}
 	
 	
@@ -97,7 +97,7 @@ public class LoanService {
 		
 		if(request.getLoan() == null || request.getLoan().getId() == null || request.getLoan().getClientId() == null) {
 			log.debug("Insufficient Data");
-			throw new Exception("Invalid BG Group");
+			throw new Exception("Invalid Loan or Loan Not Found in Request");
 		}
 		
 		if(request.getLink() == null) {

@@ -56,8 +56,8 @@ public class LoanEndPoint {
 	 * @return
 	 */
 	@GetMapping("/collateral/{client_id}/{loan_id}")
-	ResponseEntity<List<CreditFacilityDTO>> getCollateralForLoan(@PathVariable("client_id") Long clientId, @PathVariable("loan_id")Long loanId){
-		List<CreditFacilityDTO> list = service.getCollateralForLoan(clientId, loanId);
+	ResponseEntity<List<CreditFacilityDTO>> loanCollateral(@PathVariable("client_id") Long clientId, @PathVariable("loan_id")Long loanId){
+		List<CreditFacilityDTO> list = service.loanCollateral(clientId, loanId);
 		return ResponseEntity.ok(list);
 	}
 	

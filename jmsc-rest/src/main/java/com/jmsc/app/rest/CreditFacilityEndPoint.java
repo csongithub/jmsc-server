@@ -52,8 +52,8 @@ public class CreditFacilityEndPoint {
 	
 	
 	@GetMapping("/free_facilities/{client_id}")
-	ResponseEntity<List<CreditFacilityDTO>> getFreeFacilities(@PathVariable("client_id") Long clientId){
-		List<CreditFacilityDTO> list = service.getFreeFacilities(clientId);
+	ResponseEntity<List<CreditFacilityDTO>> getCollateralsForBid(@PathVariable("client_id") Long clientId){
+		List<CreditFacilityDTO> list = service.getCollateralsForBid(clientId);
 		return ResponseEntity.ok(list);
 	}
 
