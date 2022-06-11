@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.jmsc.app.common.dto.CreditFacilityDTO;
 import com.jmsc.app.common.enums.EFacility;
+import com.jmsc.app.common.rqrs.FacilityLinkageDetails;
 import com.jmsc.app.service.CreditFacilityService;
 
 import io.swagger.annotations.Api;
@@ -99,6 +100,13 @@ public class CreditFacilityEndPoint {
 	@GetMapping("/guarantees_for_bg_group/{client_id}")
 	ResponseEntity<List<CreditFacilityDTO>> getApplicableBankGuaranteeBgGroup(@PathVariable("client_id") Long clientId){
 		List<CreditFacilityDTO> list = service.getApplicableBankGuaranteeBgGroup(clientId);
+		return ResponseEntity.ok(list);
+	}
+	
+	
+	@GetMapping("linkage_details/{client_id}/{facility_id}")
+	ResponseEntity<FacilityLinkageDetails> getApplicableBankGuaranteeBgGroup(@PathVariable("client_id") Long clientId, @PathVariable("facility_id") Long facilityId){
+		FacilityLinkageDetails list = service.getFacilityLinkageDetails(clientId, facilityId);
 		return ResponseEntity.ok(list);
 	}
 }

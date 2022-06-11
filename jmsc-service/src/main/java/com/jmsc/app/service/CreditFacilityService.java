@@ -16,17 +16,29 @@ import org.apache.commons.collections4.map.HashedMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.jmsc.app.common.dto.BgGroupDTO;
+import com.jmsc.app.common.dto.BidDTO;
 import com.jmsc.app.common.dto.CreditFacilityDTO;
+import com.jmsc.app.common.dto.LoanDTO;
 import com.jmsc.app.common.enums.EFacility;
 import com.jmsc.app.common.enums.EFacilityIssuerType;
+import com.jmsc.app.common.enums.EFacilityLinkageType;
+import com.jmsc.app.common.rqrs.FacilityLinkageDetails;
 import com.jmsc.app.common.util.Collections;
 import com.jmsc.app.common.util.ObjectMapperUtil;
 import com.jmsc.app.common.wrapper.CreditFacilityWrapper;
 import com.jmsc.app.config.jmsc.JmscProperties;
+import com.jmsc.app.config.jmsc.ServiceLocator;
+import com.jmsc.app.entity.BgGroup;
+import com.jmsc.app.entity.Bid;
 import com.jmsc.app.entity.Client;
 import com.jmsc.app.entity.CreditFacility;
+import com.jmsc.app.entity.Loan;
+import com.jmsc.app.repository.BgGroupRepository;
+import com.jmsc.app.repository.BidRepository;
 import com.jmsc.app.repository.ClientRepository;
 import com.jmsc.app.repository.CreditFacilityRepository;
+import com.jmsc.app.repository.LoanRepository;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -272,6 +284,79 @@ public class CreditFacilityService {
 		List<CreditFacilityDTO> all = ObjectMapperUtil.mapAll(allEntity, CreditFacilityDTO.class);
 		
 		return all;
+	}
+	
+	
+	
+	/**
+	 * 
+	 * This service gives the linkage details for of a Credit Facility (FD, NSC, BG).
+	 * For Example 
+	 * 1. 	If a Fixed Deposit or NSC is pledged in a bid as bid security then
+	 * 		it will give the Bid Details. Similarly is a FD/NSC is submitted in a loan
+	 * 		or bank guarantee security then it will give the loan/bg group details
+	 * 
+	 * 2	For a Bank Guarantee it gives the BG Group and the Bid Details in which the
+	 * 		bank guarantee is pledged.
+	 * 
+	 * @param clientId
+	 * @param facilityId
+	 * @return
+	 */
+	public FacilityLinkageDetails getFacilityLinkageDetails(Long clientId, Long facilityId) {
+		
+		FacilityLinkageDetails response = new FacilityLinkageDetails();
+		
+		Optional<CreditFacility> optional = repository.findById(facilityId);
+		
+		if(optional.isPresent()) {
+			
+			CreditFacility cf = optional.get();
+			response.setFacilityType(cf.getFacilityType());
+			response.setFacilityAccountNo(cf.getAccountNumber());
+			response.setFacilityId(cf.getId());
+			
+			if(cf.getLoanId() != null) {
+				LoanRepository loanRepository = ServiceLocator.getService(LoanRepository.class);
+				Optional<Loan> optionalLoan = loanRepository.findById(cf.getLoanId());
+				if(optionalLoan.isPresent()) {
+					LoanDTO loanDTO = ObjectMapperUtil.map(optionalLoan.get(), LoanDTO.class);
+					response.setLoan(loanDTO);
+					response.setLinkageType(EFacilityLinkageType.LOAN);
+				}
+				
+			} else if(cf.getBgGroupId() != null) {
+				BgGroupRepository bgGroupRepository = ServiceLocator.getService(BgGroupRepository.class);
+				Optional<BgGroup> optionalGroup = bgGroupRepository.findById(cf.getBgGroupId());
+				if(optionalGroup.isPresent()) {
+					BgGroupDTO groupDTO = ObjectMapperUtil.map(optionalGroup.get(), BgGroupDTO.class);
+					response.setBgGroup(groupDTO);
+					response.setLinkageType(EFacilityLinkageType.BG_GROUP);
+				}
+				
+			}
+			
+			if (cf.getIsPledged() && cf.getPledgedId() != null) {
+				BidRepository bidRepository = ServiceLocator.getService(BidRepository.class);
+				Optional<Bid> optionalBid = bidRepository.findById(cf.getPledgedId());
+				if(optionalBid.isPresent()) {
+					BidDTO bidDTO = ObjectMapperUtil.map(optionalBid.get(), BidDTO.class);
+					response.setBid(bidDTO);
+					
+					/**
+					 * If this is already linked to a BID then set linkage type  BID_AND_BG_GROUP
+					 * Otherwise set linkage type BG_GROUP
+					 */
+					if(EFacilityLinkageType.BG_GROUP.equals(response.getLinkageType()))
+						response.setLinkageType(EFacilityLinkageType.BID_AND_BG_GROUP);
+					else
+						response.setLinkageType(EFacilityLinkageType.BID);
+				}
+				
+			}
+		}
+		
+		return response;
 	}
 	
 	
