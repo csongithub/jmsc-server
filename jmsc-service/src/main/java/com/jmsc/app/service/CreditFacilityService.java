@@ -23,6 +23,7 @@ import com.jmsc.app.common.dto.LoanDTO;
 import com.jmsc.app.common.enums.EFacility;
 import com.jmsc.app.common.enums.EFacilityIssuerType;
 import com.jmsc.app.common.enums.EFacilityLinkageType;
+import com.jmsc.app.common.enums.EFacilityStatus;
 import com.jmsc.app.common.rqrs.FacilityLinkageDetails;
 import com.jmsc.app.common.util.Collections;
 import com.jmsc.app.common.util.ObjectMapperUtil;
@@ -102,6 +103,10 @@ public class CreditFacilityService {
 	
 	public List<CreditFacilityDTO> getAllCrditFacility(Long clientId){
 		List<CreditFacility> cfList = repository.findAllByClientId(clientId);
+		cfList =  cfList.stream().map(cf -> EFacilityStatus.ALIVE.equals(cf.getStatus()) ? cf : null).collect(Collectors.toList());
+		
+		cfList.removeAll(java.util.Collections.singletonList(null));
+		
 		if(Collections.isNullOrEmpty(cfList)) {
 			return new ArrayList<CreditFacilityDTO>();
 		}else {
@@ -315,7 +320,8 @@ public class CreditFacilityService {
 			response.setFacilityType(cf.getFacilityType());
 			response.setFacilityAccountNo(cf.getAccountNumber());
 			response.setFacilityId(cf.getId());
-			
+			response.setFacilityAmount(cf.getAmount());
+			response.setIssuer(cf.getIssuerName() + ", " + cf.getIssuerBranch());			
 			if(cf.getLoanId() != null) {
 				LoanRepository loanRepository = ServiceLocator.getService(LoanRepository.class);
 				Optional<Loan> optionalLoan = loanRepository.findById(cf.getLoanId());
@@ -357,6 +363,44 @@ public class CreditFacilityService {
 		}
 		
 		return response;
+	}
+	
+	
+	
+	/**
+	 * 
+	 * This service mark a credit facility close.
+	 * A closed facility will not be available to use in any bid, loan, bg group etc.
+	 * Also if a facility is already linked to any loan, bid or bg group
+	 * then before closing we need to remove this facility from any such linkage.
+	 * 
+	 * @param clientId
+	 * @param facilityId
+	 * @return
+	 * @throws Throwable
+	 */
+	public Boolean closeFacility(Long clientId, Long facilityId) throws Throwable {
+		Optional<CreditFacility> optional = repository.findByIdAndClientId(facilityId, clientId);
+		
+		if(!optional.isPresent())
+			throw new Exception("Facility does not exist");
+		
+		CreditFacility cf = optional.get();
+		
+		if(cf.getLoanId() != null)
+			throw new Exception("Facility is linked to a loan, first remove it");
+		
+		if(cf.getBgGroupId() != null)
+			throw new Exception("Facility is linked to a bg group, first remove it");
+		
+		if(cf.getPledgedId() != null)
+			throw new Exception("Facility is linked to a bid, first remove it");
+		
+		cf.setStatus(EFacilityStatus.CLOSED);
+		
+		repository.save(cf);
+		;
+		return Boolean.TRUE;
 	}
 	
 	

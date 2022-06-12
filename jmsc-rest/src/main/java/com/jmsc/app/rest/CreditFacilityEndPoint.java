@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -108,5 +109,23 @@ public class CreditFacilityEndPoint {
 	ResponseEntity<FacilityLinkageDetails> getApplicableBankGuaranteeBgGroup(@PathVariable("client_id") Long clientId, @PathVariable("facility_id") Long facilityId){
 		FacilityLinkageDetails list = service.getFacilityLinkageDetails(clientId, facilityId);
 		return ResponseEntity.ok(list);
+	}
+	
+	/**
+	 * 
+	 * This service mark a credit facility close.
+	 * A closed facility will not be available to use in any bid, loan, bg group etc.
+	 * Also if a facility is already linked to any loan, bid or bg group
+	 * then before closing we need to remove this facility from any such linkage.
+	 * 
+	 * @param clientId
+	 * @param facilityId
+	 * @return
+	 * @throws Throwable
+	 */
+	@PutMapping("close/{client_id}/{facility_id}")
+	ResponseEntity<Boolean> closeFacility(@PathVariable("client_id") Long clientId, @PathVariable("facility_id") Long facilityId) throws Throwable{
+		Boolean status = service.closeFacility(clientId, facilityId);
+		return ResponseEntity.ok(status);
 	}
 }

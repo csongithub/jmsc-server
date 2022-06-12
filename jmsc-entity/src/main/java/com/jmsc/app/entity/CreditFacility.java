@@ -17,6 +17,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import com.jmsc.app.common.enums.EFacilityIssuerType;
+import com.jmsc.app.common.enums.EFacilityStatus;
 import com.jmsc.app.common.enums.EFacility;
 import com.jmsc.app.common.enums.EPledgedType;
 import com.sun.istack.NotNull;
@@ -125,6 +126,11 @@ public class CreditFacility extends BaseEntity{
 	@Nullable
 	@Column(name = "IS_LIEN")
 	private Boolean isLien;
+	
+	@NotNull
+	@Enumerated(EnumType.STRING)
+	@Column(name = "STATUS")
+	private EFacilityStatus status;
 	
 	
 	

@@ -43,5 +43,9 @@ public class FacilityLinkageDetails implements Serializable {
 	private String facilityAccountNo;
 	
 	private Long facilityId;
+	
+	private String issuer;
+	
+	private Long facilityAmount;
 
 }

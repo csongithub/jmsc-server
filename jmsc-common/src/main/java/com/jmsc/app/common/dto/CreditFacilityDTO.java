@@ -8,6 +8,7 @@ import java.util.Date;
 
 import com.jmsc.app.common.enums.EFacility;
 import com.jmsc.app.common.enums.EFacilityIssuerType;
+import com.jmsc.app.common.enums.EFacilityStatus;
 import com.jmsc.app.common.enums.EPledgedType;
 
 import lombok.Data;
@@ -64,4 +65,6 @@ public class CreditFacilityDTO implements Serializable{
 	private Long loanId;
 	
 	private Boolean isLien;
+	
+	private EFacilityStatus status;
 }

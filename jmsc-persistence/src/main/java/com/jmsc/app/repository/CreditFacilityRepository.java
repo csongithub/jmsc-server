@@ -19,6 +19,8 @@ public interface CreditFacilityRepository extends JpaRepository<CreditFacility, 
 
 	List<CreditFacility> findAllByClientId(Long clientId);
 	
+	Optional<CreditFacility> findByIdAndClientId(Long id, Long clientId);
+	
 	Optional<CreditFacility> findAllByClientIdAndAccountNumber(Long clientId, String accountNumber);
 	
 	List<CreditFacility> findAllByClientIdAndFacilityType(Long clientId, EFacility facilityType);
