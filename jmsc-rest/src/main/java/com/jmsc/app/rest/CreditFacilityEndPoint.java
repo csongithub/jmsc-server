@@ -45,9 +45,16 @@ public class CreditFacilityEndPoint {
 	}
 	
 	
-	@GetMapping("/get_all/{client_id}")
-	ResponseEntity<List<CreditFacilityDTO>> getAll(@PathVariable("client_id") Long clientId){
-		List<CreditFacilityDTO> list = service.getAllCrditFacility(clientId);
+	@GetMapping("/get_all_active/{client_id}")
+	ResponseEntity<List<CreditFacilityDTO>> getAllActive(@PathVariable("client_id") Long clientId){
+		List<CreditFacilityDTO> list = service.getAllActiveCrditFacility(clientId);
+		return ResponseEntity.ok(list);
+	}
+	
+	
+	@GetMapping("/get_all_closed/{client_id}")
+	ResponseEntity<List<CreditFacilityDTO>> getAllClosed(@PathVariable("client_id") Long clientId){
+		List<CreditFacilityDTO> list = service.getAllClosedCrditFacility(clientId);
 		return ResponseEntity.ok(list);
 	}
 	
@@ -61,9 +68,17 @@ public class CreditFacilityEndPoint {
 
 	
 	
-	@GetMapping("/all_by_facility_type")
-	ResponseEntity<List<CreditFacilityDTO>> getAllByFacilityType(@RequestParam("clientId") Long clientId, @RequestParam("facilityType") EFacility facilityType){
-		List<CreditFacilityDTO> list = service.getAllByFacilityType(clientId, facilityType);
+	@GetMapping("/all_active_by_facility_type")
+	ResponseEntity<List<CreditFacilityDTO>> getAllActiveByFacilityType(@RequestParam("clientId") Long clientId, @RequestParam("facilityType") EFacility facilityType){
+		List<CreditFacilityDTO> list = service.getAllActiveByFacilityType(clientId, facilityType);
+		return ResponseEntity.ok(list);
+	}
+	
+	
+	
+	@GetMapping("/all_closed_by_facility_type")
+	ResponseEntity<List<CreditFacilityDTO>> getAllClosedByFacilityType(@RequestParam("clientId") Long clientId, @RequestParam("facilityType") EFacility facilityType){
+		List<CreditFacilityDTO> list = service.getAllClosedByFacilityType(clientId, facilityType);
 		return ResponseEntity.ok(list);
 	}
 	
@@ -81,6 +96,7 @@ public class CreditFacilityEndPoint {
 	 * 1. FD/NSc should not be pledged in any bid as security or agreement
 	 * 2. FD/NSC should not be already linked to any other BG Group
 	 * 3. FD/NSC should not be already linked to any other Loan
+	 * 4. FD/NSC should not be closed
 	 * @param clientId
 	 * @return
 	 */

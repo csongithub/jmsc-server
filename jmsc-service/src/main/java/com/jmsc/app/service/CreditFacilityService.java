@@ -101,15 +101,29 @@ public class CreditFacilityService {
 	
 	
 	
-	public List<CreditFacilityDTO> getAllCrditFacility(Long clientId){
-		List<CreditFacility> cfList = repository.findAllByClientId(clientId);
-		cfList =  cfList.stream().map(cf -> EFacilityStatus.ALIVE.equals(cf.getStatus()) ? cf : null).collect(Collectors.toList());
+	public List<CreditFacilityDTO> getAllActiveCrditFacility(Long clientId){
 		
-		cfList.removeAll(java.util.Collections.singletonList(null));
+		List<CreditFacility> cfList = repository.findAllByClientId(clientId);
 		
 		if(Collections.isNullOrEmpty(cfList)) {
 			return new ArrayList<CreditFacilityDTO>();
 		}else {
+			cfList = filterByStatus(cfList, EFacilityStatus.ALIVE);
+			List<CreditFacilityDTO> cfDTOList =  ObjectMapperUtil.mapAll(cfList, CreditFacilityDTO.class);
+			return cfDTOList;
+		}
+	}
+	
+	
+	
+	public List<CreditFacilityDTO> getAllClosedCrditFacility(Long clientId){
+		
+		List<CreditFacility> cfList = repository.findAllByClientId(clientId);
+		
+		if(Collections.isNullOrEmpty(cfList)) {
+			return new ArrayList<CreditFacilityDTO>();
+		}else {
+			cfList = filterByStatus(cfList, EFacilityStatus.CLOSED);
 			List<CreditFacilityDTO> cfDTOList =  ObjectMapperUtil.mapAll(cfList, CreditFacilityDTO.class);
 			return cfDTOList;
 		}
@@ -118,17 +132,52 @@ public class CreditFacilityService {
 	
 	
 	
-	public List<CreditFacilityDTO> getAllByFacilityType(Long clientId, EFacility facilityType){
+	public List<CreditFacilityDTO> getAllActiveByFacilityType(Long clientId, EFacility facilityType){
 		if(facilityType == null) {
 			throw new RuntimeException("Insufficient Information");
 		}
+		
 		List<CreditFacility> cfList = repository.findAllByClientIdAndFacilityType(clientId, facilityType);
+		
 		if(Collections.isNullOrEmpty(cfList)) {
 			return new ArrayList<CreditFacilityDTO>();
 		}else {
+			cfList = filterByStatus(cfList, EFacilityStatus.ALIVE);
 			List<CreditFacilityDTO> cfDTOList =  ObjectMapperUtil.mapAll(cfList, CreditFacilityDTO.class);
 			return cfDTOList;
 		}
+	}
+	
+	
+	
+	
+	public List<CreditFacilityDTO> getAllClosedByFacilityType(Long clientId, EFacility facilityType){
+		if(facilityType == null) {
+			throw new RuntimeException("Insufficient Information");
+		}
+		
+		List<CreditFacility> cfList = repository.findAllByClientIdAndFacilityType(clientId, facilityType);
+		
+		if(Collections.isNullOrEmpty(cfList)) {
+			return new ArrayList<CreditFacilityDTO>();
+		}else {
+			cfList = filterByStatus(cfList, EFacilityStatus.CLOSED);
+			List<CreditFacilityDTO> cfDTOList =  ObjectMapperUtil.mapAll(cfList, CreditFacilityDTO.class);
+			return cfDTOList;
+		}
+	}
+	
+	
+	
+	
+	private List<CreditFacility> filterByStatus(List<CreditFacility> cfList, EFacilityStatus status){
+		if(Collections.isNullOrEmpty(cfList))
+			return new ArrayList<CreditFacility>();
+		
+		cfList =  cfList.stream().map(cf -> status.equals(cf.getStatus()) ? cf : null).collect(Collectors.toList());
+		cfList.removeAll(java.util.Collections.singletonList(null));
+		
+		return cfList;
 	}
 	
 	
@@ -151,6 +200,7 @@ public class CreditFacilityService {
 			return new ArrayList<CreditFacilityDTO>();
 		}
 		
+		all = all.stream().map(cf -> EFacilityStatus.ALIVE.equals(cf.getStatus()) ? cf : null).collect(Collectors.toList());
 		all.removeAll(java.util.Collections.singletonList(null));
 		
 		if(Collections.isNotNullOrEmpty(all)) {
@@ -189,8 +239,8 @@ public class CreditFacilityService {
 		List<CreditFacility> all = repository.findAllByClientId(clientId);
 		
 		//Filter for FD, NSC
-		all = all.stream().map(cf -> (cf.getFacilityType().equals(EFacility.FD) 
-												|| cf.getFacilityType().equals(EFacility.NSC)) ? cf : null).collect(Collectors.toList());
+		all = all.stream().map(cf -> ((cf.getFacilityType().equals(EFacility.FD) 
+												|| cf.getFacilityType().equals(EFacility.NSC))) && EFacilityStatus.ALIVE.equals(cf.getStatus()) ? cf : null).collect(Collectors.toList());
 		
 		all.removeAll(java.util.Collections.singletonList(null));
 		
@@ -390,7 +440,7 @@ public class CreditFacilityService {
 		if(cf.getLoanId() != null)
 			throw new Exception("Facility is linked to a loan, first remove it");
 		
-		if(cf.getBgGroupId() != null)
+		if(cf.getBgGroupId() != null && !EFacility.BG.equals(cf.getFacilityType()))
 			throw new Exception("Facility is linked to a bg group, first remove it");
 		
 		if(cf.getPledgedId() != null)
