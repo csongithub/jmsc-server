@@ -23,7 +23,7 @@ import io.swagger.annotations.Api;
 @RestController
 @RequestMapping("/v1/home")
 @Api(value = "Home Apis")
-public class HomeEndPoint {
+public class JMSCHomeEndPoint {
 	
 	
 	@Autowired
