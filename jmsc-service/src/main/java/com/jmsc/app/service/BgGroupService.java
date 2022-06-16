@@ -81,6 +81,7 @@ public class BgGroupService {
 				if(optional.isPresent()) {
 					CreditFacility cf = optional.get();
 					cf.setBgGroupId(newGroup.getId());
+					cf.setIsLien(Boolean.TRUE);
 					ServiceLocator.getService(CreditFacilityRepository.class).save(cf);
 				}
 			}
