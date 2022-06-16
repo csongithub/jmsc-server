@@ -85,7 +85,16 @@ public class CreditFacilityService {
 			
 		}
 		
+		boolean expired = hasExpired(dto);
+		if(!expired)
+			dto.setStatus(EFacilityStatus.ALIVE);
+		else
+			dto.setStatus(EFacilityStatus.EXPIRED);
+		
 		if(dto.getId() == null) {
+			
+			dto.setIsLien(Boolean.FALSE); //FOr any new facility set is_lien to false		
+			dto.setStatus(EFacilityStatus.ALIVE);
 			Optional<CreditFacility> optional = repository.findAllByClientIdAndAccountNumber(dto.getClientId(), dto.getAccountNumber());
 			if(optional.isPresent()) {
 				throw new RuntimeException("Account Number Already Exists");
@@ -100,6 +109,22 @@ public class CreditFacilityService {
 	
 	
 	
+	private boolean hasExpired(CreditFacilityDTO dto) {
+		
+		ZoneId defaultZoneId = ZoneId.systemDefault();
+		Date todaysDate = Date.from(java.time.LocalDate.now().atStartOfDay(defaultZoneId).toInstant());
+		
+	    long diffInMillies = dto.getMaturityDate().getTime() - todaysDate.getTime();
+	    long diff = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
+	    
+	    if(diff < 0)
+	    	return true;
+	    else
+	    	return false;
+	}
+	
+	
+	
 	
 	public List<CreditFacilityDTO> getAllActiveCrditFacility(Long clientId){
 		
@@ -108,7 +133,10 @@ public class CreditFacilityService {
 		if(Collections.isNullOrEmpty(cfList)) {
 			return new ArrayList<CreditFacilityDTO>();
 		}else {
-			cfList = filterByStatus(cfList, EFacilityStatus.ALIVE);
+			List<EFacilityStatus> list = new ArrayList<EFacilityStatus>();
+			list.add(EFacilityStatus.ALIVE);
+			list.add(EFacilityStatus.EXPIRED);
+			cfList = filterByStatus(cfList, list);
 			List<CreditFacilityDTO> cfDTOList =  ObjectMapperUtil.mapAll(cfList, CreditFacilityDTO.class);
 			return cfDTOList;
 		}
@@ -142,7 +170,10 @@ public class CreditFacilityService {
 		if(Collections.isNullOrEmpty(cfList)) {
 			return new ArrayList<CreditFacilityDTO>();
 		}else {
-			cfList = filterByStatus(cfList, EFacilityStatus.ALIVE);
+			List<EFacilityStatus> list = new ArrayList<EFacilityStatus>();
+			list.add(EFacilityStatus.ALIVE);
+			list.add(EFacilityStatus.EXPIRED);
+			cfList = filterByStatus(cfList, list);
 			List<CreditFacilityDTO> cfDTOList =  ObjectMapperUtil.mapAll(cfList, CreditFacilityDTO.class);
 			return cfDTOList;
 		}
@@ -178,6 +209,23 @@ public class CreditFacilityService {
 		cfList.removeAll(java.util.Collections.singletonList(null));
 		
 		return cfList;
+	}
+	
+	
+	private List<CreditFacility> filterByStatus(List<CreditFacility> cfList, List<EFacilityStatus> statusList){
+		List<CreditFacility> result = new ArrayList<CreditFacility>();
+		
+		if(Collections.isNullOrEmpty(cfList))
+			return result ;
+		
+		for(EFacilityStatus status: statusList) {
+			List<CreditFacility> filtered = cfList.stream().map(cf -> status.equals(cf.getStatus()) ? cf : null).collect(Collectors.toList());
+			result.addAll(filtered);
+		}
+
+		result.removeAll(java.util.Collections.singletonList(null));
+		
+		return result;
 	}
 	
 	

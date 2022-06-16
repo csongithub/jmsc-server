@@ -8,7 +8,8 @@ package com.jmsc.app.common.enums;
  *
  */
 public enum ENotificationType {
-	CREDIT_FACILITY,
+	CF_EXPRY_ALERT,
+	CF_EXPRY_UPDATE,
 	VEHICLES,
 	DOCUMENTS
 }
