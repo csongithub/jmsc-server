@@ -57,9 +57,6 @@ public class CreditFacilityService {
 	@Autowired
 	private ClientRepository clientRepository;
 	
-	@Autowired
-	private JmscProperties properties;
-	
 	
 	public CreditFacilityDTO addCreditFacility(CreditFacilityDTO dto) {
 		
@@ -504,14 +501,14 @@ public class CreditFacilityService {
 	
 	
 	
-	public Map<Long, List<CreditFacilityDTO>> evaluateExpiry(){
+	public Map<Long, List<CreditFacilityDTO>> evaluateExpiry(Long alertBeforeDays){
 		log.debug("Evaluating CF Expiry");
 		Map<Long, List<CreditFacilityDTO>> clientCfMap = new HashedMap<Long, List<CreditFacilityDTO>>();
 		List<Client> clients = clientRepository.findAll();
 		
 		if(!Collections.isNullOrEmpty(clients)) {
 			
-			Long cfAlertDays = properties.getCreditFacilityExpiryAlertDays();
+			Long cfAlertDays = alertBeforeDays != null ? alertBeforeDays : -1;
 			
 			for(Client client: clients) {
 				List<CreditFacilityDTO> cfList = new ArrayList<CreditFacilityDTO>();

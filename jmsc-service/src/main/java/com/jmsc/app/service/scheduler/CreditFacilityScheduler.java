@@ -25,6 +25,7 @@ import com.jmsc.app.common.enums.EFacilityStatus;
 import com.jmsc.app.common.enums.ENotificationType;
 import com.jmsc.app.common.util.DateUtils;
 import com.jmsc.app.common.util.Strings;
+import com.jmsc.app.config.jmsc.JmscProperties;
 import com.jmsc.app.config.jmsc.ServiceLocator;
 import com.jmsc.app.entity.CreditFacility;
 import com.jmsc.app.entity.Notification;
@@ -78,7 +79,10 @@ public class CreditFacilityScheduler {
 	
 	//@Scheduled(fixedRate = CREDIT_FACILITY_EXPIRY_INTERVAL)
 	public void alertCreditFacilityExpiry() {
-		Map<Long, List<CreditFacilityDTO>> expiringCf = cfService.evaluateExpiry();
+		JmscProperties properties = ServiceLocator.getService(JmscProperties.class);
+		Long alertBeforeDays = properties.getCreditFacilityExpiryAlertDays();
+		
+		Map<Long, List<CreditFacilityDTO>> expiringCf = cfService.evaluateExpiry(alertBeforeDays);
 		Set<Long> clients = expiringCf.keySet();
 		for(Long clientId: clients) {
 			
@@ -153,7 +157,8 @@ public class CreditFacilityScheduler {
 	 */
 	@Scheduled(fixedRate = CREDIT_FACILITY_EXPIRY_UPDATE_INTERVAL)
 	public void markFacilityExpired() {
-		Map<Long, List<CreditFacilityDTO>> expiringCf = cfService.evaluateExpiry();
+		
+		Map<Long, List<CreditFacilityDTO>> expiringCf = cfService.evaluateExpiry(null);
 		
 		if(expiringCf != null && expiringCf.size() > 0) {
 			Set<Long> clients = expiringCf.keySet();

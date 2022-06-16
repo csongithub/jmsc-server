@@ -86,7 +86,7 @@ public class CreditFacilityEndPoint {
 	
 	@GetMapping("/expiry")
 	ResponseEntity<Map<Long, List<CreditFacilityDTO>>> expiry(){
-		return ResponseEntity.ok(service.evaluateExpiry());
+		return ResponseEntity.ok(service.evaluateExpiry(null));
 	}
 	
 	
