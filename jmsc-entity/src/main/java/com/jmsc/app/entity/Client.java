@@ -59,6 +59,10 @@ public class Client implements Serializable{
 	private String recipients;
 	
 	
+	@Column(name = "ADMIN_PASSWORD")
+	private String adminPassword;
+	
+	
 	
 	
 	@Override

@@ -11,9 +11,12 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.jmsc.app.common.rqrs.AdminAuthRequest;
+import com.jmsc.app.common.rqrs.AdminAuthResponse;
 import com.jmsc.app.common.rqrs.LoginRequest;
 import com.jmsc.app.common.rqrs.LoginResponse;
 import com.jmsc.app.common.rqrs.ResetPasswordRequest;
+import com.jmsc.app.common.rqrs.UpdateAdminPasswordRequest;
 import com.jmsc.app.common.rqrs.UpdatePasswordRequest;
 import com.jmsc.app.common.rqrs.UpdatePasswordResponse;
 import com.jmsc.app.service.AuthService;
@@ -48,8 +51,22 @@ public class AuthEndPoint {
 	
 	
 	@PostMapping("/reset_password")
-	 public ResponseEntity<UpdatePasswordResponse> resetPassword(@RequestBody ResetPasswordRequest request, @RequestHeader("Authorization") String authorization)throws Throwable {
+	public ResponseEntity<UpdatePasswordResponse> resetPassword(@RequestBody ResetPasswordRequest request, @RequestHeader("Authorization") String authorization)throws Throwable {
 		UpdatePasswordResponse response = service.resetPassword(request, authorization);
 		return ResponseEntity.ok(response);
-	 }
+	}
+	
+	
+	@PostMapping("/authorize_admin_access")
+	public ResponseEntity<AdminAuthResponse> authorizeAdminAccess(@RequestBody AdminAuthRequest req) throws Throwable{
+		AdminAuthResponse response = service.authorizeAdminAccess(req);
+		return ResponseEntity.ok(response);
+	}
+	
+	
+	@PostMapping("/update_admin_password")
+	public ResponseEntity<UpdatePasswordResponse> updateAdminPassword(@RequestBody UpdateAdminPasswordRequest req) throws Throwable{
+		UpdatePasswordResponse response = service.updateAdminPassword(req);
+		return ResponseEntity.ok(response);
+	}
 }

@@ -32,7 +32,7 @@ public class ClientEndPoint {
 	private ClientService service;
 
 	@PostMapping("/addClient")
-	public ResponseEntity<ClientDTO> addClient(@RequestBody ClientDTO clientDTO){
+	public ResponseEntity<ClientDTO> addClient(@RequestBody ClientDTO clientDTO) throws Throwable {
 		ClientDTO client = service.addClient(clientDTO);
 		return ResponseEntity.ok(client);
 	}

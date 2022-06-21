@@ -17,7 +17,6 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper=false)
 @NoArgsConstructor
 public class ResetPasswordRequest implements Serializable {
-
 	/**
 	 * 
 	 */

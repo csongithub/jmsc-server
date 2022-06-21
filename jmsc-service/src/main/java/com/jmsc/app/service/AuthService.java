@@ -3,18 +3,25 @@
  */
 package com.jmsc.app.service;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.jmsc.app.common.dto.ClientDTO;
+import com.jmsc.app.common.rqrs.AdminAuthRequest;
+import com.jmsc.app.common.rqrs.AdminAuthResponse;
 import com.jmsc.app.common.rqrs.LoginRequest;
 import com.jmsc.app.common.rqrs.LoginResponse;
 import com.jmsc.app.common.rqrs.ResetPasswordRequest;
+import com.jmsc.app.common.rqrs.UpdateAdminPasswordRequest;
 import com.jmsc.app.common.rqrs.UpdatePasswordRequest;
 import com.jmsc.app.common.rqrs.UpdatePasswordResponse;
 import com.jmsc.app.common.util.ObjectMapperUtil;
 import com.jmsc.app.common.util.Strings;
+import com.jmsc.app.config.jmsc.ServiceLocator;
 import com.jmsc.app.entity.Client;
+import com.jmsc.app.repository.ClientRepository;
 import com.jmsc.app.service.jwt.JwtProvider;
 import com.jmsc.app.service.jwt.JwtTokenUtil;
 
@@ -49,7 +56,7 @@ public class AuthService {
 			return response;
 		}
 		
-		ClientDTO client = service.getClientByLogonId(request.getLogonId());
+		ClientDTO client = service.getClientForAuth(request.getLogonId());
 		if(client != null) {
 			
 			if(!"ACTIVE".equalsIgnoreCase(client.getStatus())) {
@@ -59,7 +66,7 @@ public class AuthService {
 			LoginResponse response = new LoginResponse();
 			String encryptedPassword = encService.getEncryptedPassword(request.getPassword());
 			if(encryptedPassword.equals(client.getPassword())) {
-				client.removePassword();
+				client.clearAllPassword();
 				response.setLoginSuccess(true);
 				response.setClientDTO(client);
 				
@@ -130,7 +137,7 @@ public class AuthService {
 		}
 		
 		UpdatePasswordResponse response = new UpdatePasswordResponse();
-		ClientDTO clientDTO = service.getClientByLogonId(request.getLogonId());
+		ClientDTO clientDTO = service.getClientForAuth(request.getLogonId());
 		Client client = ObjectMapperUtil.map(clientDTO, Client.class);
 		String encryptedPassword = encService.getEncryptedPassword(request.getNewPassword());
 		
@@ -142,5 +149,133 @@ public class AuthService {
 		
 		return response;
 	}
+	
+	
+	/**
+	 * This service is useful in authorizing a client with Admin access.
+	 * For example lets say that if someone who has logged in to the application
+	 * and want to delete or modify some credit facility, so such type of actions
+	 * would be required to validate with admin password. Once the user will provide 
+	 * the correct admin password then only he will be able to perform such kind of 
+	 * authorized action.
+	 * @param req
+	 * @return
+	 */
+	public AdminAuthResponse authorizeAdminAccess(AdminAuthRequest req) throws Throwable{
+		
+		if(req.getClientId() == null || Strings.isNullOrEmpty(req.getAdminPassword())){
+			throw new RuntimeException("Insufficient Data");
+		}
+		
+		ClientDTO client = service.getClientForAuth(req.getClientId());
+		if(client != null) {
+			
+			if(!"ACTIVE".equalsIgnoreCase(client.getStatus())) {
+				throw new RuntimeException("Use has been blocked, Kindly contact admin");
+			}
+			
+			AdminAuthResponse response = new AdminAuthResponse();
+			String encryptedAdminPassword = encService.getEncryptedPassword(req.getAdminPassword());
+			
+			if(encryptedAdminPassword.equals(client.getAdminPassword())) {
+				response.setAuthorized(true);
+				response.setMessage("Authorization Successful");
+			} else {
+				response.setAuthorized(false);
+				response.setMessage("Authorization Failed");
+			}
+			return response;
+		}else {
+			AdminAuthResponse response = new AdminAuthResponse();
+			response.setAuthorized(false);
+			response.setMessage("Client not found");
+			return response;
+		}
+	}
+	
+	
+	
+	
+	
+	public UpdatePasswordResponse updateAdminPassword(UpdateAdminPasswordRequest request) {
+		
+		if(Strings.isNullOrEmpty(request.getLogonId()) || Strings.isNullOrEmpty(request.getPassword()) 
+				|| Strings.isNullOrEmpty(request.getCurrentAdminPassword()) ||  Strings.isNullOrEmpty(request.getNewAdminPassword())){
+			UpdatePasswordResponse response = new UpdatePasswordResponse();
+			response.setUpdateSuccess(false);
+			response.setMessage("Insufficient Data");
+			return response;
+		}
+		
+		LoginRequest loginRequest = new LoginRequest();
+		loginRequest.setLogonId(request.getLogonId());
+		loginRequest.setPassword(request.getPassword());
+		
+		// First validate the user with login
+		LoginResponse loginResponse = this.login(loginRequest);
+		
+		UpdatePasswordResponse response = new UpdatePasswordResponse();
+		
+		/*
+		 * Once login is successful then update the admin password
+		 */
+		if(loginResponse.isLoginSuccess()) {
+			/*
+			 * In the client present in the login response password info wont be there
+			 * So, need to fetch the client from database  to get the password info.
+			 * 
+			 * Get the client id from login response data and fetch the client from the database
+			 */
+			Long clientId = loginResponse.getClientDTO().getId();
+			
+			ClientRepository clientRepository = ServiceLocator.getService(ClientRepository.class);
+			
+			Optional<Client> optional =  clientRepository.findById(clientId);
+			
+			Client client = null;
+			
+			if(optional.isPresent())
+				client = optional.get();
+			else
+				throw new RuntimeException("Somethting went wrong, please try again later");
+			/*
+			 *Check if the Admin password is present in the client object.
+			 *If it is present then go for Admin password updation, otherwise 
+			 *throw error, because password update can be done only if old 
+			 *password ispresent.
+			 *
+			 */
+			if(Strings.isNullOrEmpty(client.getAdminPassword()))
+				throw new RuntimeException("Somethgin went wrong, pleas try later");
+		
+			
+			String currentAdminPwdEnc = encService.getEncryptedPassword(request.getCurrentAdminPassword());
+			
+			/*
+			 * If admin password is present then first match it with the current admin password in the request.
+			 * If the current admin password matches with the client admin password, then update the new admin password
+			 */
+			if(client.getAdminPassword().equals(currentAdminPwdEnc)) {
+				String newAdminPwdEnc = encService.getEncryptedPassword(request.getNewAdminPassword());
+				
+				client.setAdminPassword(newAdminPwdEnc);
+				clientRepository.save(client);
+				
+				response.setUpdateSuccess(true);
+				response.setMessage("Password Updated Successfully");
+			} else {
+				response.setUpdateSuccess(false);
+				response.setMessage("Admin password did not match");
+			}
+			
+			
+			
+		} else {
+			response.setUpdateSuccess(false);
+			response.setMessage(loginResponse.getMessage());
+		}
+		return response;
+	}
+	
 
 }
