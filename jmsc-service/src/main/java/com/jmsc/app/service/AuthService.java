@@ -199,38 +199,36 @@ public class AuthService {
 	
 	public UpdatePasswordResponse updateAdminPassword(UpdateAdminPasswordRequest request) {
 		
-		if(Strings.isNullOrEmpty(request.getLogonId()) || Strings.isNullOrEmpty(request.getPassword()) 
-				|| Strings.isNullOrEmpty(request.getCurrentAdminPassword()) ||  Strings.isNullOrEmpty(request.getNewAdminPassword())){
-			UpdatePasswordResponse response = new UpdatePasswordResponse();
-			response.setUpdateSuccess(false);
-			response.setMessage("Insufficient Data");
-			return response;
-		}
-		
-		LoginRequest loginRequest = new LoginRequest();
-		loginRequest.setLogonId(request.getLogonId());
-		loginRequest.setPassword(request.getPassword());
-		
-		// First validate the user with login
-		LoginResponse loginResponse = this.login(loginRequest);
+//		if(Strings.isNullOrEmpty(request.getLogonId()) || Strings.isNullOrEmpty(request.getPassword()) 
+//				|| Strings.isNullOrEmpty(request.getCurrentAdminPassword()) ||  Strings.isNullOrEmpty(request.getNewAdminPassword())){
+//			UpdatePasswordResponse response = new UpdatePasswordResponse();
+//			response.setUpdateSuccess(false);
+//			response.setMessage("Insufficient Data");
+//			return response;
+//		}
+//		
+//		LoginRequest loginRequest = new LoginRequest();
+//		loginRequest.setLogonId(request.getLogonId());
+//		loginRequest.setPassword(request.getPassword());
+//		
+//		// First validate the user with login
+//		LoginResponse loginResponse = this.login(loginRequest);
 		
 		UpdatePasswordResponse response = new UpdatePasswordResponse();
 		
 		/*
 		 * Once login is successful then update the admin password
 		 */
-		if(loginResponse.isLoginSuccess()) {
+		if(request.getClientId() != null) {
 			/*
 			 * In the client present in the login response password info wont be there
 			 * So, need to fetch the client from database  to get the password info.
 			 * 
 			 * Get the client id from login response data and fetch the client from the database
 			 */
-			Long clientId = loginResponse.getClientDTO().getId();
-			
 			ClientRepository clientRepository = ServiceLocator.getService(ClientRepository.class);
 			
-			Optional<Client> optional =  clientRepository.findById(clientId);
+			Optional<Client> optional =  clientRepository.findById(request.getClientId());
 			
 			Client client = null;
 			
@@ -265,14 +263,14 @@ public class AuthService {
 				response.setMessage("Password Updated Successfully");
 			} else {
 				response.setUpdateSuccess(false);
-				response.setMessage("Admin password did not match");
+				response.setMessage("Current Admin password did not match");
 			}
 			
 			
 			
 		} else {
 			response.setUpdateSuccess(false);
-			response.setMessage(loginResponse.getMessage());
+			response.setMessage("Insufficient Data");
 		}
 		return response;
 	}
