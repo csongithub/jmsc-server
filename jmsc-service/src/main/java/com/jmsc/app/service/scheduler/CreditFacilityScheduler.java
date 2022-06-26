@@ -52,8 +52,6 @@ public class CreditFacilityScheduler {
 	
 	private final long CREDIT_FACILITY_EXPIRY_INTERVAL = 30 * 60000; //At Every 30 Minutes
 	
-	private final long CREDIT_FACILITY_EXPIRY_UPDATE_INTERVAL = 30 * 60000;
-	
 	private final String CREDIT_FACILITY_EXPIRY_TEMPLATE_RESOURCE = "classpath:cf_expiry_alert_template.html";
 	
 	@Autowired
@@ -146,57 +144,6 @@ public class CreditFacilityScheduler {
 				} catch (MessagingException e) {
 					e.printStackTrace();
 				}
-			}
-		}
-	}
-	
-	
-	
-	/**
-	 * This schedule marks all expired credit facilities in the table
-	 */
-	@Scheduled(fixedRate = CREDIT_FACILITY_EXPIRY_UPDATE_INTERVAL)
-	public void markFacilityExpired() {
-		
-		Map<Long, List<CreditFacilityDTO>> expiringCf = cfService.evaluateExpiry(null);
-		
-		if(expiringCf != null && expiringCf.size() > 0) {
-			Set<Long> clients = expiringCf.keySet();
-			for(Long clientId: clients) {
-				
-				//Check if this has been already alerted today, if yes then do not alert again today
-				Optional<Notification> optional =  notificationRepo.findByClientIdAndType(clientId, ENotificationType.CF_EXPRY_UPDATE);
-				Notification notification = null;
-				if(optional.isPresent()) {
-					notification  = optional.get();
-					Date lastUpdated = notification.getUpdatedTimestamp();
-					if(DateUtils.isToday(lastUpdated)) {
-						log.debug("Credit Facility Expiry Evaluation Already Done For the Day");
-						continue;
-					} else {
-						log.debug("Starting Credit Facility Expiry Evaluation");
-					}
-				}
-				
-				
-				List<CreditFacilityDTO> list = expiringCf.get(clientId);
-				for(CreditFacilityDTO cfDTO: list) {
-					
-					CreditFacilityRepository cfRepository = ServiceLocator.getService(CreditFacilityRepository.class);
-					Optional<CreditFacility> optionalCF = cfRepository.findByIdAndClientId(cfDTO.getId(), clientId);
-					if(optionalCF.isPresent()) {
-						CreditFacility cf = optionalCF.get();
-						cf.setStatus(EFacilityStatus.EXPIRED);
-						cfRepository.save(cf);
-					}
-				}
-				if(notification == null) {
-					notification = new Notification();
-					notification.setClientId(clientId);
-					notification.setType(ENotificationType.CF_EXPRY_UPDATE);
-				}
-				notification.setUpdatedTimestamp(null);
-				notificationRepo.save(notification);
 			}
 		}
 	}

@@ -11,6 +11,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 
 import com.jmsc.app.config.jmsc.ServiceLocator;
+import com.jmsc.app.service.scheduler.PostActivationService;
 
 
 
@@ -25,10 +26,33 @@ import com.jmsc.app.config.jmsc.ServiceLocator;
 @EnableAutoConfiguration
 @EnableConfigurationProperties
 public class JMSCApplication {
+	
 	public static void main(String[] args) {
 		System.out.println("Java Version- " + System.getProperty("java.version"));
 		System.setProperty("spring.devtools.restart.enabled", "false");
+		
 		ConfigurableApplicationContext ctx = SpringApplication.run(JMSCApplication.class, args);
+		
 		ServiceLocator.getInstance().initialize(ctx);
+		
+		/**
+		 * Call hook to execute post activation calls
+		 */
+		executePostActivte();
 	}
+	
+	
+	/**
+	 * This is a hook method to call all services which needs to start once post activation of this application
+	 */
+	private static void executePostActivte() {
+
+		System.out.println("Executing post activation....");
+		
+		PostActivationService execute = ServiceLocator.getService(PostActivationService.class);
+		
+		//Mark credit facility expiry for all clients
+		execute.markFacilityExpired();
+	}
+	
 }

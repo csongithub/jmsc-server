@@ -263,7 +263,7 @@ public class AuthService {
 				response.setMessage("Password Updated Successfully");
 			} else {
 				response.setUpdateSuccess(false);
-				response.setMessage("Current Admin password did not match");
+				response.setMessage("Incorrect admin password");
 			}
 			
 			
