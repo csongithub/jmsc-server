@@ -1,0 +1,2 @@
+q-bar 	class="bg-primary glossy text-white text-weight-light text-subtitle2"
+q-btn	class="text-capitalize text-weight-light text-subtitle2"
