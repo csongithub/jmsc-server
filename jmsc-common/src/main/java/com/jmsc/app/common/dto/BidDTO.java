@@ -92,4 +92,6 @@ public class BidDTO implements Serializable{
 	
 	
 	private Long bidId;
+	
+	private Long siteId;
 }

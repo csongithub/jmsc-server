@@ -13,6 +13,8 @@ import javax.persistence.TemporalType;
 
 import org.hibernate.annotations.UpdateTimestamp;
 
+import com.sun.istack.NotNull;
+
 import lombok.Data;
 
 @MappedSuperclass
@@ -23,7 +25,10 @@ public class BaseEntity implements Serializable{
 	 * 
 	 */
 	private static final long serialVersionUID = 2899482330401514356L;
-
+	
+	@NotNull
+	@Column(name = "CLIENT_ID")
+	private Long clientId;
 
 	@Column(name = "CREATED_TS",  insertable = true, updatable = false)
 	@Temporal(TemporalType.TIMESTAMP)

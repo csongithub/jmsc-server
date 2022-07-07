@@ -40,10 +40,6 @@ public class Loan extends BaseEntity {
 	private Long id;
 	
 	@NotNull
-	@Column(name = "CLIENT_ID")
-	private Long clientId;
-	
-	@NotNull
 	@Column(name = "ACCOUNT_NO")
 	private String accountNo;
 	

@@ -3,6 +3,9 @@
  */
 package com.jmsc.app.common.util;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 /**
  * @author Chandan
  *
@@ -11,6 +14,18 @@ import java.util.Calendar;
 import java.util.Date;
 
 public class DateUtils {
+	
+	
+	public static boolean isValidFormat(String date, String format) {
+        DateFormat sdf = new SimpleDateFormat(format);
+        sdf.setLenient(false);
+        try {
+            sdf.parse(date);
+        } catch (ParseException e) {
+            return false;
+        }
+        return true;
+    }
     
     /**
      * <p>Checks if two dates are on the same day ignoring time.</p>

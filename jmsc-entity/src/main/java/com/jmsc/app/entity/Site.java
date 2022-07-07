@@ -3,14 +3,18 @@
  */
 package com.jmsc.app.entity;
 
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 import com.sun.istack.NotNull;
+import com.sun.istack.Nullable;
 
 import lombok.Data;
 
@@ -20,12 +24,12 @@ import lombok.Data;
  */
 @Data
 @Entity
-@Table(name = "PAYMENT_DRAFT")
-public class PaymentDraft extends BaseEntity {
+public class Site extends BaseEntity {
+
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -6703228999839709912L;
+	private static final long serialVersionUID = -381745943053272394L;
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,15 +37,29 @@ public class PaymentDraft extends BaseEntity {
 	private Long id;
 	
 	@NotNull
-	@Column(name = "STATUS")
-	private String status;
+	@Column(name = "SITE_NAME")
+	private String siteName;
 	
 	@NotNull
-	@Column(name = "DRAFT")
-	private byte[] draft;
+	@Column(name = "DISPLAY_NAME")
+	private String displayName;
 	
+	@Nullable
+	@Column(name = "BID_LINKAGE_ID")
+	private Long bidLinkageId;
 	
+	@Nullable
+	@Column(name = "AGREEMENT_NO")
+	private String agreementNo;
 	
+	@Nullable
+	@Temporal(TemporalType.DATE)
+	@Column(name = "AGREEMENT_DATE")
+	private Date agreementDate;
+	
+	@Nullable
+	@Column(name = "AGREEMENT_VALUE")
+	private Long agreementValue;
 	
 	
 	@Override
@@ -60,7 +78,7 @@ public class PaymentDraft extends BaseEntity {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		PaymentDraft other = (PaymentDraft) obj;
+		Site other = (Site) obj;
 		if (id == null) {
 			if (other.id != null)
 				return false;

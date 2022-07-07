@@ -35,10 +35,6 @@ public class Notification extends BaseEntity{/**
 	private Long id;
 	
 	@NotNull
-	@Column(name = "CLIENT_ID")
-	private Long clientId;
-	
-	@NotNull
 	@Enumerated(EnumType.STRING)
 	@Column(name = "TYPE")
 	private ENotificationType type;

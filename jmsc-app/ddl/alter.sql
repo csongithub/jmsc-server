@@ -11,5 +11,6 @@ alter table jmsc.CREDIT_FACILITY add column LOAN_ID integer;
 alter table jmsc.CREDIT_FACILITY add column	IS_LIEN boolean  NOT NULL default false;
 alter table jmsc.CREDIT_FACILITY add column	STATUS character varying(50) NOT NULL default 'ALIVE';
 
---admin password
+--admin password, sites
 alter table jmsc.CLIENT add column ADMIN_PASSWORD character varying(200);
+alter table jmsc.BID add column SITE_ID integer;

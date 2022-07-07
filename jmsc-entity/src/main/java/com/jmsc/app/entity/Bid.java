@@ -42,10 +42,6 @@ public class Bid extends BaseEntity {
 	private Long id;
 	
 	@NotNull
-	@Column(name = "CLIENT_ID")
-	private Long clientId;
-	
-	@NotNull
 	@Column(name = "DISPLAY_NAME")
 	private String displayName;
 	
@@ -153,6 +149,12 @@ public class Bid extends BaseEntity {
 	 */
 	@Column(name = "BID_ID")
 	private Long bidId;
+	
+	/**
+	 * In case when bid is awarded and we have an equivalent site in system
+	 */
+	@Column(name = "SITE_ID")
+	private Long siteId;
 	
 	@Override
 	public int hashCode() {

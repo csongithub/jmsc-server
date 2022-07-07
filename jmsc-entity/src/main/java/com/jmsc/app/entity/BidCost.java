@@ -35,9 +35,6 @@ public class BidCost extends BaseEntity{
 	@Column(name = "ID")
 	private Long id;
 	
-	@Column(name = "CLIENT_ID")
-	private Long clientId;
-	
 	@Column(name = "BID_ID")
 	private Long bidId;
 	
