@@ -6,13 +6,8 @@ package com.jmsc.app.common.dto;
 import java.io.Serializable;
 import java.util.Date;
 
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.jmsc.app.common.enums.ELoanStatus;
-import com.sun.istack.NotNull;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -23,8 +18,9 @@ import lombok.ToString;
  *
  */
 @Data
-@EqualsAndHashCode(callSuper=false)
 @ToString
+@JsonIgnoreProperties(ignoreUnknown = true)
+@EqualsAndHashCode(callSuper=false)
 public class LoanDTO implements Serializable{
 	/**
 	 * 

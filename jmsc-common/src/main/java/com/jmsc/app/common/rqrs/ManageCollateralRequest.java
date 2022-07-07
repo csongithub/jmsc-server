@@ -6,6 +6,7 @@ package com.jmsc.app.common.rqrs;
 import java.io.Serializable;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.jmsc.app.common.dto.CreditFacilityDTO;
 import com.jmsc.app.common.dto.LoanDTO;
 
@@ -16,6 +17,7 @@ import lombok.Data;
  *
  */
 @Data
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ManageCollateralRequest implements Serializable{
 	/**
 	 * 

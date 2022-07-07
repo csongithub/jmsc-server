@@ -27,6 +27,7 @@ public class WebConfiguration implements WebMvcConfigurer {
 	  public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
 	    JavaTimeModule module = new JavaTimeModule();
 	    module.addDeserializer(Date.class, new CustomJsonDateDeserializer());
+	    module.addSerializer(Date.class, new CustomJsonDateSerializer());
 
 	    ObjectMapper mapper = new ObjectMapper();
 	    mapper.registerModule(module);

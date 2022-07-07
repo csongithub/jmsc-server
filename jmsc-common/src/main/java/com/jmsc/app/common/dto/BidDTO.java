@@ -6,8 +6,10 @@ package com.jmsc.app.common.dto;
 import java.io.Serializable;
 import java.util.Date;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.jmsc.app.common.enums.EBidSourceSite;
 import com.jmsc.app.common.enums.EBidStatus;
+import com.jmsc.app.config.jmsc.CustomJsonDateSerializer;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -43,10 +45,8 @@ public class BidDTO implements Serializable{
 	
 	private String 	tenderId;
 	
-
 	private String 	title;
 	
-
 	private Long 	workValue;
 	
 	private Long 	biddingCost;
@@ -63,33 +63,23 @@ public class BidDTO implements Serializable{
 	
 	private Long 	bankCertificate;
 	
-
 	private Long	periodOfWork;
-	
 	
 	private Long	bidValidity;
 	
-
 	private Date	bidStartDate;
 	
-
 	private Date	bidEndDate;
 	
-
 	private Date	bidOpeningDate;
 	
-
 	private Double	biddingRate;
 	
-
 	private EBidStatus status;
-	
 	
 	private String 	reason;
 	
-	
 	private Date bidSubmittedDate;
-	
 	
 	private Long bidId;
 	

@@ -6,7 +6,6 @@ package com.jmsc.app.common.dto;
 import java.io.Serializable;
 import java.util.Date;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.Data;
@@ -44,7 +43,6 @@ public class SiteDTO implements Serializable {
 	private String agreementNo;
 
 	@JsonProperty("agreement_date")
-//	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-YYYY")
 	private Date agreementDate;
 
 	@JsonProperty("agreement_value")
