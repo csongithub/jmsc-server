@@ -6,10 +6,8 @@ package com.jmsc.app.common.dto;
 import java.io.Serializable;
 import java.util.Date;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.jmsc.app.common.enums.EBidSourceSite;
 import com.jmsc.app.common.enums.EBidStatus;
-import com.jmsc.app.config.jmsc.CustomJsonDateSerializer;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
