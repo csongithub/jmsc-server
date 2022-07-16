@@ -6,8 +6,6 @@ package com.jmsc.app.common.dto;
 import java.io.Serializable;
 import java.util.Date;
 
-import javax.persistence.Column;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.jmsc.app.common.enums.EMachineType;
@@ -24,7 +22,8 @@ import lombok.ToString;
 @ToString
 @JsonIgnoreProperties(ignoreUnknown = true)
 @EqualsAndHashCode(callSuper=false)
-public class MachineDTO implements Serializable{/**
+public class MachineDTO implements Serializable{
+	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 5866758490302680599L;
@@ -37,9 +36,9 @@ public class MachineDTO implements Serializable{/**
 
 	@JsonProperty("name")
 	private String name;
-
-	@JsonProperty("display_name")
-	private String displayName;
+	
+	@JsonProperty("owner")
+	private String owner;
 	
 	@JsonProperty("machine_type")
 	private EMachineType EMachineType;
@@ -65,9 +64,18 @@ public class MachineDTO implements Serializable{/**
 	@JsonProperty("tax_valid_up_to")
 	private Date taxValidUpTo;
 	
-	@Column(name = "pollution_valid_up_to")
+	@JsonProperty("pollution_valid_up_to")
 	private Date pollutionValidUpTo;
 	
-	@Column(name = "fitness_valid_up_to")
+	@JsonProperty("fitness_valid_up_to")
 	private Date fitnessValidUpTo;
+	
+	
+	public void toUppercase() {
+		this.name = this.name.trim().toUpperCase();
+		this.owner = this.owner.trim().toUpperCase();
+		this.registrationNo = this.registrationNo.trim().toUpperCase();
+		this.chasisNo = this.chasisNo.trim().toUpperCase();
+		this.engineNo = this.engineNo.trim().toUpperCase();
+	}
 }

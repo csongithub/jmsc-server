@@ -87,7 +87,7 @@ public class CreditFacility extends BaseEntity{
 	private Boolean isPledged;
 	
 	/**
-	 * Linked BID ID
+	 * Linked BID ID or Site Id if submitted against agreement in a project
 	 */
 	@Nullable
 	@Column(name = "PLEDGED_ID")

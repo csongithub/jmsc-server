@@ -25,7 +25,7 @@ import lombok.Data;
  */
 @Data
 @Entity
-@Table(name = "PARTY")
+@Table(name = "MACHINE")
 public class Machine extends BaseEntity{
 	/**
 	 * 
@@ -42,8 +42,8 @@ public class Machine extends BaseEntity{
 	private String name;
 	
 	@NotNull
-	@Column(name = "DISPLAY_NAME")
-	private String displayName;
+	@Column(name = "OWNER")
+	private String owner;
 	
 	@Column(name = "MACHINE_TYPE")
 	private EMachineType EMachineType;
@@ -52,7 +52,7 @@ public class Machine extends BaseEntity{
 	private String registrationNo;
 	
 	@Temporal(TemporalType.DATE)
-	@Column(name = "REGI_NO")
+	@Column(name = "REGI_DATE")
 	private Date registrationDate;
 	
 	@Column(name = "CHASIS_NO")
