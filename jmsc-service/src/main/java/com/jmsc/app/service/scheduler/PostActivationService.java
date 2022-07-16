@@ -32,8 +32,38 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class PostActivationService {
 	
+	private final long gloab_client_id = 0l;
 	
-	
+	/**
+	 * @throws Throwable 
+	 * 
+	 */
+	public void dataBackup() throws Throwable {
+		PostgresService service  = ServiceLocator.getService(PostgresService.class);
+		
+		NotificationRepository notificationRepo =  ServiceLocator.getService(NotificationRepository.class);
+		Optional<Notification> optional =  notificationRepo.findByClientIdAndType(gloab_client_id, ENotificationType.DATA_BACKUP);
+		Notification notification = null;
+		
+		if(optional.isPresent()) {
+			notification  = optional.get();
+			Date lastUpdated = notification.getUpdatedTimestamp();
+			if(DateUtils.isToday(lastUpdated)) {
+				log.debug("Data-Backup Already done for the day");
+				return;
+			}
+		}
+		
+		service.startBackup();
+		
+		if(notification == null) {
+			notification = new Notification();
+			notification.setClientId(gloab_client_id);
+			notification.setType(ENotificationType.DATA_BACKUP);
+		}
+		notification.setUpdatedTimestamp(null);
+		notificationRepo.save(notification);
+	}
 	
 	public void markFacilityExpired() {
 		
@@ -53,7 +83,7 @@ public class PostActivationService {
 					notification  = optional.get();
 					Date lastUpdated = notification.getUpdatedTimestamp();
 					if(DateUtils.isToday(lastUpdated)) {
-						log.debug("Credit Facility Expiry Evaluation Already Done For the Day");
+						log.debug("Credit-Facility Expiry evaluation already done for the day for the client {}", clientId);
 						continue;
 					} else {
 						log.debug("Starting Credit Facility Expiry Evaluation");

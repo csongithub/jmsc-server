@@ -35,11 +35,13 @@ public class PostgresService {
 	
 	public PostgresBackup startBackup() throws Throwable {
 		
+		log.debug("Starting Data Backup...");
+		
 		System.out.println("*************************************************");
 		System.out.println("*         Starting Database Backup Now");
 		System.out.println("*************************************************");
 		
-		
+		long startTime = System.currentTimeMillis();
 		
 		PostgresBackup backup = new PostgresBackup();
 		
@@ -90,7 +92,13 @@ public class PostgresService {
 	        	backup.setBackupDone(true);
 	        }
 	        log.info("Exit Code: {}", p.exitValue());
-
+	        long endTime = System.currentTimeMillis();
+	        
+	        long executionTime = endTime - startTime;
+	        
+	        log.debug("Data Backup Completed Successfully...");
+	        log.debug("Data Backup Took {} Millisecond.", executionTime);
+	        
 	    } catch (IOException | InterruptedException e) {
 	        System.out.println(e.getMessage());
 	    }
@@ -105,7 +113,7 @@ public class PostgresService {
 	    StringBuffer date = new StringBuffer();
 	    date.append(df.format(Calendario.getTime()));
 	    
-	    StringBuffer file = new StringBuffer("jmsc_db_").append(date.toString()).append(".").append(format);
+	    StringBuffer file = new StringBuffer("jmsc_db_backup_").append(date.toString()).append(".").append(format);
 	    System.out.println(file.toString());
 	    return file.toString();
 	}

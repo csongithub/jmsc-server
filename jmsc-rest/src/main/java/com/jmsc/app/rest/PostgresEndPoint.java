@@ -29,7 +29,7 @@ public class PostgresEndPoint {
 
 	
 	
-	@PostMapping("/create_backup")
+	@PostMapping("/backup")
 	public ResponseEntity<PostgresBackup> backup() throws Throwable{
 		PostgresBackup response = service.startBackup();
 		return ResponseEntity.ok(response);

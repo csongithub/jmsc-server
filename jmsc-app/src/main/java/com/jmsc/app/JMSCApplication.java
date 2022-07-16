@@ -48,11 +48,19 @@ public class JMSCApplication {
 	private static void executePostActivte() {
 
 		System.out.println("Executing post activation....");
+		try {
+			PostActivationService execute = ServiceLocator.getService(PostActivationService.class);
+			
+			//Mark credit facility expiry for all clients
+			execute.markFacilityExpired();
+			
+			//Start Data-Backup
+			execute.dataBackup();
+		}catch(Throwable t) {
+			
+		}
 		
-		PostActivationService execute = ServiceLocator.getService(PostActivationService.class);
 		
-		//Mark credit facility expiry for all clients
-		execute.markFacilityExpired();
 	}
 	
 }

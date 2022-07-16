@@ -11,5 +11,6 @@ public enum ENotificationType {
 	CF_EXPRY_ALERT,
 	CF_EXPRY_UPDATE,
 	VEHICLES,
-	DOCUMENTS
+	DOCUMENTS,
+	DATA_BACKUP
 }
