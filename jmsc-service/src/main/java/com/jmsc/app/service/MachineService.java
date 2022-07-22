@@ -69,6 +69,15 @@ public class MachineService {
 		}
 		
 		List<MachineDTO> machines = ObjectMapperUtil.mapAll(all, MachineDTO.class);
+		
+		boolean mask = false;
+		if(mask) {
+			machines.stream().forEach(m -> {
+				m.setChasisNo(Strings.mask(m.getChasisNo(), 4));
+				m.setEngineNo(Strings.mask(m.getEngineNo(), 4));
+			});
+		}
+		
 		return machines;
 	}
 	

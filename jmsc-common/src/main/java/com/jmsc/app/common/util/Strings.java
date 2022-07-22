@@ -61,7 +61,26 @@ public class Strings {
             return s;
         return s.length() > size ? s.substring(0, size) : s;
     }
-
+    
+    
+    
+    public static String mask(String str, int visibleLength) {
+    	int length = str.length();
+    	int maskLength = length - visibleLength;
+    	
+    	String visible = str.substring(maskLength);
+    	
+    	StringBuilder sb = new StringBuilder();
+    	
+    	while(maskLength !=0 ) {
+    		sb.append("*");
+    		maskLength--;
+    	}
+    	
+    	sb.append(visible);
+    	
+    	return sb.toString();
+    }
 
 
 

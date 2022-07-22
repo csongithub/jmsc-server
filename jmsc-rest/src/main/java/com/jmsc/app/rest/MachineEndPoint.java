@@ -15,9 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jmsc.app.common.dto.MachineDTO;
-import com.jmsc.app.common.dto.PartyDTO;
 import com.jmsc.app.service.MachineService;
-import com.jmsc.app.service.PartyService;
 
 import io.swagger.annotations.Api;
 
