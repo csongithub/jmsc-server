@@ -3,6 +3,9 @@
  */
 package com.jmsc.app;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -10,8 +13,9 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 
+import com.jmsc.app.config.jmsc.JmscEvent;
+import com.jmsc.app.config.jmsc.JmscEventPublisher;
 import com.jmsc.app.config.jmsc.ServiceLocator;
-import com.jmsc.app.service.scheduler.PostActivationService;
 
 
 
@@ -48,17 +52,13 @@ public class JMSCApplication {
 	private static void executePostActivte() {
 
 		System.out.println("Executing post activation....");
-		try {
-			PostActivationService execute = ServiceLocator.getService(PostActivationService.class);
-			
-			//Mark credit facility expiry for all clients
-			execute.markFacilityExpired();
-			
-			//Start Data-Backup
-			execute.dataBackup();
-		}catch(Throwable t) {
-			
-		}
+		JmscEventPublisher eventPublisher = ServiceLocator.getService(JmscEventPublisher.class);
+		
+		Map<String, Object> eventMap = new HashMap<String, Object>();
+		eventMap.put("topic", JmscEvent.POST_ACTIVATE_EVENT_TOPIC);
+		eventMap.put("payload", null);
+		
+		eventPublisher.publishEvent(eventMap);
 		
 		
 	}
