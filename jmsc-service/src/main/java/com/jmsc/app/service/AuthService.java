@@ -106,7 +106,12 @@ public class AuthService {
 		UpdatePasswordResponse response = new UpdatePasswordResponse();
 		
 		if(loginResponse.isLoginSuccess()) {
-			Client client = ObjectMapperUtil.map(loginResponse.getClientDTO(), Client.class);
+			
+			Optional<Client> optional =  ServiceLocator.getService(ClientRepository.class).findByLogonId(request.getLogonId());
+			Client client = null;
+			if(optional.isPresent()) {
+				client = optional.get();
+			}
 			String encryptedPassword = encService.getEncryptedPassword(request.getNewPassword());
 			client.setPassword(encryptedPassword);
 			ClientDTO clientDTO = ObjectMapperUtil.map(client, ClientDTO.class);
