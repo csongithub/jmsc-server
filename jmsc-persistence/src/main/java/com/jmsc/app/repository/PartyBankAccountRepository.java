@@ -19,4 +19,6 @@ public interface PartyBankAccountRepository extends JpaRepository<PartyBankAccou
 	public List<PartyBankAccount> findByClientId(Long clientId);
 	
 	public Optional<PartyBankAccount> findByClientIdAndAccountNumber(Long clientId, String accountNumber);
+	
+	public Optional<PartyBankAccount> findByClientIdAndId(Long clientId, Long id);
 }

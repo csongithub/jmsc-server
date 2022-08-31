@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -66,5 +67,13 @@ public class PartyBankAccountEndPoint {
 	public ResponseEntity<List<PartyBankAccountDTO>> getAllAccounts(@RequestParam("clientId") Long clientId) {
 		List<PartyBankAccountDTO> accounts = service.getAllAccounts(clientId);
 		return ResponseEntity.ok(accounts);
+	}
+	
+	
+	
+	@GetMapping("/account_by_id/{client_id}/{account_id}")
+	public ResponseEntity<PartyBankAccountDTO> getAccount(@PathVariable("client_id")Long clientId, @PathVariable("account_id")Long accountId) {
+		PartyBankAccountDTO account  = service.getAccount(clientId, accountId);
+		return ResponseEntity.ok(account);
 	}
 }

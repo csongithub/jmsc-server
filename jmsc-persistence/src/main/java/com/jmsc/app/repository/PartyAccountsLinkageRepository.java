@@ -15,6 +15,5 @@ import com.jmsc.app.entity.PartyAccountsLinkage;
  */
 public interface PartyAccountsLinkageRepository extends JpaRepository<PartyAccountsLinkage, Long> {
 	
-	public List<PartyAccountsLinkage> findByPartyId(Long partyId);
-
+	public List<PartyAccountsLinkage> findByClientIdAndPartyId(Long clientId, Long partyId);
 }

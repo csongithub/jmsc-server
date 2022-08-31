@@ -27,8 +27,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.jmsc.app.common.dto.BankAccountDTO;
 import com.jmsc.app.common.dto.PartyBankAccountDTO;
 import com.jmsc.app.common.util.ObjectMapperUtil;
+import com.jmsc.app.entity.BankAccount;
 import com.jmsc.app.entity.PartyBankAccount;
 import com.jmsc.app.repository.PartyBankAccountRepository;
 
@@ -154,5 +156,17 @@ public class PartyBankAccountService {
 		List<PartyBankAccount> accounts = repository.findByClientId(clientId);
 		List<PartyBankAccountDTO> accountsDTO = ObjectMapperUtil.mapAll(accounts, PartyBankAccountDTO.class);
 		return accountsDTO;
+	}
+	
+	
+	
+	public PartyBankAccountDTO getAccount(Long clientId, Long accountId) {
+		Optional<PartyBankAccount> optional = repository.findByClientIdAndId(clientId, accountId);
+		if(optional.isPresent()) {
+			PartyBankAccountDTO dto = ObjectMapperUtil.map(optional.get(), PartyBankAccountDTO.class);
+			return dto;
+		} else {
+			throw new RuntimeException("Account dose not exist");
+		}
 	}
 }

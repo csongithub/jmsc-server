@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -50,5 +51,11 @@ public class BankAccountEndPoint {
 	public ResponseEntity<List<BankAccountDTO>> getActiveAccounts(@RequestParam("clientId") Long clientId){
 		List<BankAccountDTO> accounts = service.getActiveAccounts(clientId);
 		return ResponseEntity.ok(accounts);
+	}
+	
+	@GetMapping("/account_by_id/{client_id}/{account_id}")
+	public ResponseEntity<BankAccountDTO> getAccount(@PathVariable("client_id") Long clientId, @PathVariable("account_id")Long accountId){
+		BankAccountDTO account = service.getAccount(clientId, accountId);
+		return ResponseEntity.ok(account);
 	}
 }

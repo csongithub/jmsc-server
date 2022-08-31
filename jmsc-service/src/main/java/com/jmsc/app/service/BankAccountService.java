@@ -66,5 +66,13 @@ public class BankAccountService {
 	}
 	
 	
-
+	public BankAccountDTO getAccount(Long clientId, Long accountId) {
+		Optional<BankAccount> optional = repository.findByClientIdAndId(clientId, accountId);
+		if(optional.isPresent()) {
+			BankAccountDTO dto = ObjectMapperUtil.map(optional.get(), BankAccountDTO.class);
+			return dto;
+		} else {
+			throw new RuntimeException("Account dose not exist");
+		}
+	}
 }
