@@ -71,7 +71,7 @@ public class PaymentSummaryDTO implements Serializable{
 	
 	private Date paymentDate;
 	
-//	private boolean print;
+	private boolean print;
 	
 	
 }
