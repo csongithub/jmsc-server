@@ -34,7 +34,7 @@ public class PartyAccountsLinkage extends BaseEntity{
 	private Long partyId;
 	
 	@Column(name = "ACCOUNT_ID")
-	private Long accuontId;
+	private Long accountId;
 	
 	
 	@Override

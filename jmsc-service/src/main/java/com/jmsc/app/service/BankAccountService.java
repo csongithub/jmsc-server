@@ -59,9 +59,9 @@ public class BankAccountService {
 	public List<BankAccountDTO> getActiveAccounts(Long clientId){
 		List<BankAccount> bankAccouns = repository.findByClientIdAndStatus(clientId, "ACTIVE");
 		List<BankAccountDTO> dtos = ObjectMapperUtil.mapAll(bankAccouns, BankAccountDTO.class);
-		dtos.stream().forEach(account -> {
-			account.setDisplayName(account.getAccountNumber()+"-"+account.getAccountHolder()+"-"+account.getBankName());
-		});
+//		dtos.stream().forEach(account -> {
+//			account.setDisplayName(account.getAccountNumber()+"-"+account.getAccountHolder()+"-"+account.getBankName());
+//		});
 		return dtos;
 	}
 	

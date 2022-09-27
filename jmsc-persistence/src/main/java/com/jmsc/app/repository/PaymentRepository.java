@@ -20,7 +20,7 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
 	
 	List<Payment> findAllByClientId(Long clientId);
 	
-	List<Payment> findAllByClientIdAndPaymentDateBetween(Long clientId, Date paymentDateStart, Date paymentDateEnd);
+	List<Payment> findAllByClientIdAndStatusAndPaymentDateBetween(Long clientId, EPaymentStatus status, Date paymentDateStart, Date paymentDateEnd);
 	
 	List<Payment> findAllByClientIdAndStatus(Long clientId, EPaymentStatus status);
 	

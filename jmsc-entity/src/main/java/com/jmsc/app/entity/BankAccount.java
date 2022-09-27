@@ -66,6 +66,9 @@ public class BankAccount extends BaseEntity{
 	@Column(name = "STATUS")
 	private String status;
 	
+	@Column(name = "DISPLAY_NAME")
+	private String displayName;
+	
 	
 	@Override
 	public int hashCode() {

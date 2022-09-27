@@ -14,3 +14,4 @@ alter table jmsc.CREDIT_FACILITY add column	STATUS character varying(50) NOT NUL
 --admin password, sites
 alter table jmsc.CLIENT add column ADMIN_PASSWORD character varying(200);
 alter table jmsc.BID add column SITE_ID integer;
+alter table jmsc.BANK_ACCOUNT add column DISPLAY_NAME character varying(100) NOT NULL default 'DEFAULT-DISPLAY-NAME';

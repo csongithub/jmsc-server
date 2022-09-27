@@ -59,7 +59,7 @@ public class BankAccountDTO implements Serializable{
 	@ApiModelProperty(name = "status", example = "Active", notes = "Bank account status", required = true)
 	private String status;
 	
-	
+	@ApiModelProperty(name = "displayName", example = "JMSC-INDB-45", notes = "Bank account display name", required = true)
 	private String displayName; 
 	
 	
@@ -93,6 +93,9 @@ public class BankAccountDTO implements Serializable{
 		
 		if(status != null)
 			status = status.toUpperCase();
+		
+		if(displayName != null)
+			displayName = displayName.toUpperCase();
 		
 		return this;
 	}
