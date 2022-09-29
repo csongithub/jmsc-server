@@ -117,6 +117,23 @@ public class PaymentService2 {
 	}
 	
 	
+	public Integer rejectPayment(Long clientId, Long paymentId) {
+		Optional<Payment> optional  = paymentRepository.findAllByClientIdAndId(clientId, paymentId);
+		
+		if(optional.isPresent()) {
+			Payment payment = optional.get();
+			payment.setStatus(EPaymentStatus.DRAFT);
+			paymentRepository.save(payment);
+			
+			//TODO: Create Account linkage entry
+			
+			return 0;
+		} else {
+			throw new ResourceNotFoundException("Payment not found");
+		}
+	}
+	
+	
 	public Integer linkPartyAccount(Long clientId, Long partyId, Long accountId) {
 		
 		Optional<PartyAccountsLinkage> optional =  linkageRepository.findByClientIdAndPartyIdAndAccountId(clientId, partyId, accountId);

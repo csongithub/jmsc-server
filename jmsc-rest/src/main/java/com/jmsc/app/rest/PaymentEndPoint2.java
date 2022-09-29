@@ -75,6 +75,14 @@ public class PaymentEndPoint2 {
 	}
 	
 	
+	@PutMapping("/reject/{client_id}/{payment_id}")
+	public ResponseEntity<Integer> rejectPayment(@PathVariable("client_id")Long clientId,
+												 @PathVariable("payment_id")Long paymentId) {
+		Integer statusCode = service.rejectPayment(clientId, paymentId);
+		return ResponseEntity.ok(statusCode);
+	}
+	
+	
 	@PutMapping("/linke_party_account/{client_id}/{party_id}/{account_id}")
 	public ResponseEntity<Integer> linkPartyAccount(@PathVariable("client_id")Long clientId,
 												  @PathVariable("party_id")Long partyId,
