@@ -7,6 +7,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -74,6 +75,13 @@ public class PaymentService2 {
 			summary.setPaymentDate(draft.getPaymentDate());
 			listOfDraft.add(summary);
 		}
+		
+		
+		java.util.Collections.sort(listOfDraft, new Comparator<PaymentSummaryDTO>() {
+	        public int compare(PaymentSummaryDTO emp1, PaymentSummaryDTO emp2) {
+	            return emp2.getPaymentDate().compareTo(emp1.getPaymentDate());
+	        }
+	    });
 		
 		return listOfDraft;
 	}
@@ -211,6 +219,12 @@ public class PaymentService2 {
 			summary.setPaymentDate(draft.getPaymentDate());
 			listOfDraft.add(summary);
 		}
+		
+		java.util.Collections.sort(listOfDraft, new Comparator<PaymentSummaryDTO>() {
+	        public int compare(PaymentSummaryDTO emp1, PaymentSummaryDTO emp2) {
+	            return emp2.getPaymentDate().compareTo(emp1.getPaymentDate());
+	        }
+	    });
 		
 		return listOfDraft;
 	}
