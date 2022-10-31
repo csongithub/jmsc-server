@@ -73,5 +73,18 @@ public class PartyService {
 		List<PartyDTO> parties = ObjectMapperUtil.mapAll(all, PartyDTO.class);
 		return parties;
 	}
+	
+	
+	
+	public PartyDTO getPartyById(Long clientId, Long partyId){
+		Optional<Party> optional = repository.findByClientIdAndId(clientId, partyId);
+		
+		if(!optional.isPresent()) {
+			throw new RuntimeException("Party dose not exists");
+		}
+		
+		PartyDTO party = ObjectMapperUtil.map(optional.get(), PartyDTO.class);
+		return party;
+	}
 
 }

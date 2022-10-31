@@ -43,5 +43,12 @@ public class PartyEndPoint {
 		List<PartyDTO> all = service.getAllParties(clientId);
 		return ResponseEntity.ok(all);
 	}
+	
+	
+	@GetMapping("/{client_id}/{party_id}")
+	public ResponseEntity<PartyDTO> getParty(@PathVariable("client_id") Long clientId, @PathVariable("party_id")Long partyId){
+		PartyDTO party = service.getPartyById(clientId, partyId);
+		return ResponseEntity.ok(party);
+	}
 
 }

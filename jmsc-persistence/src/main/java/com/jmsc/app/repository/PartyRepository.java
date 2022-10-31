@@ -19,4 +19,7 @@ public interface PartyRepository extends JpaRepository<Party, Long> {
 	public List<Party> findByClientId(Long clientId);
 	
 	public Optional<Party> findByNameOrNickName(String name, String nickName);
+	
+	public Optional<Party> findByClientIdAndId(Long clientId, Long id);
+	
 }
