@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.map.HashedMap;
@@ -516,6 +517,9 @@ public class CreditFacilityService {
 				Long clientId = client.getId();
 		
 				List<CreditFacility> cfs = repository.findAllByClientId(clientId);
+				
+				//Ignore all closed facilities
+				cfs = cfs.stream().filter(cf -> !EFacilityStatus.CLOSED.equals(cf.getStatus())).collect(Collectors.toList());
 				
 				if(!Collections.isNullOrEmpty(cfs)) {
 					
