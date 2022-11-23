@@ -12,6 +12,7 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.modelmapper.convention.MatchingStrategies;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
@@ -69,6 +70,18 @@ public class ObjectMapperUtil {
     		return null;
 		try {
 			return new ObjectMapper().readValue(json, outClass);
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+    
+    
+    public static <T> List<T> listOfObjects(String json, TypeReference<List<T>> type) {
+    	if(json == null)
+    		return null;
+		try {
+			return new ObjectMapper().readValue(json, type);
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}
