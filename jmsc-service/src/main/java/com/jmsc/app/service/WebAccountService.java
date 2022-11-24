@@ -11,11 +11,11 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.amazonaws.services.rds.model.Option;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.jmsc.app.common.dto.AttributeDTO;
 import com.jmsc.app.common.dto.WebAccountDTO;
 import com.jmsc.app.common.enums.EAttributeType;
+import com.jmsc.app.common.exception.ResourceNotFoundException;
 import com.jmsc.app.common.util.Collections;
 import com.jmsc.app.common.util.ObjectMapperUtil;
 import com.jmsc.app.entity.WebAccount;
@@ -143,5 +143,23 @@ public class WebAccountService {
 		}
 		
 		return account;
+	}
+	
+	
+	public Boolean deleteAccount(Long clientId, Long accountId) throws Exception{
+		if(clientId == null || accountId == null) {
+			throw new RuntimeException("Insufficient Data");
+		}
+		
+		Optional<WebAccount> optional = repository.findByClientIdAndId(clientId, accountId);
+		
+		if(!optional.isPresent()) {
+			log.debug("Account not found {}", accountId);
+			throw new ResourceNotFoundException("Account Not Found");
+		}
+		
+		repository.delete(optional.get());
+		
+		return Boolean.TRUE;
 	}
 }

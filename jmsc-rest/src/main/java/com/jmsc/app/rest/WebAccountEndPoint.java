@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,6 +33,7 @@ public class WebAccountEndPoint {
 	}
 	
 	
+	
 	@GetMapping("/all/{client_id}")
 	public ResponseEntity<List<WebAccountDTO>> allAccounts(@PathVariable("client_id")Long clientId){
 		List<WebAccountDTO> response = service.getAll(clientId);
@@ -40,9 +42,17 @@ public class WebAccountEndPoint {
 	
 	
 	
-	@GetMapping("/show_all/{client_id}/{account_id}")
+	@GetMapping("/get_account_attributes/{client_id}/{account_id}")
 	public ResponseEntity<WebAccountDTO> showAllAttributes(@PathVariable("client_id")Long clientId, @PathVariable("account_id")Long accountId){
 		WebAccountDTO response = service.showAllAttributes(clientId, accountId);
+		return ResponseEntity.ok(response);
+	}
+	
+	
+	
+	@DeleteMapping("/delete_account/{client_id}/{account_id}")
+	public ResponseEntity<Boolean> deleteAccount(@PathVariable("client_id")Long clientId, @PathVariable("account_id")Long accountId)throws Exception{
+		Boolean response = service.deleteAccount(clientId, accountId);
 		return ResponseEntity.ok(response);
 	}
 }
