@@ -5,14 +5,14 @@
 	"url":	"/account"
 },
 {
-	"title": "Add Party",
+	"title": "Add Party Account",
 	"description": "Do you have got a new party account to make payment,Please go here and add the party bank account.",
 	"url":	"/manage_party_accounts"
 },
 {
 	"title": "Make Payments",
 	"description": "Do yo really think that you have some pending payments?? If yes please go here to payout.",
-	"url":	"/create_payment"
+	"url":	"/create_payment_new"
 },
 {
 	"title": "Manage Facilities",
