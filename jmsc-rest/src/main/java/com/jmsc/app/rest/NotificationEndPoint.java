@@ -39,5 +39,13 @@ public class NotificationEndPoint {
 		List<NotificationDTO> response = NotificationService.refreshAndGet(clientId);
 		return ResponseEntity.ok(response);
 	}
+	
+	
+	
+	@GetMapping("/count/{client_id}")
+	public ResponseEntity<Integer> count(@PathVariable("client_id") Long clientId){
+		Integer response = NotificationService.count(clientId);
+		return ResponseEntity.ok(response);
+	}
 
 }

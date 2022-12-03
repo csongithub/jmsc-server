@@ -178,7 +178,7 @@ public class MachineService {
 			NotificationService.pushNotifications(clientId, machineList);
 			return machineList;
 		}
-		return null;
+		return machineList;
 	}
 	
 	
@@ -195,18 +195,19 @@ public class MachineService {
 	    if(diff <= alertBeforeDays) {
 	    	notification = new NotificationDTO();    	
 	    	notification.setClientId(clientId);
+	    	notification.setEntityId(machine.getId());
 	    	notification.setMachine(ObjectMapperUtil.map(machine, MachineDTO.class));
 	    	notification.setEntityType(ENotificationEntityType.MACHINE);
 	    	
 	    	if(diff < 0) {
-	    		String message = prefix + " has been expired "  + Math.abs(diff) + " days ago, effectively on " + expiryDate + ".";
+	    		String message = prefix + " has been expired "  + Math.abs(diff) + " days ago, effectively on " + expiryDate.toString() + ".";
 	    		notification.setNotificationMessage(message);
 	    	}else {
 	    		if(diff == 0) {
 	    			String message = prefix + " is expiring today";
 	    			notification.setNotificationMessage(message);
 	    		}else {
-	    			String message = prefix + " would be expiring in next " + Math.abs(diff) + " days, effectively on " + expiryDate + ".";
+	    			String message = prefix + " would be expiring in next " + Math.abs(diff) + " days, effectively on " + expiryDate.toString() + ".";
 	    			notification.setNotificationMessage(message);
 	    		}
 	    	}

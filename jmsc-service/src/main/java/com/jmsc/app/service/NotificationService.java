@@ -63,9 +63,16 @@ public class NotificationService {
 		}
 		
 		List<NotificationDTO> all = ServiceLocator.getService(MachineService.class).evaluateExpiryForClient(clientId);
-		
-		
 		return all;
+	}
+	
+	
+	public static int count(Long clientId) {
+		if(notificationsMap.containsKey(clientId)) {
+			return notificationsMap.get(clientId).size();
+		} else {
+			return 0;
+		}
 	}
 	
 }
