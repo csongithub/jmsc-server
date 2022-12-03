@@ -1,0 +1,13 @@
+/**
+ * 
+ */
+package com.jmsc.app.common.enums;
+
+/**
+ * @author anuhr
+ *
+ */
+public enum ENotificationEntityType {
+	MACHINE, CREDIT_FACILITY
+
+}

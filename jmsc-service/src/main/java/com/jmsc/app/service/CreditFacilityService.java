@@ -495,7 +495,7 @@ public class CreditFacilityService {
 		cf.setStatus(EFacilityStatus.CLOSED);
 		
 		repository.save(cf);
-		;
+		
 		return Boolean.TRUE;
 	}
 	

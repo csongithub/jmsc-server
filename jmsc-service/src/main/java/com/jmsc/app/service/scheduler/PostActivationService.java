@@ -21,6 +21,7 @@ import com.jmsc.app.entity.Notification;
 import com.jmsc.app.repository.CreditFacilityRepository;
 import com.jmsc.app.repository.NotificationRepository;
 import com.jmsc.app.service.CreditFacilityService;
+import com.jmsc.app.service.MachineService;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -111,6 +112,12 @@ public class PostActivationService {
 				notificationRepo.save(notification);
 			}
 		}
+	}
+	
+	
+	
+	public void evaluateMachineExpiry() {
+		ServiceLocator.getService(MachineService.class).evaluateExpiry();
 	}
 
 }

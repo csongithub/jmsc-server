@@ -17,6 +17,7 @@ import com.jmsc.app.config.jmsc.ServiceLocator;
 public class JmscEventListener implements ApplicationListener<JmscEvent> {
 
 	
+	
 	@Override
 	public void onApplicationEvent(JmscEvent event) {
 		System.out.println("Received Jmsc event...");
@@ -26,6 +27,7 @@ public class JmscEventListener implements ApplicationListener<JmscEvent> {
 			try {
 				postActivateService.dataBackup();
 				postActivateService.markFacilityExpired();
+				postActivateService.evaluateMachineExpiry();
 			} catch (Throwable e) {
 				e.printStackTrace();
 			}
