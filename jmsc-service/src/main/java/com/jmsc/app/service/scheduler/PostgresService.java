@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.TimeZone;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.jmsc.app.common.rqrs.PostgresBackup;
@@ -33,8 +34,11 @@ public class PostgresService {
 	@Autowired
 	private PostgresConfig config;
 	
+	@Value("${instanceType}")
+	private String instanceType;
+	
 	public PostgresBackup startBackup() throws Throwable {
-		
+		log.debug(instanceType);
 		log.debug("Starting Data Backup...");
 		
 		System.out.println("*************************************************");
@@ -112,8 +116,13 @@ public class PostgresService {
 	    SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy");
 	    StringBuffer date = new StringBuffer();
 	    date.append(df.format(Calendario.getTime()));
-	    
-	    StringBuffer file = new StringBuffer("jmsc_db_backup_").append(date.toString()).append(".").append(format);
+	    String fileName = "jmsc_db_backup_";
+	    if("aws".equals(instanceType))
+	    	fileName = "jmsc_aws_prod_db_backup_";
+	    else if("prod".equals(instanceType))
+	    	fileName = "jmsc_local_prod_db_backup_";
+	    	
+	    StringBuffer file = new StringBuffer(fileName).append(date.toString()).append(".").append(format);
 	    System.out.println(file.toString());
 	    return file.toString();
 	}
