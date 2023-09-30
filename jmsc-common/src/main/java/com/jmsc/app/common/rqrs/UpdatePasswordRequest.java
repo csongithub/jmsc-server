@@ -30,4 +30,6 @@ public class UpdatePasswordRequest implements Serializable{
 	private String currentPassword;
 	
 	private String newPassword;
+	
+	private boolean isAdmin;
 }

@@ -26,5 +26,7 @@ public class LoginRequest implements Serializable{
 	private String logonId;
 	
 	private String password;
+	
+	private boolean isAdmin;
 
 }

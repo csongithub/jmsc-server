@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jmsc.app.common.dto.ClientDTO;
+import com.jmsc.app.common.dto.UserDTO;
 import com.jmsc.app.common.rqrs.UpdateClientBasicInfoRequest;
 import com.jmsc.app.service.ClientService;
 
@@ -34,6 +35,13 @@ public class ClientEndPoint {
 	@PostMapping("/addClient")
 	public ResponseEntity<ClientDTO> addClient(@RequestBody ClientDTO clientDTO) throws Throwable {
 		ClientDTO client = service.addClient(clientDTO);
+		return ResponseEntity.ok(client);
+	}
+	
+	
+	@PostMapping("/addUser")
+	public ResponseEntity<UserDTO> addUser(@RequestBody UserDTO userDTO) throws Throwable {
+		UserDTO client = service.addUser(userDTO);
 		return ResponseEntity.ok(client);
 	}
 	

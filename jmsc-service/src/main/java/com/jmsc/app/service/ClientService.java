@@ -9,11 +9,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.jmsc.app.common.dto.ClientDTO;
+import com.jmsc.app.common.dto.UserDTO;
 import com.jmsc.app.common.rqrs.UpdateClientBasicInfoRequest;
 import com.jmsc.app.common.util.ObjectMapperUtil;
 import com.jmsc.app.common.util.Strings;
 import com.jmsc.app.entity.Client;
+import com.jmsc.app.entity.User;
 import com.jmsc.app.repository.ClientRepository;
+import com.jmsc.app.repository.UserRepository;
 import com.jmsc.app.service.jwt.JwtClientDetailsService;
 import com.jmsc.app.service.jwt.JwtTokenUtil;
 
@@ -29,6 +32,9 @@ public class ClientService {
 	
 	@Autowired
 	private ClientRepository repository;
+	
+	@Autowired
+	private UserRepository userRepository;
 	
 	@Autowired
 	private EncryptionService encService;
@@ -68,6 +74,35 @@ public class ClientService {
 		ClientDTO dto = ObjectMapperUtil.map(entity, ClientDTO.class);
 		
 		dto.clearAllPassword();
+		return dto;
+	}
+	
+	public UserDTO addUser(UserDTO userDTO) throws Throwable {
+		
+		if(userDTO.getClientId() == null)
+			if(Strings.isNullOrEmpty(userDTO.getName()))
+				throw new RuntimeException("Client id can be null");
+		
+		if(Strings.isNullOrEmpty(userDTO.getName()))
+			throw new RuntimeException("Client name can be null");
+		
+		if(Strings.isNullOrEmpty(userDTO.getDisplayName()))
+			throw new RuntimeException("Client display name can not be null, please provide a small nick name.");
+		
+		if(Strings.isNullOrEmpty(userDTO.getLogonId()))
+			throw new RuntimeException("Logon id can not be null, this will be required in login");
+		
+		if(Strings.isNullOrEmpty(userDTO.getPassword()))
+			throw new RuntimeException("Password can not be null, this will be required in login");
+		
+		String encryptedPassword = encService.getEncryptedPassword(userDTO.getPassword());
+		
+		userDTO.setPassword(encryptedPassword);
+		User user = ObjectMapperUtil.map(userDTO, User.class);
+		User entity = userRepository.save(user);
+		UserDTO dto = ObjectMapperUtil.map(entity, UserDTO.class);
+		
+		dto.clearPassword();
 		return dto;
 	}
 	

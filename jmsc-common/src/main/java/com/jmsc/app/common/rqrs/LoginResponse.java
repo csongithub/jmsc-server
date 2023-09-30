@@ -6,6 +6,7 @@ package com.jmsc.app.common.rqrs;
 import java.io.Serializable;
 
 import com.jmsc.app.common.dto.ClientDTO;
+import com.jmsc.app.common.dto.UserDTO;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -28,7 +29,11 @@ public class LoginResponse implements Serializable{
 	
 	private ClientDTO clientDTO;
 	
+	private UserDTO userDTO;
+	
 	private String message;
 	
 	private String token;
+	
+	private boolean isAdmin;
 }

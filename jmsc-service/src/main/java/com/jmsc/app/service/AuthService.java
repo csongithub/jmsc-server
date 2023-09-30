@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.jmsc.app.common.dto.ClientDTO;
+import com.jmsc.app.common.dto.UserDTO;
 import com.jmsc.app.common.rqrs.AdminAuthRequest;
 import com.jmsc.app.common.rqrs.AdminAuthResponse;
 import com.jmsc.app.common.rqrs.LoginRequest;
@@ -21,7 +22,9 @@ import com.jmsc.app.common.util.ObjectMapperUtil;
 import com.jmsc.app.common.util.Strings;
 import com.jmsc.app.config.jmsc.ServiceLocator;
 import com.jmsc.app.entity.Client;
+import com.jmsc.app.entity.User;
 import com.jmsc.app.repository.ClientRepository;
+import com.jmsc.app.repository.UserRepository;
 import com.jmsc.app.service.jwt.JwtProvider;
 import com.jmsc.app.service.jwt.JwtTokenUtil;
 
@@ -47,6 +50,9 @@ public class AuthService {
 	@Autowired
 	private JwtTokenUtil jwtUtil;
 	
+	@Autowired
+	private UserRepository userRepository;
+	
 	public LoginResponse login(LoginRequest request) {
 		
 		if(Strings.isNullOrEmpty(request.getLogonId()) || Strings.isNullOrEmpty(request.getPassword())){
@@ -56,6 +62,15 @@ public class AuthService {
 			return response;
 		}
 		
+		if(request.isAdmin()) {
+			return clientLogin(request);
+		} else {
+			return userLogin(request);
+		}
+	}
+	
+	
+	private LoginResponse clientLogin(LoginRequest request) {
 		ClientDTO client = service.getClientForAuth(request.getLogonId());
 		if(client != null) {
 			
@@ -74,6 +89,7 @@ public class AuthService {
 				log.debug("Issued token: {} for logon request by: {}",token,request.getLogonId());
 				
 				response.setToken(token);
+				response.setAdmin(true);
 				response.setMessage("Login Successful");
 			} else {
 				response.setLoginSuccess(false);
@@ -83,10 +99,64 @@ public class AuthService {
 		}else {
 			LoginResponse response = new LoginResponse();
 			response.setLoginSuccess(false);
-			response.setMessage("Client not found");
+			response.setMessage("Invalid Credentials");
 			return response;
 		}
 	}
+	
+	
+	private LoginResponse userLogin(LoginRequest request) {
+		
+		Optional<User> optionalUser = userRepository.findByLogonId(request.getLogonId());
+		
+		if(!optionalUser.isPresent()) {
+			LoginResponse response = new LoginResponse();
+			response.setLoginSuccess(false);
+			response.setMessage("User not found");
+			return response;
+		}
+		
+		User user = optionalUser.get();
+		
+		ClientDTO client = service.getClientById(user.getClientId());
+		if(client == null) {
+			LoginResponse response = new LoginResponse();
+			response.setLoginSuccess(false);
+			response.setMessage("No client found for this user");
+			return response;
+		}
+		
+		if(!"ACTIVE".equalsIgnoreCase(user.getStatus())) {
+			throw new RuntimeException("User has been blocked, Kindly contact admin");
+		}
+		
+		LoginResponse response = new LoginResponse();
+		if(user != null) {
+			if(!"ACTIVE".equalsIgnoreCase(user.getStatus())) {
+				throw new RuntimeException("User has been blocked, Kindly contact admin");
+			}
+			String encryptedPassword = encService.getEncryptedPassword(request.getPassword());
+			if(encryptedPassword.equals(user.getPassword())) {
+				UserDTO userDTO = ObjectMapperUtil.map(user, UserDTO.class);
+				userDTO.clearPassword();
+				response.setLoginSuccess(true);
+				response.setClientDTO(client);
+				response.setUserDTO(userDTO);
+				
+				final String token = jwtProvider.generateToken(client.getLogonId());
+				log.debug("Issued token: {} for logon request by: {}",token,request.getLogonId());
+				
+				response.setToken(token);
+				response.setAdmin(false);
+				response.setMessage("Login Successful");
+			} else {
+				response.setLoginSuccess(false);
+				response.setMessage("Incorrect Password, Please Try Again");
+			}
+		}
+		return response;
+	}
+	
 	
 	
 	
@@ -98,9 +168,19 @@ public class AuthService {
 			return response;
 		}
 		
+		if(request.isAdmin()) {
+			return updateAdminPassword(request);
+		} else {
+			return updateUserPassword(request);
+		}
+	}
+	
+	
+	private UpdatePasswordResponse updateAdminPassword(UpdatePasswordRequest request) {
 		LoginRequest loginRequest = new LoginRequest();
 		loginRequest.setLogonId(request.getLogonId());
 		loginRequest.setPassword(request.getCurrentPassword());
+		loginRequest.setAdmin(true);
 		
 		LoginResponse loginResponse = this.login(loginRequest);
 		UpdatePasswordResponse response = new UpdatePasswordResponse();
@@ -116,6 +196,35 @@ public class AuthService {
 			client.setPassword(encryptedPassword);
 			ClientDTO clientDTO = ObjectMapperUtil.map(client, ClientDTO.class);
 			service.updateClient(clientDTO);
+			response.setUpdateSuccess(true);
+			response.setMessage("Password Updated Successfully");
+		} else {
+			response.setUpdateSuccess(false);
+			response.setMessage(loginResponse.getMessage());
+		}
+		return response;
+	}
+	
+	
+	private UpdatePasswordResponse updateUserPassword(UpdatePasswordRequest request) {
+		LoginRequest loginRequest = new LoginRequest();
+		loginRequest.setLogonId(request.getLogonId());
+		loginRequest.setPassword(request.getCurrentPassword());
+		loginRequest.setAdmin(false);
+		
+		LoginResponse loginResponse = this.login(loginRequest);
+		UpdatePasswordResponse response = new UpdatePasswordResponse();
+		
+		if(loginResponse.isLoginSuccess()) {
+			
+			Optional<User> optional =  userRepository.findByLogonId(request.getLogonId());
+			User user = null;
+			if(optional.isPresent()) {
+				user = optional.get();
+			}
+			String encryptedPassword = encService.getEncryptedPassword(request.getNewPassword());
+			user.setPassword(encryptedPassword);
+			userRepository.save(user);
 			response.setUpdateSuccess(true);
 			response.setMessage("Password Updated Successfully");
 		} else {
