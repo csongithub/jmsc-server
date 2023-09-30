@@ -23,7 +23,7 @@ import lombok.Data;
 @Data
 @Entity
 @Table(name = "USERS")
-public class User implements Serializable{/**
+public class User extends BaseEntity implements Serializable{/**
 	 * 
 	 */
 	private static final long serialVersionUID = 7259416513842807444L;

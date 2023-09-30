@@ -26,7 +26,9 @@ CREATE TABLE jmsc.USERS
     DISP_NAME 		character varying(200) NOT NULL,
     STATUS 			character varying(200) NOT NULL,
     LOGON_ID 		character varying(200) NOT NULL UNIQUE,
-    PASSWORD		character varying(200) NOT NULL
+    PASSWORD		character varying(200) NOT NULL,
+    CREATED_TS 		timestamp with time zone NOT NULL,
+	UPDATED_TS 		timestamp with time zone NOT NULL,
     CONSTRAINT users_key PRIMARY KEY (ID)
 )
 WITH (
