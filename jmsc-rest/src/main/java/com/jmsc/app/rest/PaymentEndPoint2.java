@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.jmsc.app.common.dto.PartyBankAccountDTO;
 import com.jmsc.app.common.dto.PaymentDTO;
-import com.jmsc.app.common.dto.PaymentDraftDTO;
 import com.jmsc.app.common.dto.PaymentSummaryDTO;
 import com.jmsc.app.common.enums.EPaymentStatus;
 import com.jmsc.app.common.rqrs.GetPaymentsByDateRequest;

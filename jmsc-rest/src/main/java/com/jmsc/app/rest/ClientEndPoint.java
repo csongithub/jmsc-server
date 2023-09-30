@@ -39,13 +39,6 @@ public class ClientEndPoint {
 	}
 	
 	
-	@PostMapping("/addUser")
-	public ResponseEntity<UserDTO> addUser(@RequestBody UserDTO userDTO) throws Throwable {
-		UserDTO client = service.addUser(userDTO);
-		return ResponseEntity.ok(client);
-	}
-	
-	
 	@GetMapping("/getClient/{logonId}")
 	public ResponseEntity<ClientDTO> getClient(@PathVariable("logonId") String logonId){
 		ClientDTO client = service.getClient(logonId);

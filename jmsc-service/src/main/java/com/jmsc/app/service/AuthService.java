@@ -127,7 +127,10 @@ public class AuthService {
 		}
 		
 		if(!"ACTIVE".equalsIgnoreCase(user.getStatus())) {
-			throw new RuntimeException("User has been blocked, Kindly contact admin");
+			LoginResponse response = new LoginResponse();
+			response.setLoginSuccess(false);
+			response.setMessage("User has been blocked, Kindly contact admin");
+			return response;
 		}
 		
 		LoginResponse response = new LoginResponse();

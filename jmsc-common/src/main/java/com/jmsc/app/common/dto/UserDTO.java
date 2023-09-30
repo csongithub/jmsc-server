@@ -25,7 +25,7 @@ public class UserDTO implements Serializable{
 	@ApiModelProperty(name = "id", example = "1", notes = "Unique Id (Primary Key) of the client", required = false)
 	private Long id;
 	
-	@ApiModelProperty(name = "clientId", example = "1", notes = "refer to respected client", required = false)
+	@ApiModelProperty(name = "clientId", example = "1", notes = "refer to respected client", required = true)
 	private Long clientId;
 
 	@ApiModelProperty(name = "name", example = "JMSC", notes = "Name of the client", required = true)
@@ -42,12 +42,6 @@ public class UserDTO implements Serializable{
 	
 	@ApiModelProperty(name = "password", example = "1", notes = "Password of the client", required = true)
 	private String password;
-	
-	@ApiModelProperty(name = "recipients", example = "jaimaa072@gmail.com", notes = "Email recipients of the client", required = false)
-	private String recipients;
-	
-	@ApiModelProperty(name = "adminPassword", example = "1", notes = "Admin Password of the client", required = false)
-	private String adminPassword;
 	
 	
 	public void clearPassword() {
