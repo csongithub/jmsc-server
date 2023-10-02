@@ -12,7 +12,7 @@
 {
 	"title": "Make Payments",
 	"description": "Do yo really think that you have some pending payments?? If yes please go here to payout.",
-	"url":	"/create_payment_new"
+	"url":	"/create_payment"
 },
 {
 	"title": "Manage Facilities",

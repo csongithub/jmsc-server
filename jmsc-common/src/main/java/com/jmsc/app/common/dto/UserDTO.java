@@ -15,7 +15,7 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper=false)
-public class UserDTO implements Serializable{
+public class UserDTO extends BaseDTO implements Serializable{
 
 	/**
 	 * 
@@ -24,9 +24,6 @@ public class UserDTO implements Serializable{
 	
 	@ApiModelProperty(name = "id", example = "1", notes = "Unique Id (Primary Key) of the client", required = false)
 	private Long id;
-	
-	@ApiModelProperty(name = "clientId", example = "1", notes = "refer to respected client", required = true)
-	private Long clientId;
 
 	@ApiModelProperty(name = "name", example = "JMSC", notes = "Name of the client", required = true)
 	private String name;
