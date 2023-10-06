@@ -49,7 +49,7 @@ public class UserEndPoint {
 	
 	
 	@DeleteMapping("/delete/{client_id}/{user_id}")
-	public ResponseEntity<Integer> deletePayment(@PathVariable("client_id")Long clientId,
+	public ResponseEntity<Integer> deleteuser(@PathVariable("client_id")Long clientId,
 												 @PathVariable("user_id")Long userId) {
 		Integer statusCode = service.deleteUser(clientId, userId);
 		return ResponseEntity.ok(statusCode);

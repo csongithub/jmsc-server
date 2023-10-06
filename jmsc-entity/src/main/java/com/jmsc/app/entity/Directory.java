@@ -3,8 +3,6 @@
  */
 package com.jmsc.app.entity;
 
-import java.io.Serializable;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -22,38 +20,34 @@ import lombok.Data;
  */
 @Data
 @Entity
-@Table(name = "USERS")
-public class User extends BaseEntity implements Serializable{
+@Table(name = "DIRECTORY")
+public class Directory extends BaseEntity {
+
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 7259416513842807444L;
+	private static final long serialVersionUID = 3661845157170055459L;
 	
-
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "ID")
 	private Long id;
 	
 	@NotNull
+	@Column(name = "CLIENT_ID")
+	private Long clientId;
+	
+	@NotNull
 	@Column(name = "NAME")
 	private String name;
 	
 	@NotNull
-	@Column(name = "DISP_NAME")
-	private String displayName;
+	@Column(name = "DESCRIPTION")
+	private String description;
 	
 	@NotNull
-	@Column(name = "STATUS")
-	private String status;
-	
-	@NotNull
-	@Column(name = "LOGON_ID")
-	private String logonId;
-	
-	@NotNull
-	@Column(name = "PASSWORD")
-	private String password;
+	@Column(name = "CATEGORY")
+	private String category;
 	
 	@Override
 	public int hashCode() {
@@ -71,7 +65,7 @@ public class User extends BaseEntity implements Serializable{
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		User other = (User) obj;
+		Directory other = (Directory) obj;
 		if (id == null) {
 			if (other.id != null)
 				return false;

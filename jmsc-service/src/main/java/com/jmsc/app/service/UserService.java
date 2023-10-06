@@ -35,8 +35,7 @@ public class UserService {
 	public UserDTO createUser(UserDTO userDTO) throws Throwable {
 		
 		if(userDTO.getClientId() == null)
-			if(Strings.isNullOrEmpty(userDTO.getName()))
-				throw new RuntimeException("Client id can be null");
+			throw new RuntimeException("Client id can be null");
 		
 		if(Strings.isNullOrEmpty(userDTO.getName()))
 			throw new RuntimeException("User name can be null");
@@ -91,8 +90,8 @@ public class UserService {
 	
 	
 	
-	public Integer deleteUser(Long clientId, Long paymentId) {
-		Optional<User> optional  = repository.findAllByClientIdAndId(clientId, paymentId);
+	public Integer deleteUser(Long clientId, Long id) {
+		Optional<User> optional  = repository.findAllByClientIdAndId(clientId, id);
 		
 		if(optional.isPresent()) {
 			User user = optional.get();
