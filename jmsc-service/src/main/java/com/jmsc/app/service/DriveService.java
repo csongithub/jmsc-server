@@ -99,16 +99,22 @@ public class DriveService {
 	}
 	
 	
-	public String storeFile(MultipartFile file) throws Exception {
+	public FileMetaDataDTO storeFile(MultipartFile file, String jsonMetadata) throws Exception {
+		FileMetaDataDTO fileMetaData = ObjectMapperUtil.object(jsonMetadata, FileMetaDataDTO.class);
 		 String fileName = StringUtils.cleanPath(file.getOriginalFilename());
 	     if(fileName.contains(" ")){
 	    	 fileName = fileName.replace(" ", "_");
 	     }
 		 try {
-	        Path fileStorageLocation = Paths.get("C:\\Users\\\\anuhr\\Downloads\\jmsc\\").toAbsolutePath().normalize();
+	        Path fileStorageLocation = Paths.get("C:\\Users\\anuhr\\Downloads\\jmsc\\").toAbsolutePath().normalize();
 	        Path targetLocation =	fileStorageLocation.resolve(new Timestamp(System.currentTimeMillis()).getTime() + "_" + fileName);
 	        Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
-	        return targetLocation.toString();
+	        
+	        FileMetaData entity = ObjectMapperUtil.map(fileMetaData, FileMetaData.class);
+			FileMetaData savedFile = fileRepositoty.save(entity);
+			FileMetaDataDTO response = ObjectMapperUtil.map(savedFile, FileMetaDataDTO.class);
+			response.setFilePath(targetLocation.toString());
+	        return response;
 	     } catch (java.io.IOException ex) {
 	    	 throw new Exception("Could not store file " + fileName + ". Please try again!", ex);
 	     }finally {

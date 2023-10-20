@@ -14,6 +14,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import com.jmsc.app.common.enums.EFileStatus;
 import com.jmsc.app.common.enums.EFileType;
 import com.sun.istack.NotNull;
 
@@ -62,6 +63,15 @@ public class FileMetaData extends BaseEntity implements Serializable{
 	@NotNull
 	@Column(name = "CREATED_BY")
 	private String createdBy;
+	
+	@NotNull
+	@Column(name = "UPDATED_BY")
+	private String updatedBy;
+	
+	@NotNull
+	@Enumerated(EnumType.STRING)
+	@Column(name = "STATUS")
+	private EFileStatus status;
 	
 	@NotNull
 	@Column(name = "DESCRIPTION")

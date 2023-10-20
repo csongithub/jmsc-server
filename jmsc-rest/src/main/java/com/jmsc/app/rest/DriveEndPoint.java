@@ -69,8 +69,10 @@ public class DriveEndPoint {
 	
 	
 	@PostMapping("/uploadFile")
-	 public String uploadFile(@RequestParam("file") MultipartFile file)throws Throwable {
-		 return service.storeFile(file);
+	 public ResponseEntity<FileMetaDataDTO> uploadFile(@RequestParam("file") MultipartFile file, 
+			 				  @RequestParam("metadata")String jsonMetadata)throws Throwable {
+		FileMetaDataDTO response = service.storeFile(file, jsonMetadata);
+		return ResponseEntity.ok(response);
 	 }
 	
 	

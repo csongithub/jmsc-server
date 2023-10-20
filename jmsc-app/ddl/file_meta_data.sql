@@ -29,6 +29,8 @@ CREATE TABLE jmsc.FILE_META_DATA
     FILE_TYPE 		character varying(30) NOT NULL,
     FILE_PATH		character varying(200),
     CREATED_BY		character varying(30) NOT NULL,
+    UPDATED_BY		character varying(30) NOT NULL,
+    STATUS			character varying(30) NOT NULL,
     DESCRIPTION		character varying(200) NOT NULL,
     CREATED_TS 		timestamp with time zone NOT NULL,
 	UPDATED_TS 		timestamp with time zone NOT NULL,
