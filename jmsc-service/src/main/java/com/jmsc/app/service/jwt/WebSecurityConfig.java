@@ -111,6 +111,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	    configAutenticacao.addAllowedOriginPattern("*");
 	    configAutenticacao.addAllowedHeader("Authorization");
 	    configAutenticacao.addAllowedHeader("Content-Type");
+	    configAutenticacao.addAllowedHeader("Content-Disposition");
 	    configAutenticacao.addAllowedHeader("Accept");
 	    configAutenticacao.addAllowedMethod("POST");
 	    configAutenticacao.addAllowedMethod("GET");

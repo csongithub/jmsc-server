@@ -77,6 +77,14 @@ public class FileMetaData extends BaseEntity implements Serializable{
 	@Column(name = "DESCRIPTION")
 	private String description;
 	
+	@NotNull
+	@Column(name = "CONTENT_TYPE")
+	private String contentType;
+	
+	@NotNull
+	@Column(name = "DATA")
+	private byte[] data;
+	
 	
 	@Override
 	public int hashCode() {

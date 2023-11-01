@@ -3,13 +3,11 @@
  */
 package com.jmsc.app.service;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.sql.Timestamp;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,14 +18,17 @@ import org.springframework.web.multipart.MultipartFile;
 import com.jmsc.app.common.dto.DirectoryDTO;
 import com.jmsc.app.common.dto.FileMetaDataDTO;
 import com.jmsc.app.common.exception.ResourceNotFoundException;
+import com.jmsc.app.common.rqrs.File;
 import com.jmsc.app.common.rqrs.GetFilesRequest;
 import com.jmsc.app.common.util.Collections;
 import com.jmsc.app.common.util.ObjectMapperUtil;
 import com.jmsc.app.common.util.Strings;
+import com.jmsc.app.config.aws.AwsConfig;
 import com.jmsc.app.entity.Directory;
 import com.jmsc.app.entity.FileMetaData;
 import com.jmsc.app.repository.DirectoryRepository;
 import com.jmsc.app.repository.FileMetaDataRepository;
+import com.jmsc.app.service.aws.AmazonS3Service;
 
 /**
  * @author anuhr
@@ -41,6 +42,16 @@ public class DriveService {
 	
 	@Autowired
 	private FileMetaDataRepository fileRepositoty;
+	
+	
+	@Autowired
+	private AwsConfig aws;
+	
+	@Autowired
+	private AmazonS3Service amazonS3Service;
+	
+	
+	private static Map<Long, FileMetaData> db = new HashMap<Long, FileMetaData>();
 	
 	
 	public DirectoryDTO createDirectory(DirectoryDTO deDTO) throws Throwable {
@@ -99,21 +110,30 @@ public class DriveService {
 	}
 	
 	
-	public FileMetaDataDTO storeFile(MultipartFile file, String jsonMetadata) throws Exception {
+	public FileMetaDataDTO uploadFile(MultipartFile file, String jsonMetadata) throws Exception {
 		FileMetaDataDTO fileMetaData = ObjectMapperUtil.object(jsonMetadata, FileMetaDataDTO.class);
-		 String fileName = StringUtils.cleanPath(file.getOriginalFilename());
-	     if(fileName.contains(" ")){
-	    	 fileName = fileName.replace(" ", "_");
-	     }
-		 try {
-	        Path fileStorageLocation = Paths.get("C:\\Users\\anuhr\\Downloads\\jmsc\\").toAbsolutePath().normalize();
-	        Path targetLocation =	fileStorageLocation.resolve(new Timestamp(System.currentTimeMillis()).getTime() + "_" + fileName);
-	        Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
+		String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+		fileMetaData.setFileName(fileName);
+		
+	    if (file.isEmpty())
+            throw new IllegalStateException("Cannot upload empty file");
+		try {   
+	        Map<String, String> metadata = new HashMap<>();
+	        metadata.put("Content-Type", file.getContentType());
+	        metadata.put("Content-Length", String.valueOf(file.getSize()));
+	        
+	        String filePath = String.format("%s/%s/%s", aws.getBucketName(),fileMetaData.getClientId(), fileMetaData.getSystemPath());
+	      
+//	        PutObjectResult putResult = amazonS3Service.upload(filePath, fileName, Optional.of(metadata), file.getInputStream());
 	        
 	        FileMetaData entity = ObjectMapperUtil.map(fileMetaData, FileMetaData.class);
-			FileMetaData savedFile = fileRepositoty.save(entity);
-			FileMetaDataDTO response = ObjectMapperUtil.map(savedFile, FileMetaDataDTO.class);
-			response.setFilePath(targetLocation.toString());
+	        entity.setFilePath(filePath);
+	        entity.setData(file.getBytes());
+	        entity.setContentType(file.getContentType());
+//			FileMetaData savedFile = fileRepositoty.save(entity);
+	        entity.setId(1l);
+	        db.put(1l, entity);
+			FileMetaDataDTO response = ObjectMapperUtil.map(entity, FileMetaDataDTO.class);
 	        return response;
 	     } catch (java.io.IOException ex) {
 	    	 throw new Exception("Could not store file " + fileName + ". Please try again!", ex);
@@ -123,7 +143,27 @@ public class DriveService {
 	 }
 	
 	
-	public List<FileMetaDataDTO> getAllFiles(GetFilesRequest req){
+	
+	public File downloadFile(Long clientId, Long directoryId, Long fileId)throws Exception {
+//		Optional<FileMetaData> optional = fileRepositoty.findByClientIdAndDirectoryIdAndId(clientId, directoryId, fileId);
+		FileMetaData f = db.get(1l);
+		if(f != null) {
+//			S3Object file = amazonS3Service.download(optional.get().getFilePath(), optional.get().getFileName());
+//			S3ObjectInputStream is = file.getObjectContent();
+//			byte[] content = IOUtils.toByteArray(is);
+			
+			File file= new File(f.getData(), 
+								f.getFileName(),
+								f.getContentType());
+			
+			return file;
+		} else {
+			throw new ResourceNotFoundException("Selected file does not exist in system.");
+		}
+	}
+	
+	
+	public List<FileMetaDataDTO> listFiles(GetFilesRequest req){
 		List<FileMetaData> all = fileRepositoty.findAllByClientIdAndDirectoryIdAndSystemPath(req.getClientId(),
 																							 req.getDirectoryId(),
 																							 req.getSystemPath());
@@ -140,14 +180,5 @@ public class DriveService {
 		return savedFile;
 	}
 	
-	public FileMetaDataDTO uploadFile(FileMetaDataDTO dto) {
-		
-		//TODO: upload to aws s3 bucket
-		FileMetaData entity = ObjectMapperUtil.map(dto, FileMetaData.class);
-		FileMetaData file = fileRepositoty.save(entity);
-		FileMetaDataDTO savedFile = ObjectMapperUtil.map(file, FileMetaDataDTO.class);
-		
-		return savedFile;
-	}
 
 }

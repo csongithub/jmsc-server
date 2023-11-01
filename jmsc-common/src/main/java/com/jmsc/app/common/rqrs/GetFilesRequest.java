@@ -18,7 +18,8 @@ import lombok.NoArgsConstructor;
 @Data
 @EqualsAndHashCode(callSuper=false)
 @NoArgsConstructor
-public class GetFilesRequest implements Serializable{/**
+public class GetFilesRequest implements Serializable{
+	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -3561534930353885701L;

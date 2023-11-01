@@ -26,6 +26,10 @@ allprojects{
 	group = 'com.jmsc.app'
 	version = '0.0.1-SNAPSHOT'
 }
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
 
 subprojects{
     apply plugin: 'org.springframework.boot'
@@ -38,6 +42,7 @@ subprojects{
     sourceCompatibility = '1.8'
 
     dependencies {
+    	implementation 'org.springframework.boot:spring-boot-starter'
         implementation 'org.springframework.boot:spring-boot-starter-web'
         implementation 'org.springframework.boot:spring-boot-starter-security'
         implementation 'org.springframework.boot:spring-boot-starter-actuator'
