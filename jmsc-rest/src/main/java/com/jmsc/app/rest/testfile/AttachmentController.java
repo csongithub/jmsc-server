@@ -39,7 +39,7 @@ public class AttachmentController {
 
     @GetMapping("/download")
     public ResponseEntity<Resource> downloadFile() throws Exception {
-    	String fileId = "rc.jpg";
+    	String fileId = "doc.jpg";
         Attachment file = null;
         file = attachmentService.getAttachment(fileId);
         return  ResponseEntity.ok()
