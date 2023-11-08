@@ -29,7 +29,7 @@ public class AttachmentServiceImpl implements AttachmentService{
             									  fileName,
             									  file.getContentType(),
             									  file.getBytes());
-            db.put(fileName, attachment);
+            db.put("1", attachment);
             
             return attachment;
 
