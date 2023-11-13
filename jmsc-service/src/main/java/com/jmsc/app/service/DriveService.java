@@ -23,7 +23,6 @@ import com.jmsc.app.common.rqrs.GetFilesRequest;
 import com.jmsc.app.common.util.Collections;
 import com.jmsc.app.common.util.ObjectMapperUtil;
 import com.jmsc.app.common.util.Strings;
-import com.jmsc.app.config.aws.AwsConfig;
 import com.jmsc.app.entity.Directory;
 import com.jmsc.app.entity.FileMetaData;
 import com.jmsc.app.repository.DirectoryRepository;
@@ -43,8 +42,8 @@ public class DriveService {
 	private FileMetaDataRepository fileRepositoty;
 	
 	
-	@Autowired
-	private AwsConfig aws;
+//	@Autowired
+//	private AwsConfig aws;
 	
 //	@Autowired
 //	private AmazonS3Service amazonS3Service;
@@ -121,12 +120,12 @@ public class DriveService {
 	        metadata.put("Content-Type", file.getContentType());
 	        metadata.put("Content-Length", String.valueOf(file.getSize()));
 	        
-	        String filePath = String.format("%s/%s/%s", aws.getBucketName(),fileMetaData.getClientId(), fileMetaData.getSystemPath());
+//	        String filePath = String.format("%s/%s/%s", aws.getBucketName(),fileMetaData.getClientId(), fileMetaData.getSystemPath());
 	      
 //	        PutObjectResult putResult = amazonS3Service.upload(filePath, fileName, Optional.of(metadata), file.getInputStream());
 	        
 	        FileMetaData entity = ObjectMapperUtil.map(fileMetaData, FileMetaData.class);
-	        entity.setFilePath(filePath);
+	        entity.setFilePath(entity.getSystemPath()); //Here AWS path needs to be set from line no 124
 	        entity.setData(file.getBytes());
 	        entity.setContentType(file.getContentType());
 			FileMetaData savedFile = fileRepositoty.save(entity);
