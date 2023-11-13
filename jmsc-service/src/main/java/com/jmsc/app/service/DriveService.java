@@ -198,6 +198,7 @@ public class DriveService {
 	
 	public FileMetaDataDTO addFolder(FileMetaDataDTO dto) {
 		FileMetaData entity = ObjectMapperUtil.map(dto, FileMetaData.class);
+		entity.setContentType("Folder");
 		FileMetaData file = fileRepositoty.save(entity);
 		FileMetaDataDTO savedFile = ObjectMapperUtil.map(file, FileMetaDataDTO.class);
 		

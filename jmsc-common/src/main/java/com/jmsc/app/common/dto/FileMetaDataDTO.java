@@ -5,12 +5,9 @@ package com.jmsc.app.common.dto;
 
 import java.io.Serializable;
 
-import javax.persistence.Column;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.jmsc.app.common.enums.EFileStatus;
 import com.jmsc.app.common.enums.EFileType;
-import com.sun.istack.NotNull;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
