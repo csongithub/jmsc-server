@@ -5,14 +5,7 @@ package com.jmsc.app.rest;
 
 import java.util.List;
 
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.Resource;
-import org.springframework.http.ContentDisposition;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -85,34 +78,23 @@ public class DriveEndPoint {
 	
 	
 	@GetMapping("/download_file/{client_id}/{directory_id}/{file_id}")
-	 public ResponseEntity<Resource> downloadFile(@PathVariable("client_id") Long clientId, 
+	 public ResponseEntity<File> downloadFile(@PathVariable("client_id") Long clientId, 
 			 									  @PathVariable("directory_id") Long directoryId,
-			 									  @PathVariable("file_id") Long fileId,
-			 									 HttpServletResponse response)throws Throwable {
+			 									  @PathVariable("file_id") Long fileId)throws Throwable {
 		
 		File file  = service.downloadFile(clientId, directoryId, fileId);
 		
-//		HttpHeaders headers = new HttpHeaders();
-//	    headers.setContentType(MediaType.parseMediaType(file.getContentType()));
-//	    response.setHeader("Content-Disposition", "attachment; filename=" + file.getFileName());
-//	    return new HttpEntity<byte[]>(file.getData(), headers);
-		
-		 ByteArrayResource resource = new ByteArrayResource(file.getData());
-		 return ResponseEntity.ok()
-		            .contentType(MediaType.APPLICATION_OCTET_STREAM)
-		            .contentLength(resource.contentLength())
-		            .header(HttpHeaders.CONTENT_DISPOSITION,
-		                    ContentDisposition.attachment()
-		                        .filename(file.getFileName())
-		                        .build().toString())
-		            .body(resource);
-		
-//		return  ResponseEntity.ok()
-//                .contentType(MediaType.parseMediaType(file.getContentType()))
-//                .contentLength(file.getData().length)
-//                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFileName() + "\"")
-//                .body(new ByteArrayResource(file.getData()));
+		return ResponseEntity.ok(file);
 	 }
+	
+	
+	@DeleteMapping("/delete_file/{client_id}/{directory_id}/{file_id}")
+	public ResponseEntity<Integer> deleteFile(@PathVariable("client_id") Long clientId, 
+			  								  @PathVariable("directory_id") Long directoryId,
+			  								  @PathVariable("file_id") Long fileId) {
+		Integer statusCode = service.deleteFile(clientId, directoryId, fileId);
+		return ResponseEntity.ok(statusCode);
+	}
 	
 	
 	

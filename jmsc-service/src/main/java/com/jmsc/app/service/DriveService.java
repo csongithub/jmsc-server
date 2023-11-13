@@ -3,7 +3,6 @@
  */
 package com.jmsc.app.service;
 
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.jmsc.app.common.dto.DirectoryDTO;
 import com.jmsc.app.common.dto.FileMetaDataDTO;
+import com.jmsc.app.common.enums.EFileType;
 import com.jmsc.app.common.exception.ResourceNotFoundException;
 import com.jmsc.app.common.rqrs.File;
 import com.jmsc.app.common.rqrs.GetFilesRequest;
@@ -28,7 +28,6 @@ import com.jmsc.app.entity.Directory;
 import com.jmsc.app.entity.FileMetaData;
 import com.jmsc.app.repository.DirectoryRepository;
 import com.jmsc.app.repository.FileMetaDataRepository;
-import com.jmsc.app.service.aws.AmazonS3Service;
 
 /**
  * @author anuhr
@@ -47,11 +46,11 @@ public class DriveService {
 	@Autowired
 	private AwsConfig aws;
 	
-	@Autowired
-	private AmazonS3Service amazonS3Service;
+//	@Autowired
+//	private AmazonS3Service amazonS3Service;
 	
 	
-	private static Map<Long, FileMetaData> db = new HashMap<Long, FileMetaData>();
+//	private static Map<Long, FileMetaData> db = new HashMap<Long, FileMetaData>();
 	
 	
 	public DirectoryDTO createDirectory(DirectoryDTO deDTO) throws Throwable {
@@ -105,7 +104,7 @@ public class DriveService {
 			repository.delete(entity);
 			return 0;
 		} else {
-			throw new ResourceNotFoundException("Category not found");
+			throw new ResourceNotFoundException("Directory not found");
 		}
 	}
 	
@@ -130,10 +129,10 @@ public class DriveService {
 	        entity.setFilePath(filePath);
 	        entity.setData(file.getBytes());
 	        entity.setContentType(file.getContentType());
-//			FileMetaData savedFile = fileRepositoty.save(entity);
-	        entity.setId(1l);
-	        db.put(1l, entity);
-			FileMetaDataDTO response = ObjectMapperUtil.map(entity, FileMetaDataDTO.class);
+			FileMetaData savedFile = fileRepositoty.save(entity);
+//	        entity.setId(1l);
+//	        db.put(1l, entity);
+			FileMetaDataDTO response = ObjectMapperUtil.map(savedFile, FileMetaDataDTO.class);
 	        return response;
 	     } catch (java.io.IOException ex) {
 	    	 throw new Exception("Could not store file " + fileName + ". Please try again!", ex);
@@ -145,20 +144,46 @@ public class DriveService {
 	
 	
 	public File downloadFile(Long clientId, Long directoryId, Long fileId)throws Exception {
-//		Optional<FileMetaData> optional = fileRepositoty.findByClientIdAndDirectoryIdAndId(clientId, directoryId, fileId);
-		FileMetaData f = db.get(1l);
-		if(f != null) {
+		Optional<FileMetaData> optional = fileRepositoty.findByClientIdAndDirectoryIdAndId(clientId, directoryId, fileId);
+//		FileMetaData f = db.get(1l);
+		if(optional.isPresent()) {
 //			S3Object file = amazonS3Service.download(optional.get().getFilePath(), optional.get().getFileName());
 //			S3ObjectInputStream is = file.getObjectContent();
 //			byte[] content = IOUtils.toByteArray(is);
-			
-			File file= new File(f.getData(), 
-								f.getFileName(),
-								f.getContentType());
+			FileMetaData fileMetaData = optional.get();
+			File file= new File(fileMetaData.getData(), 
+								fileMetaData.getFileName(),
+								fileMetaData.getContentType());
 			
 			return file;
 		} else {
 			throw new ResourceNotFoundException("Selected file does not exist in system.");
+		}
+	}
+	
+	
+	public Integer deleteFile(Long clientId, Long directoryId, Long fileId) {
+		Optional<FileMetaData> optional = fileRepositoty.findByClientIdAndDirectoryIdAndId(clientId, directoryId, fileId);
+		if(optional.isPresent()) {
+			FileMetaData file = optional.get();
+			if(EFileType.DIRECTORY.equals(file.getFileType())) {
+				//Check if the directory is empty, then delete otherwise throw error
+				String systemPath = file.getSystemPath() + "/" + file.getFileName();
+				List<FileMetaData> list = fileRepositoty.findAllByClientIdAndDirectoryIdAndSystemPath(clientId,
+																									 directoryId,
+																									 systemPath);
+				if(list.isEmpty()) {
+					fileRepositoty.delete(optional.get());
+					return 0;
+				}else {
+					throw new RuntimeException("Folder is not empty");
+				}
+			} else {
+				fileRepositoty.delete(optional.get());
+				return 0;
+			}
+		} else {
+			throw new ResourceNotFoundException("File not found");
 		}
 	}
 	

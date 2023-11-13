@@ -32,6 +32,7 @@ CREATE TABLE jmsc.FILE_META_DATA
     UPDATED_BY		character varying(30) NOT NULL,
     STATUS			character varying(30) NOT NULL,
     DESCRIPTION		character varying(200) NOT NULL,
+    DATA			bytea,
     CREATED_TS 		timestamp with time zone NOT NULL,
 	UPDATED_TS 		timestamp with time zone NOT NULL,
     CONSTRAINT FILE_META_DATA_key PRIMARY KEY (ID)
