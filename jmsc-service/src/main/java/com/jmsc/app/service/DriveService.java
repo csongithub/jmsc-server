@@ -52,6 +52,9 @@ public class DriveService {
 //	private static Map<Long, FileMetaData> db = new HashMap<Long, FileMetaData>();
 	
 	
+	private static final String MS_WORD_FILE_CONTENT_TYPE = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+	private static final String MS_EXCEL_FILE_CONTENT_TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+	private static final String MS_POWER_POINT_CONTENT_TYPE = "application/vnd.openxmlformats-officedocument.presentationml.presentation";
 	public DirectoryDTO createDirectory(DirectoryDTO deDTO) throws Throwable {
 		
 		if(deDTO.getClientId() == null)
@@ -127,7 +130,16 @@ public class DriveService {
 	        FileMetaData entity = ObjectMapperUtil.map(fileMetaData, FileMetaData.class);
 	        entity.setFilePath(entity.getSystemPath()); //Here AWS path needs to be set from line no 124
 	        entity.setData(file.getBytes());
-	        entity.setContentType(file.getContentType());
+	        
+	        String contentType = file.getContentType();
+	        if(MS_WORD_FILE_CONTENT_TYPE.equalsIgnoreCase(contentType))
+	        	contentType = "MS_WORD";
+	        else if(MS_EXCEL_FILE_CONTENT_TYPE.equalsIgnoreCase(contentType))
+	        	contentType = "MS_EXCEL";
+	        else if(MS_POWER_POINT_CONTENT_TYPE.equals(contentType))
+	        	contentType = "MS_PPT";
+	        
+	        entity.setContentType(contentType);
 			FileMetaData savedFile = fileRepositoty.save(entity);
 //	        entity.setId(1l);
 //	        db.put(1l, entity);
@@ -150,9 +162,17 @@ public class DriveService {
 //			S3ObjectInputStream is = file.getObjectContent();
 //			byte[] content = IOUtils.toByteArray(is);
 			FileMetaData fileMetaData = optional.get();
+			String contentType = fileMetaData.getContentType();
+			if("MS_WORD".equals(contentType))
+				contentType = MS_WORD_FILE_CONTENT_TYPE;
+			else if("MS_EXCEL".equals(contentType))
+				contentType = MS_EXCEL_FILE_CONTENT_TYPE;
+			else if("MS_PPT".equals(contentType))
+				contentType = MS_POWER_POINT_CONTENT_TYPE;
+			
 			File file= new File(fileMetaData.getData(), 
 								fileMetaData.getFileName(),
-								fileMetaData.getContentType());
+								contentType);
 			
 			return file;
 		} else {
