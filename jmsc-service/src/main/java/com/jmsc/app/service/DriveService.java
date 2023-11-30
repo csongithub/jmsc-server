@@ -10,12 +10,16 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.jmsc.app.common.dto.DirectoryDTO;
 import com.jmsc.app.common.dto.FileMetaDataDTO;
+import com.jmsc.app.common.dto.RenameFileRequest;
 import com.jmsc.app.common.enums.EFileType;
 import com.jmsc.app.common.exception.ResourceNotFoundException;
 import com.jmsc.app.common.rqrs.File;
@@ -225,5 +229,42 @@ public class DriveService {
 		return savedFile;
 	}
 	
-
+	public Boolean rename(RenameFileRequest req) {
+		Optional<FileMetaData> optional = fileRepositoty.findByClientIdAndDirectoryIdAndId(req.getClientId(), req.getDirectoryId(), req.getFileId());
+		if(optional.isPresent()) {
+			FileMetaData file = optional.get();
+			String fileExtention = null;
+			
+			if(!EFileType.DIRECTORY.equals(file.getFileType())) {
+				fileExtention = file.getFileName().substring(file.getFileName().indexOf('.'));
+				req.setNewName(req.getNewName() + fileExtention);
+			}
+			if(EFileType.DIRECTORY.equals(file.getFileType())) {
+				String sysPath = file.getSystemPath();
+				String oldName = file.getFileName();
+				
+				String oldPath = sysPath + "/" + oldName;
+				String newPath = sysPath + "/" + req.getNewName();
+				
+				List<FileMetaData> allOtherFiles = fileRepositoty.findAllByClientId(req.getClientId());
+				
+				for(FileMetaData otherFile: allOtherFiles) {
+					if(otherFile.getSystemPath().equals(oldPath)) {
+						otherFile.setSystemPath(newPath);
+						fileRepositoty.save(otherFile);
+					} else if(otherFile.getSystemPath().contains(oldPath+"/")) {
+						otherFile.setSystemPath(otherFile.getSystemPath().replace(oldPath + "/", newPath + "/"));
+						fileRepositoty.save(otherFile);
+					}
+				}
+				
+			}
+			file.setFileName(req.getNewName());
+			file.setDescription(req.getNewDescription());
+			fileRepositoty.save(file);
+		} else {
+			throw new ResourceNotFoundException("File not found");
+		}
+		return Boolean.TRUE;
+	}
 }

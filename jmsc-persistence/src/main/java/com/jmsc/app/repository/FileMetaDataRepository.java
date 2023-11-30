@@ -18,5 +18,7 @@ public interface FileMetaDataRepository extends JpaRepository<FileMetaData, Long
 	
 	List<FileMetaData> findAllByClientIdAndDirectoryIdAndSystemPath(Long clientId, Long directoryId, String systemPath);
 	
+	List<FileMetaData> findAllByClientId(Long clientId);
+	
 	Optional<FileMetaData> findByClientIdAndDirectoryIdAndId(Long clientId, Long directoryId, Long id);
 }

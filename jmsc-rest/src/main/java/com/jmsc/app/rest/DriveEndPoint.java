@@ -19,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.jmsc.app.common.dto.DirectoryDTO;
 import com.jmsc.app.common.dto.FileMetaDataDTO;
+import com.jmsc.app.common.dto.RenameFileRequest;
 import com.jmsc.app.common.rqrs.File;
 import com.jmsc.app.common.rqrs.GetFilesRequest;
 import com.jmsc.app.service.DriveService;
@@ -111,4 +112,10 @@ public class DriveEndPoint {
 		return ResponseEntity.ok(response);
 	 }
 	
+	
+	@PostMapping("/rename_file")
+	public ResponseEntity<Boolean> rename(@RequestBody RenameFileRequest req)throws Throwable{
+		Boolean response = service.rename(req);
+		return ResponseEntity.ok(response);
+	}
 }
