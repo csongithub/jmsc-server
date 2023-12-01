@@ -10,11 +10,8 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.jmsc.app.common.dto.DirectoryDTO;
@@ -29,6 +26,7 @@ import com.jmsc.app.common.util.ObjectMapperUtil;
 import com.jmsc.app.common.util.Strings;
 import com.jmsc.app.entity.Directory;
 import com.jmsc.app.entity.FileMetaData;
+import com.jmsc.app.entity.NoDataFileMetaData;
 import com.jmsc.app.repository.DirectoryRepository;
 import com.jmsc.app.repository.FileMetaDataRepository;
 
@@ -192,7 +190,7 @@ public class DriveService {
 			if(EFileType.DIRECTORY.equals(file.getFileType())) {
 				//Check if the directory is empty, then delete otherwise throw error
 				String systemPath = file.getSystemPath() + "/" + file.getFileName();
-				List<FileMetaData> list = fileRepositoty.findAllByClientIdAndDirectoryIdAndSystemPath(clientId,
+				List<NoDataFileMetaData> list = fileRepositoty.findAllByClientIdAndDirectoryIdAndSystemPath(clientId,
 																									 directoryId,
 																									 systemPath);
 				if(list.isEmpty()) {
@@ -212,7 +210,7 @@ public class DriveService {
 	
 	
 	public List<FileMetaDataDTO> listFiles(GetFilesRequest req){
-		List<FileMetaData> all = fileRepositoty.findAllByClientIdAndDirectoryIdAndSystemPath(req.getClientId(),
+		List<NoDataFileMetaData> all = fileRepositoty.findAllByClientIdAndDirectoryIdAndSystemPath(req.getClientId(),
 																							 req.getDirectoryId(),
 																							 req.getSystemPath());
 		List<FileMetaDataDTO> list= ObjectMapperUtil.mapAll(all, FileMetaDataDTO.class);
@@ -221,6 +219,12 @@ public class DriveService {
 	
 	
 	public FileMetaDataDTO addFolder(FileMetaDataDTO dto) {
+		
+		List<NoDataFileMetaData> existing = fileRepositoty.findAllByClientIdAndSystemPathAndFileName(dto.getClientId(), dto.getSystemPath(), dto.getFileName());
+		
+		if(existing != null && existing.size() >0)
+			throw new RuntimeException("Folder Already Exists");
+		
 		FileMetaData entity = ObjectMapperUtil.map(dto, FileMetaData.class);
 		entity.setContentType("Folder");
 		FileMetaData file = fileRepositoty.save(entity);
@@ -246,15 +250,19 @@ public class DriveService {
 				String oldPath = sysPath + "/" + oldName;
 				String newPath = sysPath + "/" + req.getNewName();
 				
-				List<FileMetaData> allOtherFiles = fileRepositoty.findAllByClientId(req.getClientId());
+				List<NoDataFileMetaData> allOtherFiles = fileRepositoty.findAllByClientId(req.getClientId());
 				
-				for(FileMetaData otherFile: allOtherFiles) {
-					if(otherFile.getSystemPath().equals(oldPath)) {
-						otherFile.setSystemPath(newPath);
-						fileRepositoty.save(otherFile);
-					} else if(otherFile.getSystemPath().contains(oldPath+"/")) {
-						otherFile.setSystemPath(otherFile.getSystemPath().replace(oldPath + "/", newPath + "/"));
-						fileRepositoty.save(otherFile);
+				for(NoDataFileMetaData f: allOtherFiles) {
+					if(f.getSystemPath().equals(oldPath)) {
+						Optional<FileMetaData> optionalFile =  fileRepositoty.findByClientIdAndDirectoryIdAndId(f.getClientId(), f.getDirectoryId(), f.getId());
+						optionalFile.get().setSystemPath(newPath);
+//						otherFile.setSystemPath(newPath);
+						fileRepositoty.save(optionalFile.get());
+					} else if(f.getSystemPath().contains(oldPath+"/")) {
+						Optional<FileMetaData> optionalFile =  fileRepositoty.findByClientIdAndDirectoryIdAndId(f.getClientId(), f.getDirectoryId(), f.getId());
+						optionalFile.get().setSystemPath(f.getSystemPath().replace(oldPath + "/", newPath + "/"));
+//						otherFile.setSystemPath(otherFile.getSystemPath().replace(oldPath + "/", newPath + "/"));
+						fileRepositoty.save(optionalFile.get());
 					}
 				}
 				

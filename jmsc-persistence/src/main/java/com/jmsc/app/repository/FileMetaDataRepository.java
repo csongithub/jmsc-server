@@ -9,6 +9,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.jmsc.app.entity.FileMetaData;
+import com.jmsc.app.entity.NoDataFileMetaData;
 
 /**
  * @author anuhr
@@ -16,9 +17,11 @@ import com.jmsc.app.entity.FileMetaData;
  */
 public interface FileMetaDataRepository extends JpaRepository<FileMetaData, Long> {
 	
-	List<FileMetaData> findAllByClientIdAndDirectoryIdAndSystemPath(Long clientId, Long directoryId, String systemPath);
-	
-	List<FileMetaData> findAllByClientId(Long clientId);
+	List<NoDataFileMetaData> findAllByClientIdAndDirectoryIdAndSystemPath(Long clientId, Long directoryId, String systemPath);
 	
 	Optional<FileMetaData> findByClientIdAndDirectoryIdAndId(Long clientId, Long directoryId, Long id);
+	
+	List<NoDataFileMetaData> findAllByClientId(Long clientId);
+	
+	List<NoDataFileMetaData> findAllByClientIdAndSystemPathAndFileName(Long clientId, String systemPath, String fileName);
 }
