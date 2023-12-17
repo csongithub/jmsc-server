@@ -7,7 +7,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+import java.util.Optional;import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.jmsc.app.common.dto.DirectoryDTO;
 import com.jmsc.app.common.dto.FileMetaDataDTO;
+import com.jmsc.app.common.dto.MoveFilesRequest;
 import com.jmsc.app.common.dto.RenameFileRequest;
 import com.jmsc.app.common.enums.EFileType;
 import com.jmsc.app.common.exception.ResourceNotFoundException;
@@ -272,6 +274,46 @@ public class DriveService {
 			fileRepositoty.save(file);
 		} else {
 			throw new ResourceNotFoundException("File not found");
+		}
+		return Boolean.TRUE;
+	}
+	
+	
+	public Boolean moveFiles(MoveFilesRequest req) {
+		
+		if(Collections.isNullOrEmpty(req.getFiles()))
+			throw new RuntimeException("Invalid Request");
+		
+		for(Long fileId: req.getFiles()) {
+			Optional<FileMetaData> optional = fileRepositoty.findByClientIdAndDirectoryIdAndId(req.getClientId(), req.getDirectoryId(), fileId);
+			if(optional.isPresent()) {
+				FileMetaData file = optional.get();
+				if(EFileType.DIRECTORY.equals(file.getFileType())) {
+					
+					List<NoDataFileMetaData> all = fileRepositoty.findAllByClientIdAndDirectoryIdAndSystemPath(req.getClientId(),
+							 																				   req.getDirectoryId(),
+							 																				   file.getSystemPath() + "/" + file.getFileName());
+					//First move all files under directory
+					if(Collections.isNotNullOrEmpty(all)) {
+						List<Long> fileIds =  all.stream().map(f-> f.getId()).collect(Collectors.toList());
+						
+						MoveFilesRequest newReq = new MoveFilesRequest();
+						newReq.setClientId(req.getClientId());
+						newReq.setDirectoryId(req.getDirectoryId());
+						newReq.setFiles(fileIds);
+						newReq.setNewPath(req.getNewPath() + "/" + file.getFileName());
+						
+						moveFiles(newReq);
+						
+						//Move Directory
+						file.setSystemPath(req.getNewPath());
+						fileRepositoty.save(file);
+					}
+				} else {
+					file.setSystemPath(req.getNewPath());
+					fileRepositoty.save(file);
+				}
+			}
 		}
 		return Boolean.TRUE;
 	}
