@@ -306,13 +306,12 @@ public class DriveService {
 						moveFiles(newReq);
 						
 						//Move Directory
-						file.setSystemPath(req.getNewPath());
-						fileRepositoty.save(file);
+//						file.setSystemPath(req.getNewPath());
+//						fileRepositoty.save(file);
 					}
-				} else {
-					file.setSystemPath(req.getNewPath());
-					fileRepositoty.save(file);
 				}
+				file.setSystemPath(req.getNewPath());
+				fileRepositoty.save(file);
 			}
 		}
 		return Boolean.TRUE;
