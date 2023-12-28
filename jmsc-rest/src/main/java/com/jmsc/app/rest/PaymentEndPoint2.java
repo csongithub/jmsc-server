@@ -18,6 +18,7 @@ import com.jmsc.app.common.dto.PartyBankAccountDTO;
 import com.jmsc.app.common.dto.PaymentDTO;
 import com.jmsc.app.common.dto.PaymentSummaryDTO;
 import com.jmsc.app.common.enums.EPaymentStatus;
+import com.jmsc.app.common.rqrs.ApprovePaymentRequest;
 import com.jmsc.app.common.rqrs.GetPaymentsByDateRequest;
 import com.jmsc.app.service.PaymentService2;
 
@@ -66,10 +67,9 @@ public class PaymentEndPoint2 {
 	
 	
 	
-	@PutMapping("/approve/{client_id}/{payment_id}")
-	public ResponseEntity<Integer> approvePayment(@PathVariable("client_id")Long clientId,
-												 @PathVariable("payment_id")Long paymentId) {
-		Integer statusCode = service.approvePayment(clientId, paymentId);
+	@PutMapping("/approve_payments")
+	public ResponseEntity<Integer> approveAllPayments(@RequestBody ApprovePaymentRequest req) {
+		Integer statusCode = service.approvePayments(req);
 		return ResponseEntity.ok(statusCode);
 	}
 	

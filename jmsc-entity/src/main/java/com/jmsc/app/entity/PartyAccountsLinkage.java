@@ -3,11 +3,8 @@
  */
 package com.jmsc.app.entity;
 
-import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.Table;
 
 import lombok.Data;
@@ -19,22 +16,14 @@ import lombok.Data;
 @Data
 @Entity
 @Table(name = "PARTY_ACCOUNT_LINKAGE")
-public class PartyAccountsLinkage extends BaseEntity{
+public class PartyAccountsLinkage{
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -7914249348388501960L;
 	
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "ID")
-	private Long id;
-	
-	@Column(name = "PARTY_ID")
-	private Long partyId;
-	
-	@Column(name = "ACCOUNT_ID")
-	private Long accountId;
+	@EmbeddedId
+	private PartyAccountsLinkageKey id;
 	
 	
 	@Override

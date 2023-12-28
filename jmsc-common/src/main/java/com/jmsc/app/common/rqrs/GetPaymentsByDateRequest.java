@@ -4,7 +4,6 @@
 package com.jmsc.app.common.rqrs;
 
 import java.io.Serializable;
-import java.util.Date;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;

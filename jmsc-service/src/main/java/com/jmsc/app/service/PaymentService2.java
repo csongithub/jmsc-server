@@ -20,12 +20,14 @@ import com.jmsc.app.common.dto.PaymentDTO;
 import com.jmsc.app.common.dto.PaymentSummaryDTO;
 import com.jmsc.app.common.enums.EPaymentStatus;
 import com.jmsc.app.common.exception.ResourceNotFoundException;
+import com.jmsc.app.common.rqrs.ApprovePaymentRequest;
 import com.jmsc.app.common.rqrs.GetPaymentsByDateRequest;
 import com.jmsc.app.common.rqrs.Range;
 import com.jmsc.app.common.util.Collections;
 import com.jmsc.app.common.util.ObjectMapperUtil;
 import com.jmsc.app.config.jmsc.ServiceLocator;
 import com.jmsc.app.entity.PartyAccountsLinkage;
+import com.jmsc.app.entity.PartyAccountsLinkageKey;
 import com.jmsc.app.entity.PartyBankAccount;
 import com.jmsc.app.entity.Payment;
 import com.jmsc.app.repository.PartyAccountsLinkageRepository;
@@ -107,27 +109,30 @@ public class PaymentService2 {
 	
 	
 	
-	
-	public Integer approvePayment(Long clientId, Long paymentId) {
-		Optional<Payment> optional  = paymentRepository.findAllByClientIdAndId(clientId, paymentId);
+	public Integer approvePayments(ApprovePaymentRequest req) {
 		
-		if(optional.isPresent()) {
-			Payment payment = optional.get();
-			payment.setStatus(EPaymentStatus.APPROVED);
-			paymentRepository.save(payment);
+		if(Collections.isNullOrEmpty(req.getPayments()))
+			throw new ResourceNotFoundException("Invalid Request");
+		
+		for(Long paymentId: req.getPayments()) {
+			Optional<Payment> optional  = paymentRepository.findAllByClientIdAndId(req.getClientId(), paymentId);
 			
-			//TODO: Create Account linkage entry
-			
-			return 0;
-		} else {
-			throw new ResourceNotFoundException("Payment not found");
+			if(optional.isPresent()) {
+				Payment payment = optional.get();
+				payment.setStatus(EPaymentStatus.APPROVED);
+				paymentRepository.save(payment);
+				PaymentSummaryDTO paymentSummary = ObjectMapperUtil.object(payment.getPaymentSummary(), PaymentSummaryDTO.class);
+				
+				if(paymentSummary.getToAccountId() != null)
+					linkPartyAccount(req.getClientId(), paymentSummary.getPartyId(), paymentSummary.getToAccountId());
+			}
 		}
+		return 0;
 	}
 	
 	
 	public Integer rejectPayment(Long clientId, Long paymentId) {
 		Optional<Payment> optional  = paymentRepository.findAllByClientIdAndId(clientId, paymentId);
-		
 		if(optional.isPresent()) {
 			Payment payment = optional.get();
 			payment.setStatus(EPaymentStatus.DRAFT);
@@ -143,15 +148,13 @@ public class PaymentService2 {
 	
 	
 	public Integer linkPartyAccount(Long clientId, Long partyId, Long accountId) {
-		
 		Optional<PartyAccountsLinkage> optional =  linkageRepository.findByClientIdAndPartyIdAndAccountId(clientId, partyId, accountId);
 		if(optional.isPresent())
 			return 0;
 		else {
 			PartyAccountsLinkage linkage = new PartyAccountsLinkage();
-			linkage.setClientId(clientId);
-			linkage.setPartyId(partyId);
-			linkage.setAccountId(accountId);
+			PartyAccountsLinkageKey id = new PartyAccountsLinkageKey(clientId, partyId, accountId);
+			linkage.setId(id);
 			linkageRepository.save(linkage);
 			return 0;
 		}
@@ -171,7 +174,7 @@ public class PaymentService2 {
 		PartyBankAccountRepository partyAccountrepository = ServiceLocator.getService(PartyBankAccountRepository.class);
 	
 		for(PartyAccountsLinkage linkage: linkages) {
-			Optional<PartyBankAccount> optional = partyAccountrepository.findById(linkage.getAccountId());
+			Optional<PartyBankAccount> optional = partyAccountrepository.findById(linkage.getId().getAccountId());
 			if(optional.isPresent()) {
 				PartyBankAccountDTO accountDTO = ObjectMapperUtil.map(optional.get(), PartyBankAccountDTO.class);
 				list.add(accountDTO);
