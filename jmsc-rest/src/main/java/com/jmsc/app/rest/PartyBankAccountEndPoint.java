@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -75,5 +76,32 @@ public class PartyBankAccountEndPoint {
 	public ResponseEntity<PartyBankAccountDTO> getAccount(@PathVariable("client_id")Long clientId, @PathVariable("account_id")Long accountId) {
 		PartyBankAccountDTO account  = service.getAccount(clientId, accountId);
 		return ResponseEntity.ok(account);
+	}
+	
+	
+	
+	@PutMapping("/linke_party_account/{client_id}/{party_id}/{account_id}")
+	public ResponseEntity<Integer> linkPartyAccount(@PathVariable("client_id")Long clientId,
+												  @PathVariable("party_id")Long partyId,
+												  @PathVariable("account_id")Long accountId) {
+		Integer statusCode = service.linkPartyAccount(clientId, partyId, accountId);
+		return ResponseEntity.ok(statusCode);
+	}
+	
+	
+	
+	@PutMapping("/de_linke_party_account/{client_id}/{party_id}/{account_id}")
+	public ResponseEntity<Integer> delink(@PathVariable("client_id")Long clientId,
+												  @PathVariable("party_id")Long partyId,
+												  @PathVariable("account_id")Long accountId) {
+		Integer statusCode = service.delinkPartyAccount(clientId, partyId, accountId);
+		return ResponseEntity.ok(statusCode);
+	}
+	
+	
+	@GetMapping("/bank_by_ifsc/{ifsc_code}")
+	public ResponseEntity<String> delink(@PathVariable("ifsc_code")String ifscCode) {
+		String bank = service.getBankByIfsc(ifscCode);
+		return ResponseEntity.ok(bank);
 	}
 }

@@ -10,11 +10,17 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.jmsc.app.common.dto.PartyBankAccountDTO;
 import com.jmsc.app.common.dto.PartyDTO;
 import com.jmsc.app.common.util.Collections;
 import com.jmsc.app.common.util.ObjectMapperUtil;
 import com.jmsc.app.common.util.Strings;
+import com.jmsc.app.config.jmsc.ServiceLocator;
 import com.jmsc.app.entity.Party;
+import com.jmsc.app.entity.PartyAccountsLinkage;
+import com.jmsc.app.entity.PartyBankAccount;
+import com.jmsc.app.repository.PartyAccountsLinkageRepository;
+import com.jmsc.app.repository.PartyBankAccountRepository;
 import com.jmsc.app.repository.PartyRepository;
 
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +36,9 @@ public class PartyService {
 	
 	@Autowired
 	private PartyRepository repository;
+	
+	@Autowired
+	private PartyAccountsLinkageRepository linkageRepository;
 	
 	
 	public PartyDTO createParty(PartyDTO partyDTO) {
@@ -85,6 +94,29 @@ public class PartyService {
 		
 		PartyDTO party = ObjectMapperUtil.map(optional.get(), PartyDTO.class);
 		return party;
+	}
+	
+	
+	public List<PartyBankAccountDTO> getAllLinkedAccounts(Long clientId, Long partyId) {
+		List<PartyBankAccountDTO> list = new ArrayList<PartyBankAccountDTO>();
+		
+		List<PartyAccountsLinkage> linkages = linkageRepository.findByClientIdAndPartyId(clientId, partyId);
+		
+		if(Collections.isNullOrEmpty(linkages)) {
+			return list;
+		}
+		
+		PartyBankAccountRepository partyAccountrepository = ServiceLocator.getService(PartyBankAccountRepository.class);
+	
+		for(PartyAccountsLinkage linkage: linkages) {
+			Optional<PartyBankAccount> optional = partyAccountrepository.findById(linkage.getId().getAccountId());
+			if(optional.isPresent()) {
+				PartyBankAccountDTO accountDTO = ObjectMapperUtil.map(optional.get(), PartyBankAccountDTO.class);
+				list.add(accountDTO);
+			}
+		}
+		
+		return list;
 	}
 
 }

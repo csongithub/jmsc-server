@@ -17,6 +17,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+
+import javax.annotation.PostConstruct;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -27,11 +30,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.jmsc.app.common.dto.BankAccountDTO;
 import com.jmsc.app.common.dto.PartyBankAccountDTO;
 import com.jmsc.app.common.util.ObjectMapperUtil;
-import com.jmsc.app.entity.BankAccount;
+import com.jmsc.app.entity.PartyAccountsLinkage;
+import com.jmsc.app.entity.PartyAccountsLinkageKey;
 import com.jmsc.app.entity.PartyBankAccount;
+import com.jmsc.app.repository.PartyAccountsLinkageRepository;
 import com.jmsc.app.repository.PartyBankAccountRepository;
 
 import lombok.extern.slf4j.Slf4j; 
@@ -47,6 +51,49 @@ public class PartyBankAccountService {
 	@Autowired
 	private PartyBankAccountRepository repository;
 	
+	@Autowired
+	private PartyAccountsLinkageRepository linkageRepository;
+	
+	
+	private Map<String, String> branchCache = new ConcurrentHashMap<String, String>();
+	
+	
+	@PostConstruct
+	public void onActivate() {
+		this.loadBanks();
+	}
+	
+	
+	private void loadBanks() {
+		List<PartyBankAccount> all = repository.findAll();
+		all.forEach(account -> {
+			updateBankCache(account);
+		});
+		log.debug("All banks loaded");
+	
+	}
+	
+	
+	private void updateBankCache(PartyBankAccount account) {
+		String key = account.getIfscCode().trim().toUpperCase();
+		if(branchCache.containsKey(key))
+			return;
+		else{
+			String bank = account.getBankName();
+			String branch = account.getBranchName();
+			String branchCode = account.getBranchCode();
+			branchCache.put(key, bank+","+branch+","+branchCode);
+		}
+	}
+	
+	
+	public String getBankByIfsc(String ifscCode) {
+		if(branchCache.containsKey(ifscCode)) {
+			return branchCache.get(ifscCode);
+		} else {
+			return "-1";
+		}
+	}
 	
 	
 	 public String storeFile(MultipartFile file) throws Exception {
@@ -136,7 +183,7 @@ public class PartyBankAccountService {
 		}
 		
 		if(bankAccountDTO.getId() == null) {
-			Optional<PartyBankAccount> optional = repository.findByClientIdAndAccountNumber(bankAccountDTO.getClientId(), bankAccountDTO.getAccountNumber());
+			Optional<PartyBankAccount> optional = repository.findByClientIdAndAccountNumber(bankAccountDTO.getClientId(), bankAccountDTO.getAccountNumber().toUpperCase());
 			if(optional.isPresent()) {
 				throw new RuntimeException("Part Account Already Exists with Name: " + optional.get().getPartyName());
 			}
@@ -146,6 +193,9 @@ public class PartyBankAccountService {
 		PartyBankAccount savedAccount = repository.save(bankAccount);
 		PartyBankAccountDTO savedAccountDTO = ObjectMapperUtil.map(savedAccount, PartyBankAccountDTO.class);
 		log.debug("New Bank Account Added: " + savedAccountDTO.toString());
+		
+		this.updateBankCache(bankAccount);
+		
 		return savedAccountDTO;
 	}
 	
@@ -167,6 +217,30 @@ public class PartyBankAccountService {
 			return dto;
 		} else {
 			throw new RuntimeException("Account dose not exist");
+		}
+	}
+	
+	public Integer linkPartyAccount(Long clientId, Long partyId, Long accountId) {
+		Optional<PartyAccountsLinkage> optional =  linkageRepository.findByClientIdAndPartyIdAndAccountId(clientId, partyId, accountId);
+		if(optional.isPresent())
+			return -1;
+		else {
+			PartyAccountsLinkage linkage = new PartyAccountsLinkage();
+			PartyAccountsLinkageKey id = new PartyAccountsLinkageKey(clientId, partyId, accountId);
+			linkage.setId(id);
+			linkageRepository.save(linkage);
+			return 0;
+		}
+	}
+	
+	
+	public Integer delinkPartyAccount(Long clientId, Long partyId, Long accountId) {
+		Optional<PartyAccountsLinkage> optional =  linkageRepository.findByClientIdAndPartyIdAndAccountId(clientId, partyId, accountId);
+		if(optional.isPresent()) {
+			linkageRepository.delete(optional.get());
+			return 0;
+		} else {
+			throw new RuntimeException("Error while removing account");
 		}
 	}
 }

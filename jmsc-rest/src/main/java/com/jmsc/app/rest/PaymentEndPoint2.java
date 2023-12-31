@@ -82,22 +82,6 @@ public class PaymentEndPoint2 {
 	}
 	
 	
-	@PutMapping("/linke_party_account/{client_id}/{party_id}/{account_id}")
-	public ResponseEntity<Integer> linkPartyAccount(@PathVariable("client_id")Long clientId,
-												  @PathVariable("party_id")Long partyId,
-												  @PathVariable("account_id")Long accountId) {
-		Integer statusCode = service.linkPartyAccount(clientId, partyId, accountId);
-		return ResponseEntity.ok(statusCode);
-	}
-	
-	
-	
-	@GetMapping("/party_linked_accounts/{client_id}/{party_id}")
-	public ResponseEntity<List<PartyBankAccountDTO>> getAllLinkedAccounts(@PathVariable("client_id")Long clientId , @PathVariable("party_id")Long partyId) throws Throwable{
-		List<PartyBankAccountDTO> list = service.getAllLinkedAccounts(clientId, partyId);
-		return ResponseEntity.ok(list);
-	}
-	
 	
 	
 	@PutMapping("/payment_between_dates")

@@ -15,7 +15,6 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.jmsc.app.common.dto.PartyBankAccountDTO;
 import com.jmsc.app.common.dto.PaymentDTO;
 import com.jmsc.app.common.dto.PaymentSummaryDTO;
 import com.jmsc.app.common.enums.EPaymentStatus;
@@ -25,13 +24,7 @@ import com.jmsc.app.common.rqrs.GetPaymentsByDateRequest;
 import com.jmsc.app.common.rqrs.Range;
 import com.jmsc.app.common.util.Collections;
 import com.jmsc.app.common.util.ObjectMapperUtil;
-import com.jmsc.app.config.jmsc.ServiceLocator;
-import com.jmsc.app.entity.PartyAccountsLinkage;
-import com.jmsc.app.entity.PartyAccountsLinkageKey;
-import com.jmsc.app.entity.PartyBankAccount;
 import com.jmsc.app.entity.Payment;
-import com.jmsc.app.repository.PartyAccountsLinkageRepository;
-import com.jmsc.app.repository.PartyBankAccountRepository;
 import com.jmsc.app.repository.PaymentRepository;
 
 /**
@@ -39,13 +32,16 @@ import com.jmsc.app.repository.PaymentRepository;
  *
  */
 @Service
+
 public class PaymentService2 {
 
-	@Autowired
-	private PartyAccountsLinkageRepository linkageRepository;
+	
 	
 	@Autowired
 	private PaymentRepository paymentRepository;
+	
+	@Autowired
+	private PartyBankAccountService partyAccountService;
 	
 	
 	public PaymentDTO savePayment(PaymentDTO dto) {
@@ -124,7 +120,7 @@ public class PaymentService2 {
 				PaymentSummaryDTO paymentSummary = ObjectMapperUtil.object(payment.getPaymentSummary(), PaymentSummaryDTO.class);
 				
 				if(paymentSummary.getToAccountId() != null)
-					linkPartyAccount(req.getClientId(), paymentSummary.getPartyId(), paymentSummary.getToAccountId());
+					partyAccountService.linkPartyAccount(req.getClientId(), paymentSummary.getPartyId(), paymentSummary.getToAccountId());
 			}
 		}
 		return 0;
@@ -147,42 +143,11 @@ public class PaymentService2 {
 	}
 	
 	
-	public Integer linkPartyAccount(Long clientId, Long partyId, Long accountId) {
-		Optional<PartyAccountsLinkage> optional =  linkageRepository.findByClientIdAndPartyIdAndAccountId(clientId, partyId, accountId);
-		if(optional.isPresent())
-			return 0;
-		else {
-			PartyAccountsLinkage linkage = new PartyAccountsLinkage();
-			PartyAccountsLinkageKey id = new PartyAccountsLinkageKey(clientId, partyId, accountId);
-			linkage.setId(id);
-			linkageRepository.save(linkage);
-			return 0;
-		}
-	}
 	
 	
 	
-	public List<PartyBankAccountDTO> getAllLinkedAccounts(Long clientId, Long partyId) {
-		List<PartyBankAccountDTO> list = new ArrayList<PartyBankAccountDTO>();
-		
-		List<PartyAccountsLinkage> linkages = linkageRepository.findByClientIdAndPartyId(clientId, partyId);
-		
-		if(Collections.isNullOrEmpty(linkages)) {
-			return list;
-		}
-		
-		PartyBankAccountRepository partyAccountrepository = ServiceLocator.getService(PartyBankAccountRepository.class);
 	
-		for(PartyAccountsLinkage linkage: linkages) {
-			Optional<PartyBankAccount> optional = partyAccountrepository.findById(linkage.getId().getAccountId());
-			if(optional.isPresent()) {
-				PartyBankAccountDTO accountDTO = ObjectMapperUtil.map(optional.get(), PartyBankAccountDTO.class);
-				list.add(accountDTO);
-			}
-		}
-		
-		return list;
-	}
+	
 	
 	
 	
