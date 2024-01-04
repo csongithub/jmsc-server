@@ -12,10 +12,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import javax.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.jmsc.app.common.dto.PaymentDTO;
+import com.jmsc.app.common.dto.PaymentFilterCriteria;
 import com.jmsc.app.common.dto.PaymentSummaryDTO;
 import com.jmsc.app.common.enums.EPaymentStatus;
 import com.jmsc.app.common.exception.ResourceNotFoundException;
@@ -24,6 +27,7 @@ import com.jmsc.app.common.rqrs.GetPaymentsByDateRequest;
 import com.jmsc.app.common.rqrs.Range;
 import com.jmsc.app.common.util.Collections;
 import com.jmsc.app.common.util.ObjectMapperUtil;
+import com.jmsc.app.common.util.Strings;
 import com.jmsc.app.entity.Payment;
 import com.jmsc.app.repository.PaymentRepository;
 
@@ -144,13 +148,6 @@ public class PaymentService2 {
 	
 	
 	
-	
-	
-	
-	
-	
-	
-	
 	public List<PaymentSummaryDTO> getPaymentsBetweenDates(Long clientId, EPaymentStatus status, GetPaymentsByDateRequest req) {
 		List<PaymentSummaryDTO> listOfDraft = new ArrayList<PaymentSummaryDTO>();
 		Range range = req.getRange();
@@ -195,5 +192,84 @@ public class PaymentService2 {
 	    });
 		
 		return listOfDraft;
+	}
+	
+	
+	@PostConstruct
+	public void getAllPaymentAccountNumber() {
+//		List<Payment> drafts = paymentRepository.findByFromAccountNumber(1L, "6208430945", EPaymentStatus.APPROVED.toString());
+//		List<Payment> drafts = paymentRepository.findByParty(1L, "JMSC", EPaymentStatus.APPROVED.toString());
+//		System.out.println(drafts.size());
+	}
+	
+	
+	public List<PaymentSummaryDTO> getPaymentsByCriteria(Long clientId, EPaymentStatus status, PaymentFilterCriteria criteria){
+		List<PaymentSummaryDTO> listOfDraft = new ArrayList<PaymentSummaryDTO>();
+		
+		List<Payment> searchResult = null;
+		
+		if(isValid(criteria.getFromAccount()) && isValid(criteria.getToAccount()) && isValid(criteria.getPartyName())) {
+			searchResult = paymentRepository.findByPartyAndFromAccountAndToAccount(clientId,
+																				   criteria.getPartyName(),
+																				   criteria.getFromAccount(),
+																				   criteria.getToAccount(),
+																				   status.toString());
+		}else if(isValid(criteria.getFromAccount()) && isValid(criteria.getToAccount()) && !isValid(criteria.getPartyName())) {
+			searchResult = paymentRepository.findByFromAndToAccount(clientId,
+																	criteria.getFromAccount(),
+																	criteria.getToAccount(),
+																	status.toString());
+		}else if(isValid(criteria.getFromAccount()) &&isValid(criteria.getPartyName()) && !isValid(criteria.getToAccount())) {
+			searchResult = paymentRepository.findByFromAccountAndPartyName(clientId,
+																		   criteria.getFromAccount(),
+																		   criteria.getPartyName(),
+																		   status.toString());
+		}else if(isValid(criteria.getToAccount()) &&isValid(criteria.getPartyName()) && !isValid(criteria.getFromAccount())) {
+			searchResult = paymentRepository.findByToAccountAndPartyName(clientId,
+																		 criteria.getToAccount(),
+																		 criteria.getPartyName(),
+																		 status.toString());
+		} else if(isValid(criteria.getPartyName()) && !isValid(criteria.getFromAccount()) && !isValid(criteria.getToAccount())) {
+			searchResult = paymentRepository.findByParty(clientId,
+														 criteria.getPartyName(),
+														 status.toString());
+		}else if(isValid(criteria.getFromAccount()) && !isValid(criteria.getToAccount()) && !isValid(criteria.getPartyName())) {
+			searchResult = paymentRepository.findByFromAccountNumber(clientId,
+																	 criteria.getFromAccount(),
+																	 status.toString());
+		} else if(isValid(criteria.getToAccount()) && !isValid(criteria.getFromAccount()) && !isValid(criteria.getPartyName())) {
+			searchResult = paymentRepository.findByToAccountNumber(clientId,
+																   criteria.getToAccount(),
+																   status.toString());
+		}
+		
+		
+		if(Collections.isNotNullOrEmpty(searchResult)) {
+			this.buildPaymentSummaryDTO(searchResult, listOfDraft);
+			
+			java.util.Collections.sort(listOfDraft, new Comparator<PaymentSummaryDTO>() {
+		        public int compare(PaymentSummaryDTO emp1, PaymentSummaryDTO emp2) {
+		            return emp2.getPaymentDate().compareTo(emp1.getPaymentDate());
+		        }
+		    });
+		}
+	
+		return listOfDraft;
+	}
+		
+	
+	private boolean isValid(String val) {
+		return Strings.isNotNullOrEmpty(val);
+	}
+	
+	
+	
+	private void buildPaymentSummaryDTO(List<Payment> drafts, List<PaymentSummaryDTO> listOfDraft) {
+		for(Payment draft: drafts) {
+			PaymentSummaryDTO summary = ObjectMapperUtil.object(draft.getPaymentSummary(), PaymentSummaryDTO.class);
+			summary.setPaymentId(draft.getId());
+			summary.setPaymentDate(draft.getPaymentDate());
+			listOfDraft.add(summary);
+		}
 	}
 }

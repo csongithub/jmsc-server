@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.jmsc.app.common.dto.PartyBankAccountDTO;
 import com.jmsc.app.common.dto.PaymentDTO;
+import com.jmsc.app.common.dto.PaymentFilterCriteria;
 import com.jmsc.app.common.dto.PaymentSummaryDTO;
 import com.jmsc.app.common.enums.EPaymentStatus;
 import com.jmsc.app.common.rqrs.ApprovePaymentRequest;
@@ -90,5 +90,16 @@ public class PaymentEndPoint2 {
 																		   @RequestBody GetPaymentsByDateRequest req){
 		List<PaymentSummaryDTO> list= service.getPaymentsBetweenDates(clientId, status, req);
 		return ResponseEntity.ok(list);
+	}
+	
+	
+	@PutMapping("/payments_by_criteria")
+	public ResponseEntity<List<PaymentSummaryDTO>> getPaymentByCriteria(@RequestParam("client_id")Long clientId,
+			   															@RequestParam("status")EPaymentStatus status,
+			   															@RequestBody PaymentFilterCriteria criteria){
+		
+		List<PaymentSummaryDTO> list= service.getPaymentsByCriteria(clientId, status, criteria);
+		return ResponseEntity.ok(list);
+		
 	}
 }
