@@ -205,6 +205,7 @@ public class PartyBankAccountService {
 	public List<PartyBankAccountDTO> getAllAccounts(Long clientId){
 		List<PartyBankAccount> accounts = repository.findByClientId(clientId);
 		List<PartyBankAccountDTO> accountsDTO = ObjectMapperUtil.mapAll(accounts, PartyBankAccountDTO.class);
+		accountsDTO.sort((o1, o2)-> o1.getPartyName().compareTo(o2.getPartyName()));
 		return accountsDTO;
 	}
 	
