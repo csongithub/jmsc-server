@@ -32,6 +32,9 @@ public class UserService {
 	private EncryptionService encService;
 	
 	
+	private UserPermissionService permissionsService;
+	
+	
 	public UserDTO createUser(UserDTO userDTO) throws Throwable {
 		
 		if(userDTO.getClientId() == null)
@@ -96,6 +99,7 @@ public class UserService {
 		if(optional.isPresent()) {
 			User user = optional.get();
 			repository.delete(user);
+			permissionsService.deleteUserPermissions(clientId, id);
 			return 0;
 		} else {
 			throw new ResourceNotFoundException("User not found");

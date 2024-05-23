@@ -17,7 +17,6 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper=false)
-@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class UserPermissionsDTO extends BaseDTO implements Serializable{
 	/**
 	 * 

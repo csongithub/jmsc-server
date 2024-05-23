@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.jmsc.app.common.dto.ClientDTO;
+import com.jmsc.app.common.dto.PermisssionsDTO;
 import com.jmsc.app.common.dto.UserDTO;
 import com.jmsc.app.common.rqrs.AdminAuthRequest;
 import com.jmsc.app.common.rqrs.AdminAuthResponse;
@@ -52,6 +53,9 @@ public class AuthService {
 	
 	@Autowired
 	private UserRepository userRepository;
+	
+	@Autowired
+	private UserPermissionService permissionsService;
 	
 	public LoginResponse login(LoginRequest request) {
 		
@@ -126,6 +130,15 @@ public class AuthService {
 			return response;
 		}
 		
+		PermisssionsDTO permissions = permissionsService.getPermission(client.getId(), user.getId());
+		
+		if(!permissions.isCanLogin()) {
+			LoginResponse response = new LoginResponse();
+			response.setLoginSuccess(false);
+			response.setMessage("Login permission not granted, please contact admin");
+			return response;
+		}
+		
 		if(!"ACTIVE".equalsIgnoreCase(user.getStatus())) {
 			LoginResponse response = new LoginResponse();
 			response.setLoginSuccess(false);
@@ -145,6 +158,7 @@ public class AuthService {
 				response.setLoginSuccess(true);
 				response.setClientDTO(client);
 				response.setUserDTO(userDTO);
+				response.setPermissions(permissions);
 				
 				final String token = jwtProvider.generateToken(client.getLogonId());
 				log.debug("Issued token: {} for logon request by: {}",token,request.getLogonId());

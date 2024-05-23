@@ -5,7 +5,6 @@ package com.jmsc.app.rest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.jmsc.app.common.dto.PermisssionsDTO;
 import com.jmsc.app.common.dto.UserPermissionsDTO;
 import com.jmsc.app.service.UserPermissionService;
 
@@ -38,9 +38,9 @@ public class UserPermissionsEndPoint {
 	
 	
 	@GetMapping("/get/{client_id}/{user_id}")
-	public ResponseEntity<UserPermissionsDTO> deleteuser(@PathVariable("client_id")Long clientId,
+	public ResponseEntity<PermisssionsDTO> deleteuser(@PathVariable("client_id")Long clientId,
 												 @PathVariable("user_id")Long userId) {
-		UserPermissionsDTO permissions = service.getPermission(clientId, userId);
+		PermisssionsDTO permissions = service.getPermission(clientId, userId);
 		return ResponseEntity.ok(permissions);
 	}
 

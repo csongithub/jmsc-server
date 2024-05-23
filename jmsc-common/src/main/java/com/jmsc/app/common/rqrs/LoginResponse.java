@@ -6,6 +6,7 @@ package com.jmsc.app.common.rqrs;
 import java.io.Serializable;
 
 import com.jmsc.app.common.dto.ClientDTO;
+import com.jmsc.app.common.dto.PermisssionsDTO;
 import com.jmsc.app.common.dto.UserDTO;
 
 import lombok.Data;
@@ -30,6 +31,8 @@ public class LoginResponse implements Serializable{
 	private ClientDTO clientDTO;
 	
 	private UserDTO userDTO;
+	
+	private PermisssionsDTO permissions;
 	
 	private String message;
 	

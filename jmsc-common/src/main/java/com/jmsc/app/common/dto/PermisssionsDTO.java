@@ -5,9 +5,6 @@ package com.jmsc.app.common.dto;
 
 import java.io.Serializable;
 
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -17,18 +14,19 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper=false)
-@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class PermisssionsDTO implements Serializable{
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 6361262330429157336L;
 	
-	private boolean addUser;
+	private boolean canLogin;
 	
-	private boolean createPayment;
+	private boolean addUsers;
+	
+	private boolean createPayments;
 	
 	private boolean approvePayments;
 	
-	private boolean deletePayment;
+	private boolean deletePayments;
 }
