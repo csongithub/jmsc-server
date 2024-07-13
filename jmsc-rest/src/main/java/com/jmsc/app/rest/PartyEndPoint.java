@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.jmsc.app.common.dto.PartyBankAccountDTO;
 import com.jmsc.app.common.dto.PartyDTO;
+import com.jmsc.app.common.enums.EPartyStatus;
 import com.jmsc.app.service.PartyService;
 
 import io.swagger.annotations.Api;
@@ -46,6 +48,13 @@ public class PartyEndPoint {
 	}
 	
 	
+	@GetMapping("/all/{client_id}/{status}")
+	public ResponseEntity<List<PartyDTO>> getAllByStatus(@PathVariable("client_id") Long clientId, @PathVariable("status")EPartyStatus status ){
+		List<PartyDTO> all = service.getAllParties(clientId, status);
+		return ResponseEntity.ok(all);
+	}
+	
+	
 	@GetMapping("/{client_id}/{party_id}")
 	public ResponseEntity<PartyDTO> getParty(@PathVariable("client_id") Long clientId, @PathVariable("party_id")Long partyId){
 		PartyDTO party = service.getPartyById(clientId, partyId);
@@ -58,5 +67,15 @@ public class PartyEndPoint {
 		List<PartyBankAccountDTO> list = service.getAllLinkedAccounts(clientId, partyId);
 		return ResponseEntity.ok(list);
 	}
+	
+	
+	@DeleteMapping("/delete/{client_id}/{party_id}")
+	public ResponseEntity<Integer> deleteParty(@PathVariable("client_id")Long clientId,
+												 @PathVariable("party_id")Long partyId
+												) {
+		Integer statusCode = service.deleteParty(clientId, partyId);
+		return ResponseEntity.ok(statusCode);
+	}
+
 
 }

@@ -12,6 +12,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import com.jmsc.app.common.enums.EPartyStatus;
 import com.jmsc.app.common.enums.EPartyType;
 import com.sun.istack.NotNull;
 
@@ -53,6 +54,12 @@ public class Party extends BaseEntity{
 	
 	@Column(name = "ADDRESS")
 	private String address;
+	
+	
+	@NotNull
+	@Enumerated(EnumType.STRING)
+	@Column(name = "STATUS")
+	private EPartyStatus status;
 	
 	
 	@Override

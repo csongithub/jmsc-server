@@ -10,24 +10,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.map.HashedMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.jmsc.app.common.dto.CreditFacilityDTO;
 import com.jmsc.app.common.dto.MachineDTO;
 import com.jmsc.app.common.dto.NotificationDTO;
-import com.jmsc.app.common.enums.EFacilityStatus;
 import com.jmsc.app.common.enums.ENotificationEntityType;
+import com.jmsc.app.common.exception.ResourceNotFoundException;
 import com.jmsc.app.common.util.Collections;
 import com.jmsc.app.common.util.ObjectMapperUtil;
 import com.jmsc.app.common.util.Strings;
 import com.jmsc.app.config.jmsc.JmscProperties;
 import com.jmsc.app.config.jmsc.ServiceLocator;
 import com.jmsc.app.entity.Client;
-import com.jmsc.app.entity.CreditFacility;
 import com.jmsc.app.entity.Machine;
 import com.jmsc.app.repository.ClientRepository;
 import com.jmsc.app.repository.MachineRepository;
@@ -96,7 +93,17 @@ public class MachineService {
 	}
 	
 	
-	
+	public Integer deleteMachine(Long clientId, Long machineId) {
+		Optional<Machine> optional = repository.findByClientIdAndId(clientId, machineId);
+		
+		if(optional.isPresent()) {
+			repository.delete(optional.get());
+			return 0;
+		} else {
+			throw new ResourceNotFoundException("Machine not found");
+		}
+		
+	}
 	
 	public Map<Long, List<NotificationDTO>> evaluateExpiry(){
 

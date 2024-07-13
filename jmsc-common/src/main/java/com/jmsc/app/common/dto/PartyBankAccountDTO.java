@@ -2,6 +2,8 @@ package com.jmsc.app.common.dto;
 
 import java.io.Serializable;
 
+import com.jmsc.app.common.enums.EBankAccountStatus;
+
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -50,6 +52,9 @@ public class PartyBankAccountDTO implements Serializable{
 	
 	@ApiModelProperty(name = "address", example = "Aurngabad, Bazar, Bihar-824101", notes = "Address of the bank", required = false)
 	private String address;
+	
+	@ApiModelProperty(name = "status", example = "ACTIVE", notes = "Status of the Bank Account", required = true)
+	private EBankAccountStatus status;
 	
 	private Boolean update;
 	

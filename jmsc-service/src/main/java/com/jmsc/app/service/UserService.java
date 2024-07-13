@@ -31,7 +31,7 @@ public class UserService {
 	@Autowired
 	private EncryptionService encService;
 	
-	
+	@Autowired
 	private UserPermissionService permissionsService;
 	
 	

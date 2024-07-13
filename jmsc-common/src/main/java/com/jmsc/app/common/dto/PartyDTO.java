@@ -7,6 +7,7 @@ import java.io.Serializable;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.jmsc.app.common.enums.EPartyStatus;
 import com.jmsc.app.common.enums.EPartyType;
 
 import lombok.Data;
@@ -47,6 +48,9 @@ public class PartyDTO implements Serializable {
 	
 	@JsonProperty("address")
 	private String address;
+	
+	@JsonProperty("status")
+	private EPartyStatus status;
 	
 	public void toUppercase() {
 		this.name = this.name.trim().toUpperCase();

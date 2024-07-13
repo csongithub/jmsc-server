@@ -19,4 +19,6 @@ public interface MachineRepository extends JpaRepository<Machine, Long> {
 	public List<Machine> findByClientId(Long clientId);
 	
 	public Optional<Machine> findByName(String name);
+	
+	public Optional<Machine> findByClientIdAndId(Long clientId, Long id);
 }

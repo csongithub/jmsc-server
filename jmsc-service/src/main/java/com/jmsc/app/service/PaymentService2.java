@@ -28,7 +28,9 @@ import com.jmsc.app.common.rqrs.Range;
 import com.jmsc.app.common.util.Collections;
 import com.jmsc.app.common.util.ObjectMapperUtil;
 import com.jmsc.app.common.util.Strings;
+import com.jmsc.app.entity.PartyBankAccount;
 import com.jmsc.app.entity.Payment;
+import com.jmsc.app.repository.PartyBankAccountRepository;
 import com.jmsc.app.repository.PaymentRepository;
 
 /**
@@ -46,6 +48,9 @@ public class PaymentService2 {
 	
 	@Autowired
 	private PartyBankAccountService partyAccountService;
+	
+	@Autowired
+	private PartyBankAccountRepository partyBankAccountRepository;
 	
 	
 	public PaymentDTO savePayment(PaymentDTO dto) {
@@ -72,6 +77,12 @@ public class PaymentService2 {
 		
 		for(Payment draft: drafts) {
 			PaymentSummaryDTO summary = ObjectMapperUtil.object(draft.getPaymentSummary(), PaymentSummaryDTO.class);
+			Optional<PartyBankAccount> partyBankAccount = partyBankAccountRepository.findByClientIdAndId(clientId, summary.getToAccountId());
+			
+			if(partyBankAccount.isPresent()) {
+				summary.setAccountHolder(partyBankAccount.get().getAccountHolder());
+				summary.setAccountNumber(partyBankAccount.get().getAccountNumber());
+			}
 			
 			summary.setPaymentId(draft.getId());
 			summary.setPaymentDate(draft.getPaymentDate());
@@ -203,6 +214,17 @@ public class PaymentService2 {
 	}
 	
 	
+	public List<PaymentSummaryDTO> getPaymentsByPartyId(Long clientId, Long partyId){
+		List<PaymentSummaryDTO> listOfDraft = new ArrayList<PaymentSummaryDTO>();
+		List<Payment> searchResult = null;
+		
+		searchResult = paymentRepository.findAllByClientIdAndPartyId(clientId, partyId );
+		
+		buildPaymentsDTO(searchResult,listOfDraft);
+		return listOfDraft;
+	}
+	
+	
 	public List<PaymentSummaryDTO> getPaymentsByCriteria(Long clientId, EPaymentStatus status, PaymentFilterCriteria criteria){
 		List<PaymentSummaryDTO> listOfDraft = new ArrayList<PaymentSummaryDTO>();
 		
@@ -244,6 +266,25 @@ public class PaymentService2 {
 		}
 		
 		
+		
+		
+		
+		if(Collections.isNotNullOrEmpty(searchResult)) {
+			this.buildPaymentSummaryDTO(searchResult, listOfDraft);
+			
+			java.util.Collections.sort(listOfDraft, new Comparator<PaymentSummaryDTO>() {
+		        public int compare(PaymentSummaryDTO emp1, PaymentSummaryDTO emp2) {
+		            return emp2.getPaymentDate().compareTo(emp1.getPaymentDate());
+		        }
+		    });
+		}
+	
+		buildPaymentsDTO(searchResult,listOfDraft);
+		return listOfDraft;
+	}
+	
+	
+	private List<PaymentSummaryDTO> buildPaymentsDTO(List<Payment> searchResult, List<PaymentSummaryDTO> listOfDraft){
 		if(Collections.isNotNullOrEmpty(searchResult)) {
 			this.buildPaymentSummaryDTO(searchResult, listOfDraft);
 			

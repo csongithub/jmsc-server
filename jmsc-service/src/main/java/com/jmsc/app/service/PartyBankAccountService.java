@@ -31,6 +31,8 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.jmsc.app.common.dto.PartyBankAccountDTO;
+import com.jmsc.app.common.enums.EBankAccountStatus;
+import com.jmsc.app.common.exception.ResourceNotFoundException;
 import com.jmsc.app.common.util.ObjectMapperUtil;
 import com.jmsc.app.entity.PartyAccountsLinkage;
 import com.jmsc.app.entity.PartyAccountsLinkageKey;
@@ -243,5 +245,18 @@ public class PartyBankAccountService {
 		} else {
 			throw new RuntimeException("Error while removing account");
 		}
+	}
+	
+	public Integer updateStatus(Long clientId, Long accountId, EBankAccountStatus status) {
+		Optional<PartyBankAccount> optional  = repository.findByClientIdAndId(clientId, accountId);
+		
+		if(optional.isPresent()) {
+			PartyBankAccount account = optional.get();
+			account.setStatus(status);
+			repository.save(account);
+		} else {
+			throw new ResourceNotFoundException("Bank Account Does not Exist.");
+		}
+		return 0;
 	}
 }

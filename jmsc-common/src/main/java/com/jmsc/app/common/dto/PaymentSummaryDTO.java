@@ -37,8 +37,23 @@ public class PaymentSummaryDTO implements Serializable{
 	
 	private String partyNickName;
 	
+	/**
+	 * Name of to account holder party name
+	 */
+	private String accountHolder;
+	
+	private String accountNumber;
+	
+	/**
+	 * This is database id, not the bank account id.
+	 * Link bank to bank account id
+	 */
 	private Long fromAccountId;
 	
+	/**
+	 * This is database id, not the bank account id.
+	 * Link bank to bank account id.
+	 */
 	private Long toAccountId;
 	
 	private Long amount;

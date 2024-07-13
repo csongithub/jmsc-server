@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -42,5 +43,14 @@ public class MachineEndPoint {
 	public ResponseEntity<List<MachineDTO>> getAll(@PathVariable("client_id") Long clientId){
 		List<MachineDTO> all = service.getAllMachines(clientId);
 		return ResponseEntity.ok(all);
+	}
+	
+	
+	@DeleteMapping("/delete/{client_id}/{machine_id}")
+	public ResponseEntity<Integer> deleteMachine(@PathVariable("client_id")Long clientId,
+												 @PathVariable("machine_id")Long machineId
+												) {
+		Integer statusCode = service.deleteMachine(clientId, machineId);
+		return ResponseEntity.ok(statusCode);
 	}
 }

@@ -25,6 +25,7 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
 	public static final String FILTER_FROM_ACCOUNT = "UPPER(payment->'from_account'->>'accountNumber') =UPPER(:fromAccountNumber)";
 	public static final String FILTER_TO_ACCOUNT = "UPPER(payment->'to_account'->>'accountNumber') =UPPER(:toAccountNumber)";
 	public static final String FILTER_PARTY = "(UPPER(payment->'party'->>'name') like upper(concat('%', :name, '%')) OR UPPER(payment->'party'->>'nick_name') like upper(concat('%', :name, '%')))";
+	public static final String FILTER_PARTY_ID = "cast((payment->'party'->>'id') AS INTEGER) = :partyId";
 	public static final String AND = " AND ";
 	public static final String SELECT_PAYMENT_QUERY_PREFIX = "SELECT  * FROM jmsc.payment WHERE ";
 	
@@ -35,6 +36,9 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
 	List<Payment> findAllByClientIdAndStatus(Long clientId, EPaymentStatus status);
 	
 	Optional<Payment> findAllByClientIdAndId(Long AND, Long id);
+	
+	@Query(value = SELECT_PAYMENT_QUERY_PREFIX + FILTER_CLIENT + AND + FILTER_PARTY_ID , nativeQuery = true)
+	List<Payment> findAllByClientIdAndPartyId(@Param("clientId")Long clientId, @Param("partyId")Long partyId);
 	
 	@Query(value = SELECT_PAYMENT_QUERY_PREFIX + FILTER_CLIENT + AND + FILTER_FROM_ACCOUNT + AND + FILTER_STATUS, nativeQuery = true)
 	List<Payment> findByFromAccountNumber(@Param("clientId")Long clientId, @Param("fromAccountNumber") String accountNumber, @Param("status")String status);

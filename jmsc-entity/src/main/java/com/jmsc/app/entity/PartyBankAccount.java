@@ -5,11 +5,14 @@ package com.jmsc.app.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import com.jmsc.app.common.enums.EBankAccountStatus;
 import com.sun.istack.NotNull;
 
 import lombok.Data;
@@ -59,6 +62,11 @@ public class PartyBankAccount extends BaseEntity{
 	
 	@Column(name = "ADDRESS")
 	private String address;
+	
+	@NotNull
+	@Enumerated(EnumType.STRING)
+	@Column(name = "STATUS")
+	private EBankAccountStatus status;
 	
 	
 	@Override

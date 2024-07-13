@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.jmsc.app.common.dto.PartyBankAccountDTO;
+import com.jmsc.app.common.enums.EBankAccountStatus;
 import com.jmsc.app.service.PartyBankAccountService;
 
 import io.swagger.annotations.Api;
@@ -103,5 +104,14 @@ public class PartyBankAccountEndPoint {
 	public ResponseEntity<String> delink(@PathVariable("ifsc_code")String ifscCode) {
 		String bank = service.getBankByIfsc(ifscCode);
 		return ResponseEntity.ok(bank);
+	}
+	
+	
+	@PutMapping("/update_status/{client_id}/{account_id}/{status}")
+	public ResponseEntity<Integer> updateStatus(@PathVariable("client_id")Long clientId,
+												@PathVariable("account_id")Long accountId,
+												@PathVariable("status") EBankAccountStatus status) {
+		Integer statusCode = service.updateStatus(clientId, accountId, status);
+		return ResponseEntity.ok(statusCode);
 	}
 }

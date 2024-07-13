@@ -4,6 +4,7 @@
 package com.jmsc.app.service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -12,6 +13,10 @@ import org.springframework.stereotype.Service;
 
 import com.jmsc.app.common.dto.PartyBankAccountDTO;
 import com.jmsc.app.common.dto.PartyDTO;
+import com.jmsc.app.common.dto.PaymentSummaryDTO;
+import com.jmsc.app.common.enums.EPartyStatus;
+import com.jmsc.app.common.enums.EPaymentStatus;
+import com.jmsc.app.common.exception.ResourceNotFoundException;
 import com.jmsc.app.common.util.Collections;
 import com.jmsc.app.common.util.ObjectMapperUtil;
 import com.jmsc.app.common.util.Strings;
@@ -19,6 +24,7 @@ import com.jmsc.app.config.jmsc.ServiceLocator;
 import com.jmsc.app.entity.Party;
 import com.jmsc.app.entity.PartyAccountsLinkage;
 import com.jmsc.app.entity.PartyBankAccount;
+import com.jmsc.app.entity.Payment;
 import com.jmsc.app.repository.PartyAccountsLinkageRepository;
 import com.jmsc.app.repository.PartyBankAccountRepository;
 import com.jmsc.app.repository.PartyRepository;
@@ -80,6 +86,26 @@ public class PartyService {
 		}
 		
 		List<PartyDTO> parties = ObjectMapperUtil.mapAll(all, PartyDTO.class);
+		
+		
+		java.util.Collections.sort(parties, new Comparator<PartyDTO>() {
+	        public int compare(PartyDTO party1, PartyDTO party2) {
+	            return party1.getNickName().compareTo(party2.getNickName());
+	        }
+	    });
+		
+		return parties;
+	}
+	
+	
+	public List<PartyDTO> getAllParties(Long clientId, EPartyStatus status){
+		List<Party> all = repository.findByClientIdAndStatus(clientId, status);
+		
+		if(Collections.isNullOrEmpty(all)) {
+			return new ArrayList<PartyDTO>();
+		}
+		
+		List<PartyDTO> parties = ObjectMapperUtil.mapAll(all, PartyDTO.class);
 		return parties;
 	}
 	
@@ -117,6 +143,25 @@ public class PartyService {
 		}
 		
 		return list;
+	}
+	
+	public Integer deleteParty(Long clientId, Long partyId) {
+		Optional<Party> optional = repository.findByClientIdAndId(clientId, partyId);
+		
+		if(optional.isPresent()) {
+			Party party = optional.get();
+			PaymentService2 service =  ServiceLocator.getService(PaymentService2.class);
+			
+			List<PaymentSummaryDTO> listOfDraft  = service.getPaymentsByPartyId(clientId, partyId);
+			if(Collections.isNullOrEmpty(listOfDraft))
+				repository.delete(party);
+			else
+				throw new RuntimeException("One or more payment(s) exists for this party");
+			
+			return 0;
+		} else {
+			throw new ResourceNotFoundException("Payment not found");
+		}
 	}
 
 }
