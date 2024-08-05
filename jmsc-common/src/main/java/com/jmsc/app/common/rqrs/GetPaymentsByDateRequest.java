@@ -21,6 +21,4 @@ public class GetPaymentsByDateRequest implements Serializable{
 	private static final long serialVersionUID = 1016093855371597232L;
 	
 	private Range range;
-	
-	private String date;
 }

@@ -166,23 +166,9 @@ public class PaymentService2 {
 		Date toDate = null;
 		try {
 			fromDate =new SimpleDateFormat("yyyy/MM/dd").parse(range.getFrom());
-			Calendar cal = Calendar.getInstance();  
-			cal.setTime(fromDate);
-			cal.set(Calendar.HOUR_OF_DAY, 0);  
-		    cal.set(Calendar.MINUTE, 0);  
-		    cal.set(Calendar.SECOND, 0);  
-		    cal.set(Calendar.MILLISECOND, 0);
-		    fromDate = cal.getTime();
 		    
 			toDate = new SimpleDateFormat("yyyy/MM/dd").parse(range.getTo());
-			cal = Calendar.getInstance();
-			cal.setTime(toDate);
-			cal.set(Calendar.HOUR_OF_DAY, 23);  
-		    cal.set(Calendar.MINUTE, 59);  
-		    cal.set(Calendar.SECOND, 59);  
-		    cal.set(Calendar.MILLISECOND, 59);
-		    toDate = cal.getTime();
-			
+
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
