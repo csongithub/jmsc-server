@@ -120,6 +120,15 @@ public class BankGuarantee extends BaseEntity implements Serializable{
 	@Column(name = "FILE_ATTACHED")
 	private boolean fileAttached;
 	
+	@Column(name = "FILE")
+	private byte[] file;
+	
+	@Column(name = "FILE_NAME")
+	private String fileName;
+	
+	@Column(name = "CONTENT_TYPE")
+	private String contentType;
+	
 	
 	@Override
 	public int hashCode() {

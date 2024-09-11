@@ -9,14 +9,16 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.jmsc.app.common.dto.BankGuaranteeDTO;
 import com.jmsc.app.common.exception.ResourceNotFoundException;
+import com.jmsc.app.common.rqrs.File;
 import com.jmsc.app.common.util.Collections;
 import com.jmsc.app.common.util.ObjectMapperUtil;
 import com.jmsc.app.common.util.Strings;
 import com.jmsc.app.entity.BankGuarantee;
-import com.jmsc.app.entity.Loan;
 import com.jmsc.app.repository.BankGuaranteeRepository;
 
 import lombok.extern.slf4j.Slf4j;
@@ -94,5 +96,55 @@ public class BankGuaranteeService {
 		
 		BankGuaranteeDTO bg = ObjectMapperUtil.map(optional.get(), BankGuaranteeDTO.class);
 		return bg;
-	} 
+	}
+	
+	
+	public BankGuaranteeDTO upload(MultipartFile upcomingFile, Long clientId, Long fileId) throws Exception {
+		
+		BankGuaranteeDTO bg = null;
+		
+	    if (upcomingFile.isEmpty())
+            throw new IllegalStateException("Cannot upload empty file");
+		
+	    try {   
+			Optional<BankGuarantee> optional = repository.findByClientIdAndId(clientId, fileId);
+			if(optional.isPresent()) {
+
+				BankGuarantee bankGuarantee = optional.get();
+				bankGuarantee.setFile(upcomingFile.getBytes());
+				bankGuarantee.setFileName(StringUtils.cleanPath(upcomingFile.getOriginalFilename()));
+				bankGuarantee.setContentType(upcomingFile.getContentType());
+				bankGuarantee.setFileAttached(true);
+				
+				repository.save(bankGuarantee);
+				
+				bg = ObjectMapperUtil.map(bankGuarantee, BankGuaranteeDTO.class);
+				
+			} else {
+				throw new ResourceNotFoundException("Selected file does not exist in system.");
+			}
+			
+	     } catch (java.io.IOException ex) {
+	    	ex.printStackTrace();
+	     }
+	    return bg;
+	 }
+	
+	
+	
+	public File download(Long clientId, Long fileId)throws Exception {
+		Optional<BankGuarantee> optional = repository.findByClientIdAndId(clientId, fileId);
+		if(optional.isPresent()) {
+
+			BankGuarantee bankGuarantee = optional.get();
+			
+			File file= new File(bankGuarantee.getFile(),
+								bankGuarantee.getFileName(),
+								bankGuarantee.getContentType());
+			
+			return file;
+		} else {
+			throw new ResourceNotFoundException("Selected file does not exist in system.");
+		}
+	}
 }

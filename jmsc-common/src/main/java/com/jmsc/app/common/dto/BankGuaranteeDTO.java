@@ -61,4 +61,10 @@ public class BankGuaranteeDTO extends BaseDTO implements Serializable {
 	private String chargedFromAccount;
 	
 	private boolean fileAttached;
+	
+	private byte[] file;
+	
+	private String fileName;
+	
+	private String contentType;
 }

@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;import java.util.stream.Collector;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -123,9 +123,9 @@ public class DriveService {
 	    if (file.isEmpty())
             throw new IllegalStateException("Cannot upload empty file");
 		try {   
-	        Map<String, String> metadata = new HashMap<>();
-	        metadata.put("Content-Type", file.getContentType());
-	        metadata.put("Content-Length", String.valueOf(file.getSize()));
+//	        Map<String, String> metadata = new HashMap<>();
+//	        metadata.put("Content-Type", file.getContentType());
+//	        metadata.put("Content-Length", String.valueOf(file.getSize()));
 	        
 //	        String filePath = String.format("%s/%s/%s", aws.getBucketName(),fileMetaData.getClientId(), fileMetaData.getSystemPath());
 	      

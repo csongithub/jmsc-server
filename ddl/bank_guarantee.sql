@@ -37,6 +37,9 @@ CREATE TABLE jmsc.BANK_GUARANTEE
     CHARGE_DATE			date,
     CHARGE_FROM_ACCOUNT	text,
     FILE_ATTACHED		boolean,
+    FILE				bytea,
+    FILE_NAME			text,
+    CONTENT_TYPE		text,
    	CREATED_TS 			timestamp with time zone NOT NULL,
 	UPDATED_TS 			timestamp with time zone NOT NULL,
     CONSTRAINT bg_key PRIMARY KEY (ID)
