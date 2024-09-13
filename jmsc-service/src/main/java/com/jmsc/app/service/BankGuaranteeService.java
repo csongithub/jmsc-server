@@ -4,6 +4,7 @@
 package com.jmsc.app.service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,12 +14,14 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.jmsc.app.common.dto.BankGuaranteeDTO;
+import com.jmsc.app.common.dto.PaymentSummaryDTO;
 import com.jmsc.app.common.exception.ResourceNotFoundException;
 import com.jmsc.app.common.rqrs.File;
 import com.jmsc.app.common.util.Collections;
 import com.jmsc.app.common.util.ObjectMapperUtil;
 import com.jmsc.app.common.util.Strings;
 import com.jmsc.app.entity.BankGuarantee;
+import com.jmsc.app.entity.BankGuaranteeInterface;
 import com.jmsc.app.repository.BankGuaranteeRepository;
 
 import lombok.extern.slf4j.Slf4j;
@@ -72,12 +75,18 @@ public class BankGuaranteeService {
 		if(clientId == null) {
 			throw new RuntimeException("Insufficient Data");
 		}
-		List<BankGuarantee> list = repository.findByClientId(clientId);
+		List<BankGuaranteeInterface> list = repository.findByClientId(clientId);
 		
 		if(Collections.isNullOrEmpty(list))
 			return new ArrayList<BankGuaranteeDTO>();
 		
 		List<BankGuaranteeDTO> reponse = ObjectMapperUtil.mapAll(list, BankGuaranteeDTO.class);
+		
+		java.util.Collections.sort(reponse, new Comparator<BankGuaranteeDTO>() {
+	        public int compare(BankGuaranteeDTO bg1, BankGuaranteeDTO bg2) {
+	            return bg2.getCreatedTimestamp().compareTo(bg1.getCreatedTimestamp());
+	        }
+	    });
 		return reponse;
 		
 	}

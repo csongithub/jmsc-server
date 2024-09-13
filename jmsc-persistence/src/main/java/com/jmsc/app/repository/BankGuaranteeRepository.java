@@ -9,6 +9,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.jmsc.app.entity.BankGuarantee;
+import com.jmsc.app.entity.BankGuaranteeInterface;
 
 /**
  * @author anuhr
@@ -16,7 +17,7 @@ import com.jmsc.app.entity.BankGuarantee;
  */
 public interface BankGuaranteeRepository extends JpaRepository<BankGuarantee, Long> {
 
-	public List<BankGuarantee> findByClientId(Long clientId);
+	public List<BankGuaranteeInterface> findByClientId(Long clientId);
 	
 	public Optional<BankGuarantee> findByClientIdAndId(Long clientId, Long id);
 	
