@@ -3,26 +3,19 @@
  */
 package com.jmsc.app.service;
 
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.amazonaws.services.rds.model.Option;
 import com.jmsc.app.common.dto.BankGuaranteeDTO;
-import com.jmsc.app.common.dto.CreditFacilityDTO;
 import com.jmsc.app.common.enums.EBankGuaranteeStatus;
-import com.jmsc.app.common.enums.EFacilityStatus;
 import com.jmsc.app.common.enums.ENotificationType;
 import com.jmsc.app.common.exception.ResourceNotFoundException;
 import com.jmsc.app.common.rqrs.File;
@@ -34,11 +27,9 @@ import com.jmsc.app.config.jmsc.ServiceLocator;
 import com.jmsc.app.entity.BankGuarantee;
 import com.jmsc.app.entity.BankGuaranteeInterface;
 import com.jmsc.app.entity.Client;
-import com.jmsc.app.entity.CreditFacility;
 import com.jmsc.app.entity.Notification;
 import com.jmsc.app.repository.BankGuaranteeRepository;
 import com.jmsc.app.repository.ClientRepository;
-import com.jmsc.app.repository.CreditFacilityRepository;
 import com.jmsc.app.repository.NotificationRepository;
 
 import lombok.extern.slf4j.Slf4j;
