@@ -74,30 +74,10 @@ public class PaymentService2 {
 		
 		List<Payment> drafts = paymentRepository.findAllByClientIdAndStatus(clientId, status);
 		
-		for(Payment draft: drafts) {
-			PaymentSummaryDTO summary = ObjectMapperUtil.object(draft.getPaymentSummary(), PaymentSummaryDTO.class);
-			Optional<PartyBankAccount> partyBankAccount = partyBankAccountRepository.findByClientIdAndId(clientId, summary.getToAccountId());
-			
-			if(partyBankAccount.isPresent()) {
-				summary.setAccountHolder(partyBankAccount.get().getAccountHolder());
-				summary.setAccountNumber(partyBankAccount.get().getAccountNumber());
-			}
-			
-			summary.setPaymentId(draft.getId());
-			summary.setPaymentDate(draft.getPaymentDate());
-			listOfDraft.add(summary);
-		}
-		
-		
-		java.util.Collections.sort(listOfDraft, new Comparator<PaymentSummaryDTO>() {
-	        public int compare(PaymentSummaryDTO emp1, PaymentSummaryDTO emp2) {
-	            return emp2.getPaymentDate().compareTo(emp1.getPaymentDate());
-	        }
-	    });
+		listOfDraft = this.updateOtherDetails(clientId, drafts);
 		
 		return listOfDraft;
 	}
-	
 	
 	
 	
@@ -173,8 +153,21 @@ public class PaymentService2 {
 		}
 		List<Payment> drafts = paymentRepository.findAllByClientIdAndStatusAndPaymentDateBetween(clientId, status, fromDate, toDate);
 		
+		listOfDraft = this.updateOtherDetails(clientId, drafts);
+		
+		return listOfDraft;
+	}
+	
+	private List<PaymentSummaryDTO> updateOtherDetails(Long clientId, List<Payment> drafts) {
+		List<PaymentSummaryDTO> listOfDraft = new ArrayList<PaymentSummaryDTO>();
 		for(Payment draft: drafts) {
 			PaymentSummaryDTO summary = ObjectMapperUtil.object(draft.getPaymentSummary(), PaymentSummaryDTO.class);
+			Optional<PartyBankAccount> partyBankAccount = partyBankAccountRepository.findByClientIdAndId(clientId, summary.getToAccountId());
+			
+			if(partyBankAccount.isPresent()) {
+				summary.setAccountHolder(partyBankAccount.get().getAccountHolder());
+				summary.setAccountNumber(partyBankAccount.get().getAccountNumber());
+			}
 			
 			summary.setPaymentId(draft.getId());
 			summary.setPaymentDate(draft.getPaymentDate());
@@ -188,6 +181,7 @@ public class PaymentService2 {
 	    });
 		
 		return listOfDraft;
+		
 	}
 	
 	
@@ -204,8 +198,8 @@ public class PaymentService2 {
 		List<Payment> searchResult = null;
 		
 		searchResult = paymentRepository.findAllByClientIdAndPartyId(clientId, partyId );
-		
-		buildPaymentsDTO(searchResult,listOfDraft);
+		listOfDraft = this.updateOtherDetails(clientId, searchResult);
+
 		return listOfDraft;
 	}
 	
@@ -251,37 +245,25 @@ public class PaymentService2 {
 		}
 		
 		
+		listOfDraft = this.updateOtherDetails(clientId, searchResult);
 		
-		
-		
-		if(Collections.isNotNullOrEmpty(searchResult)) {
-			this.buildPaymentSummaryDTO(searchResult, listOfDraft);
-			
-			java.util.Collections.sort(listOfDraft, new Comparator<PaymentSummaryDTO>() {
-		        public int compare(PaymentSummaryDTO emp1, PaymentSummaryDTO emp2) {
-		            return emp2.getPaymentDate().compareTo(emp1.getPaymentDate());
-		        }
-		    });
-		}
-	
-		buildPaymentsDTO(searchResult,listOfDraft);
 		return listOfDraft;
 	}
 	
 	
-	private List<PaymentSummaryDTO> buildPaymentsDTO(List<Payment> searchResult, List<PaymentSummaryDTO> listOfDraft){
-		if(Collections.isNotNullOrEmpty(searchResult)) {
-			this.buildPaymentSummaryDTO(searchResult, listOfDraft);
-			
-			java.util.Collections.sort(listOfDraft, new Comparator<PaymentSummaryDTO>() {
-		        public int compare(PaymentSummaryDTO emp1, PaymentSummaryDTO emp2) {
-		            return emp2.getPaymentDate().compareTo(emp1.getPaymentDate());
-		        }
-		    });
-		}
-	
-		return listOfDraft;
-	}
+//	private List<PaymentSummaryDTO> buildPaymentsDTOj(List<Payment> searchResult, List<PaymentSummaryDTO> listOfDraft){
+//		if(Collections.isNotNullOrEmpty(searchResult)) {
+//			this.buildPaymentSummaryDTO(searchResult, listOfDraft);
+//			
+//			java.util.Collections.sort(listOfDraft, new Comparator<PaymentSummaryDTO>() {
+//		        public int compare(PaymentSummaryDTO emp1, PaymentSummaryDTO emp2) {
+//		            return emp2.getPaymentDate().compareTo(emp1.getPaymentDate());
+//		        }
+//		    });
+//		}
+//	
+//		return listOfDraft;
+//	}
 		
 	
 	private boolean isValid(String val) {
@@ -290,12 +272,12 @@ public class PaymentService2 {
 	
 	
 	
-	private void buildPaymentSummaryDTO(List<Payment> drafts, List<PaymentSummaryDTO> listOfDraft) {
-		for(Payment draft: drafts) {
-			PaymentSummaryDTO summary = ObjectMapperUtil.object(draft.getPaymentSummary(), PaymentSummaryDTO.class);
-			summary.setPaymentId(draft.getId());
-			summary.setPaymentDate(draft.getPaymentDate());
-			listOfDraft.add(summary);
-		}
-	}
+//	private void buildPaymentSummaryDTO(List<Payment> drafts, List<PaymentSummaryDTO> listOfDraft) {
+//		for(Payment draft: drafts) {
+//			PaymentSummaryDTO summary = ObjectMapperUtil.object(draft.getPaymentSummary(), PaymentSummaryDTO.class);
+//			summary.setPaymentId(draft.getId());
+//			summary.setPaymentDate(draft.getPaymentDate());
+//			listOfDraft.add(summary);
+//		}
+//	}
 }

@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -54,5 +55,13 @@ public class BankGuaranteeEndPoint {
 	ResponseEntity<BankGuaranteeDTO> getAllBankGuarantee(@PathVariable("clientId") Long clientId, @PathVariable("id") Long id){
 		BankGuaranteeDTO response = service.getBankGuarantee(clientId, id);
 		return ResponseEntity.ok(response);
+	}
+	
+	
+	@DeleteMapping("/delete/{client_id}/{bg_id}")
+	public ResponseEntity<Integer> deleteBankGuarantee(@PathVariable("client_id")Long clientId,
+												 @PathVariable("bg_id")Long id) {
+		Integer statusCode = service.deleteBankGuarantee(clientId, id);
+		return ResponseEntity.ok(statusCode);
 	}
 }

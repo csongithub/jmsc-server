@@ -28,6 +28,7 @@ public class JmscEventListener implements ApplicationListener<JmscEvent> {
 				postActivateService.dataBackup();
 				postActivateService.markFacilityExpired();
 				postActivateService.evaluateMachineExpiry();
+				postActivateService.markBGExpired();
 			} catch (Throwable e) {
 				e.printStackTrace();
 			}

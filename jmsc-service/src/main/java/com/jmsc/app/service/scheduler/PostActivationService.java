@@ -20,6 +20,7 @@ import com.jmsc.app.entity.CreditFacility;
 import com.jmsc.app.entity.Notification;
 import com.jmsc.app.repository.CreditFacilityRepository;
 import com.jmsc.app.repository.NotificationRepository;
+import com.jmsc.app.service.BankGuaranteeService;
 import com.jmsc.app.service.CreditFacilityService;
 import com.jmsc.app.service.MachineService;
 
@@ -118,6 +119,11 @@ public class PostActivationService {
 	
 	public void evaluateMachineExpiry() {
 		ServiceLocator.getService(MachineService.class).evaluateExpiry();
+	}
+	
+	
+	public void markBGExpired() {
+		ServiceLocator.getService(BankGuaranteeService.class).markBGExpired();
 	}
 
 }

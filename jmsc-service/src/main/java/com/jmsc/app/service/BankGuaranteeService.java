@@ -3,26 +3,43 @@
  */
 package com.jmsc.app.service;
 
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.amazonaws.services.rds.model.Option;
 import com.jmsc.app.common.dto.BankGuaranteeDTO;
-import com.jmsc.app.common.dto.PaymentSummaryDTO;
+import com.jmsc.app.common.dto.CreditFacilityDTO;
+import com.jmsc.app.common.enums.EBankGuaranteeStatus;
+import com.jmsc.app.common.enums.EFacilityStatus;
+import com.jmsc.app.common.enums.ENotificationType;
 import com.jmsc.app.common.exception.ResourceNotFoundException;
 import com.jmsc.app.common.rqrs.File;
 import com.jmsc.app.common.util.Collections;
+import com.jmsc.app.common.util.DateUtils;
 import com.jmsc.app.common.util.ObjectMapperUtil;
 import com.jmsc.app.common.util.Strings;
+import com.jmsc.app.config.jmsc.ServiceLocator;
 import com.jmsc.app.entity.BankGuarantee;
 import com.jmsc.app.entity.BankGuaranteeInterface;
+import com.jmsc.app.entity.Client;
+import com.jmsc.app.entity.CreditFacility;
+import com.jmsc.app.entity.Notification;
 import com.jmsc.app.repository.BankGuaranteeRepository;
+import com.jmsc.app.repository.ClientRepository;
+import com.jmsc.app.repository.CreditFacilityRepository;
+import com.jmsc.app.repository.NotificationRepository;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -62,6 +79,8 @@ public class BankGuaranteeService {
 		}
 		
 		BankGuarantee entity= ObjectMapperUtil.map(dto, BankGuarantee.class);
+		if(DateUtils.isBeforeDay(entity.getValidTo(), new Date()))
+			entity.setStatus(EBankGuaranteeStatus.EXPIRED);
 		
 		entity = repository.save(entity);
 		dto.setId(entity.getId());
@@ -105,6 +124,20 @@ public class BankGuaranteeService {
 		
 		BankGuaranteeDTO bg = ObjectMapperUtil.map(optional.get(), BankGuaranteeDTO.class);
 		return bg;
+	}
+	
+	
+	public Integer deleteBankGuarantee(Long clientId, Long id) {
+		if(clientId == null) {
+			throw new RuntimeException("Insufficient Data");
+		}
+		
+		Optional<BankGuarantee> optional = repository.findByClientIdAndId(clientId, id);
+		if(!optional.isPresent())
+			throw new ResourceNotFoundException("Bank guarantee does not exist");
+		
+		repository.delete(optional.get());
+		return 0;
 	}
 	
 	
@@ -155,5 +188,54 @@ public class BankGuaranteeService {
 		} else {
 			throw new ResourceNotFoundException("Selected file does not exist in system.");
 		}
+	}
+	
+	
+	public void markBGExpired() {
+		NotificationRepository notificationRepo =  ServiceLocator.getService(NotificationRepository.class);
+		
+		ClientRepository clientRepository =  ServiceLocator.getService(ClientRepository.class);
+		
+		List<Client> clients = clientRepository.findAll();
+		
+		if(!Collections.isNullOrEmpty(clients)) {
+			for(Client client: clients) {
+				List<BankGuaranteeInterface> list = repository.findByClientId(client.getId());
+				if(Collections.isNullOrEmpty(list))
+					continue;
+				Optional<Notification> optional =  notificationRepo.findByClientIdAndType(client.getId(), ENotificationType.BANK_GUARANTEE);
+				Notification notification = null;
+				if(optional.isPresent()) {
+					notification  = optional.get();
+					Date lastUpdated = notification.getUpdatedTimestamp();
+					if(DateUtils.isToday(lastUpdated)) {
+						log.debug("Bank Guarantee Expiry evaluation already done for the day for the client {}", client.getId());
+						continue;
+					} else {
+						log.debug("Starting Bank Guarantee Expiry Evaluation");
+					}
+				}
+				
+				for(BankGuaranteeInterface bgi: list) {
+					Optional<BankGuarantee> bg = repository.findByClientIdAndId(client.getId(), bgi.getId());
+					if(bg.isPresent() && bg.get().getStatus().equals(EBankGuaranteeStatus.ACTIVE)) {
+						Date validToDate = bg.get().getValidTo();
+						if(DateUtils.isBeforeDay(validToDate, new Date())) {
+							bg.get().setStatus(EBankGuaranteeStatus.EXPIRED);
+							repository.save(bg.get());
+						}
+					}
+				}
+
+				if(notification == null) {
+					notification = new Notification();
+					notification.setClientId(client.getId());
+					notification.setType(ENotificationType.BANK_GUARANTEE);
+				}
+				notification.setUpdatedTimestamp(null);
+				notificationRepo.save(notification);
+				
+			}
+		}		
 	}
 }

@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.map.HashedMap;
@@ -29,7 +28,6 @@ import com.jmsc.app.common.rqrs.FacilityLinkageDetails;
 import com.jmsc.app.common.util.Collections;
 import com.jmsc.app.common.util.ObjectMapperUtil;
 import com.jmsc.app.common.wrapper.CreditFacilityWrapper;
-import com.jmsc.app.config.jmsc.JmscProperties;
 import com.jmsc.app.config.jmsc.ServiceLocator;
 import com.jmsc.app.entity.BgGroup;
 import com.jmsc.app.entity.Bid;

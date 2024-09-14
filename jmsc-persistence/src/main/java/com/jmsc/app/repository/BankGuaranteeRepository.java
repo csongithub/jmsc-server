@@ -16,7 +16,7 @@ import com.jmsc.app.entity.BankGuaranteeInterface;
  *
  */
 public interface BankGuaranteeRepository extends JpaRepository<BankGuarantee, Long> {
-
+	
 	public List<BankGuaranteeInterface> findByClientId(Long clientId);
 	
 	public Optional<BankGuarantee> findByClientIdAndId(Long clientId, Long id);
