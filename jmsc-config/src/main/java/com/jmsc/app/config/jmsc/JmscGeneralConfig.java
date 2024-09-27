@@ -19,6 +19,10 @@ public class JmscGeneralConfig {
 	
 	private String banks;
 	
+	private String states;
+	
+	private String einvoiceStartYear;
+	
 	
 	@PostConstruct
 	 private void init() {
