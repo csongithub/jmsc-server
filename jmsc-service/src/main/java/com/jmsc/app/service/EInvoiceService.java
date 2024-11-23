@@ -3,9 +3,18 @@
  */
 package com.jmsc.app.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.jmsc.app.common.dto.EInvoiceDTO;
+import com.jmsc.app.common.enums.EFyMonths;
+import com.jmsc.app.common.util.Collections;
+import com.jmsc.app.common.util.ObjectMapperUtil;
+import com.jmsc.app.common.util.Strings;
+import com.jmsc.app.entity.EInvoice;
 import com.jmsc.app.repository.EInvoiceRepository;
 
 /**
@@ -16,15 +25,38 @@ import com.jmsc.app.repository.EInvoiceRepository;
 public class EInvoiceService {
 	
 	
+	@Autowired
 	private EInvoiceRepository repository;
 	
 	
-//	public EInvoiceDTO saveOrUpdate(EInvoiceDTO dto) {
-//		boolean isCreate = dto.getId() == null ? true : false;
-//		
-//		if(dto.getClientId() == null) {
-//			throw new RuntimeException("Insufficient Data");
-//		}
-//	}
-
+	public EInvoiceDTO saveOrUpdate(EInvoiceDTO dto) {
+		if(dto.getClientId() == null || Strings.isNullOrEmpty(dto.getGstState())
+				|| Strings.isNullOrEmpty(dto.getFy()) || dto.getMonth() == null) {
+			throw new RuntimeException("Insufficient Data");
+		}
+		
+		EInvoice entity= ObjectMapperUtil.map(dto, EInvoice.class);
+		
+		entity = repository.save(entity);
+		dto.setId(entity.getId());
+		
+		return dto;
+	}
+	
+	
+	public List<EInvoiceDTO> getEInvloices(Long clientId, String gstState, String fy, EFyMonths month) {
+		
+		List<EInvoiceDTO> results = new ArrayList<EInvoiceDTO>();
+		
+		if(clientId == null || Strings.isNullOrEmpty(gstState) || Strings.isNullOrEmpty(fy) || month == null) {
+			throw new RuntimeException("Insufficient Data");
+		}
+		
+		List<EInvoice> list =  repository.findByClientIdAndGstStateAndFyAndMonth(clientId, gstState, fy, month);
+		
+		if(Collections.isNotNullOrEmpty(list))
+			results = ObjectMapperUtil.mapAll(list, EInvoiceDTO.class);
+		
+		return results;
+	}
 }

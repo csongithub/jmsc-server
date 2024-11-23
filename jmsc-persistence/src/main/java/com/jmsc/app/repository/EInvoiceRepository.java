@@ -8,6 +8,7 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import com.jmsc.app.common.enums.EFyMonths;
 import com.jmsc.app.entity.EInvoice;
 
 /**
@@ -19,5 +20,6 @@ public interface EInvoiceRepository extends JpaRepository<EInvoice, Long> {
 	public Optional<EInvoice> findByClientIdAndId(Long clientId, Long id);
 	
 	public List<EInvoice> findByClientIdAndFyAndMonth(Long clientId, String fy, String month);
-
+	
+	public List<EInvoice> findByClientIdAndGstStateAndFyAndMonth(Long clientId, String gstState, String fy, EFyMonths month);
 }

@@ -4,6 +4,7 @@
 package com.jmsc.app.entity;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -13,6 +14,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 import com.jmsc.app.common.enums.EFyMonths;
 import com.sun.istack.NotNull;
@@ -51,43 +54,63 @@ public class EInvoice extends BaseEntity implements Serializable{
 	private EFyMonths month;
 	
 	@NotNull
-	@Column(name = "GROSS_AMOUNT")
-	private Long grossAmount;
+	@Temporal(TemporalType.DATE)
+	@Column(name = "BILL_DATE")
+	private Date billDate;
+	
+	@NotNull
+	@Temporal(TemporalType.DATE)
+	@Column(name = "PAYMENT_DATE")
+	private Date paymentDate;
 	
 	@NotNull
 	@Column(name = "CHEQUE_AMOUNT")
 	private Long chequeAmount;
 	
 	@NotNull
-	@Column(name = "GST_RATE")
-	private Long gstRate;
+	@Column(name = "GROSS_AMOUNT")
+	private Long grossAmount;
 	
 	@NotNull
 	@Column(name = "TAXABLE_AMOUNT")
 	private Long taxableAmount;
 	
 	@NotNull
-	@Column(name = "TOTAL_GST")
-	private Long totalGsttoPay;
+	@Column(name = "GST_RATE")
+	private Long gstRate;
+	
+	@NotNull
+	@Column(name = "CGST")
+	private Long cgst;
+	
+	@NotNull
+	@Column(name = "SGST")
+	private Long sgst;
+	
+	@NotNull
+	@Column(name = "TOTAL_GST_TO_PAY")
+	private Long totalGstToPay;
 	
 	@NotNull
 	@Column(name = "GST_DEDUCTED_AT_SOURCE")
 	private Long gstDeductedAtSource;
 	
 	@NotNull
-	@Column(name = "FINAL_GST_LIABILITY")
-	private Long finalGstLiability;
+	@Column(name = "FINAL_GST_TO_PAY")
+	private Long finalGstToPay;
 	
 	@NotNull
-	@Column(name = "SOURCE")
-	private String source;
+	@Column(name = "SOURCE_DIVISION_NAME")
+	private String sourceDivisionName;
 	
 	@NotNull
-	@Column(name = "WORK")
-	private String work;
+	@Column(name = "PROJECT_NAME")
+	private String projectName;
 	
 	@Column(name = "DESCRIPTION")
 	private String description;
+	
+	
 	
 	
 	@Override

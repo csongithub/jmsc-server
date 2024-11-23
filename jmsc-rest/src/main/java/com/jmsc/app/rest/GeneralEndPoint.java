@@ -36,12 +36,12 @@ public class GeneralEndPoint {
 	public ResponseEntity<String[]> getEntries(@PathVariable("name") String entryName){
 		String[] list = null;
 		switch(entryName) {
-			case "Bank":
+			case "BANKS":
 				String allBanks = config.getBanks();
 				list = allBanks.split(",");
 				break;
-			case "GST_STATE":
-				String allStates = config.getStates();
+			case "GST":
+				String allStates = config.getGst();
 				list = allStates.split(",");
 				break;
 			case "EINVOICE_YEARS":
@@ -49,6 +49,14 @@ public class GeneralEndPoint {
 				List<String> listStr = getFyForEInvoice(einvoiceStartYear);
 				list = new String[listStr.size()];
 				listStr.toArray(list);
+				break;
+			case "PROJECTS":
+				String projects = config.getProjects();
+				list = projects.split(",");
+				break;
+			case "DIVISIONS":
+				String divisions = config.getDivisions();
+				list = divisions.split(",");
 				break;
 		}
 		return ResponseEntity.ok(list);

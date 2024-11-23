@@ -4,6 +4,7 @@
 package com.jmsc.app.common.dto;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import com.jmsc.app.common.enums.EFyMonths;
 
@@ -23,33 +24,37 @@ public class EInvoiceDTO  extends BaseDTO implements Serializable{
 	 */
 	private static final long serialVersionUID = -8565279951515913512L;
 	
-	private Long id;
-	
 	private String gstState;
 	
 	private String fy;
 	
 	private EFyMonths month;
 	
-	private Long grossAmount;
+	private Date billDate;
+	
+	private Date paymentDate;
 	
 	private Long chequeAmount;
 	
-	private Long gstRate;
+	private Long grossAmount;
 
 	private Long taxableAmount;
 
-	private Long totalGsttoPay;
-
-	private Long gstDeductedAtSource;
-
-	private Long finalGstLiability;
-
-	private String source;
+	private Long gstRate;
 	
-	private String work;
+	private Long cgst;
+	
+	private Long sgst;
+	
+	private Long totalGstToPay;
+	
+	private Long gstDeductedAtSource;
+	
+	private Long finalGstToPay;
+	
+	private String sourceDivisionName;
+	
+	private String projectName;
 	
 	private String description;
-	
-
 }

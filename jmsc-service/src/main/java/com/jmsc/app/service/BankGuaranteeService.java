@@ -48,7 +48,6 @@ public class BankGuaranteeService {
 	
 	
 	public BankGuaranteeDTO createOrUpdate(BankGuaranteeDTO dto) {
-		boolean isCreate = dto.getId() == null ? true : false;
 		
 		if(dto.getClientId() == null) {
 			throw new RuntimeException("Insufficient Data");
@@ -62,16 +61,26 @@ public class BankGuaranteeService {
 			throw new RuntimeException("Beneficiary  number not found");
 		}
 		
-		if(isCreate) {
+		if(dto.isCreate()) {
 			Optional<BankGuarantee> optional = repository.findByClientIdAndBgNumber(dto.getClientId(), dto.getBgNumber());
 			if(optional.isPresent()) {
 				throw new RuntimeException("BG Account already exist with");
 			}
 		}
 		
+		
 		BankGuarantee entity= ObjectMapperUtil.map(dto, BankGuarantee.class);
+		
 		if(DateUtils.isBeforeDay(entity.getValidTo(), new Date()))
 			entity.setStatus(EBankGuaranteeStatus.EXPIRED);
+		
+	
+		if(dto.isUpdate()) {
+			Optional<BankGuarantee> optional = repository.findByClientIdAndId(dto.getClientId(), dto.getId());
+			if(optional.isPresent()) {
+				entity.setFile(optional.get().getFile());
+			}
+		}
 		
 		entity = repository.save(entity);
 		dto.setId(entity.getId());

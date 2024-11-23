@@ -19,10 +19,13 @@ public class JmscGeneralConfig {
 	
 	private String banks;
 	
-	private String states;
+	private String gst;
 	
 	private String einvoiceStartYear;
 	
+	private String projects;
+	
+	private String divisions;
 	
 	@PostConstruct
 	 private void init() {
