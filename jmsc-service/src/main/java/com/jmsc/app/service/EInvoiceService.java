@@ -5,15 +5,18 @@ package com.jmsc.app.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.jmsc.app.common.dto.EInvoiceDTO;
 import com.jmsc.app.common.enums.EFyMonths;
+import com.jmsc.app.common.exception.ResourceNotFoundException;
 import com.jmsc.app.common.util.Collections;
 import com.jmsc.app.common.util.ObjectMapperUtil;
 import com.jmsc.app.common.util.Strings;
+import com.jmsc.app.entity.BankGuarantee;
 import com.jmsc.app.entity.EInvoice;
 import com.jmsc.app.repository.EInvoiceRepository;
 
@@ -22,7 +25,7 @@ import com.jmsc.app.repository.EInvoiceRepository;
  *
  */
 @Service
-public class EInvoiceService {
+public class EInvoiceService extends AbstractService{
 	
 	
 	@Autowired
@@ -58,5 +61,20 @@ public class EInvoiceService {
 			results = ObjectMapperUtil.mapAll(list, EInvoiceDTO.class);
 		
 		return results;
+	}
+	
+	
+	
+	public Integer deleteEInvoice(Long clientId, Long id) {
+		if(clientId == null) {
+			throw new RuntimeException("Insufficient Data");
+		}
+		
+		Optional<EInvoice> optional = repository.findByClientIdAndId(clientId, id);
+		if(!optional.isPresent())
+			throw new ResourceNotFoundException("Bank guarantee does not exist");
+		
+		repository.delete(optional.get());
+		return 0;
 	}
 }

@@ -65,39 +65,39 @@ public class EInvoice extends BaseEntity implements Serializable{
 	
 	@NotNull
 	@Column(name = "CHEQUE_AMOUNT")
-	private Long chequeAmount;
+	private Double chequeAmount;
 	
 	@NotNull
 	@Column(name = "GROSS_AMOUNT")
-	private Long grossAmount;
+	private Double grossAmount;
 	
 	@NotNull
 	@Column(name = "TAXABLE_AMOUNT")
-	private Long taxableAmount;
+	private Double taxableAmount;
 	
 	@NotNull
 	@Column(name = "GST_RATE")
-	private Long gstRate;
+	private Double gstRate;
 	
 	@NotNull
 	@Column(name = "CGST")
-	private Long cgst;
+	private Double cgst;
 	
 	@NotNull
 	@Column(name = "SGST")
-	private Long sgst;
+	private Double sgst;
 	
 	@NotNull
 	@Column(name = "TOTAL_GST_TO_PAY")
-	private Long totalGstToPay;
+	private Double totalGstToPay;
 	
 	@NotNull
 	@Column(name = "GST_DEDUCTED_AT_SOURCE")
-	private Long gstDeductedAtSource;
+	private Double gstDeductedAtSource;
 	
 	@NotNull
 	@Column(name = "FINAL_GST_TO_PAY")
-	private Long finalGstToPay;
+	private Double finalGstToPay;
 	
 	@NotNull
 	@Column(name = "SOURCE_DIVISION_NAME")

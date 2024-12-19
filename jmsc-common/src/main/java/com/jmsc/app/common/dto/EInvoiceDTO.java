@@ -24,6 +24,8 @@ public class EInvoiceDTO  extends BaseDTO implements Serializable{
 	 */
 	private static final long serialVersionUID = -8565279951515913512L;
 	
+	private Long id;
+	
 	private String gstState;
 	
 	private String fy;
@@ -34,23 +36,23 @@ public class EInvoiceDTO  extends BaseDTO implements Serializable{
 	
 	private Date paymentDate;
 	
-	private Long chequeAmount;
+	private Double chequeAmount;
 	
-	private Long grossAmount;
+	private Double grossAmount;
 
-	private Long taxableAmount;
+	private Double taxableAmount;
 
-	private Long gstRate;
+	private Double gstRate;
 	
-	private Long cgst;
+	private Double cgst;
 	
-	private Long sgst;
+	private Double sgst;
 	
-	private Long totalGstToPay;
+	private Double totalGstToPay;
 	
-	private Long gstDeductedAtSource;
+	private Double gstDeductedAtSource;
 	
-	private Long finalGstToPay;
+	private Double finalGstToPay;
 	
 	private String sourceDivisionName;
 	

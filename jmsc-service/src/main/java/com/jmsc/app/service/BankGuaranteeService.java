@@ -40,11 +40,10 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Service
-public class BankGuaranteeService {
+public class BankGuaranteeService extends AbstractService{
 	
 	@Autowired
 	private BankGuaranteeRepository repository;
-	
 	
 	
 	public BankGuaranteeDTO createOrUpdate(BankGuaranteeDTO dto) {
@@ -61,7 +60,8 @@ public class BankGuaranteeService {
 			throw new RuntimeException("Beneficiary  number not found");
 		}
 		
-		if(dto.isCreate()) {
+		
+		if(this.isCreate(dto.getId())) {
 			Optional<BankGuarantee> optional = repository.findByClientIdAndBgNumber(dto.getClientId(), dto.getBgNumber());
 			if(optional.isPresent()) {
 				throw new RuntimeException("BG Account already exist with");
@@ -75,7 +75,7 @@ public class BankGuaranteeService {
 			entity.setStatus(EBankGuaranteeStatus.EXPIRED);
 		
 	
-		if(dto.isUpdate()) {
+		if(this.isupdate(dto.getId())) {
 			Optional<BankGuarantee> optional = repository.findByClientIdAndId(dto.getClientId(), dto.getId());
 			if(optional.isPresent()) {
 				entity.setFile(optional.get().getFile());

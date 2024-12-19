@@ -26,9 +26,6 @@ public class BankGuaranteeDTO extends BaseDTO implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = -2491550007725686701L;
-	
-
-
 
 	private Long id;
 	

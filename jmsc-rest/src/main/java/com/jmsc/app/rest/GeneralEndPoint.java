@@ -36,7 +36,7 @@ public class GeneralEndPoint {
 	public ResponseEntity<String[]> getEntries(@PathVariable("name") String entryName){
 		String[] list = null;
 		switch(entryName) {
-			case "BANKS":
+			case "BANK":
 				String allBanks = config.getBanks();
 				list = allBanks.split(",");
 				break;
