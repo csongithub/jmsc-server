@@ -19,7 +19,11 @@ public interface EInvoiceRepository extends JpaRepository<EInvoice, Long> {
 	
 	public Optional<EInvoice> findByClientIdAndId(Long clientId, Long id);
 	
-	public List<EInvoice> findByClientIdAndFyAndMonth(Long clientId, String fy, String month);
+	public List<EInvoice> findByClientIdAndFy(Long clientId, String fy);
+	
+	public List<EInvoice> findByClientIdAndGstStateAndFy(Long clientId, String gstState, String fy);
+	
+	public List<EInvoice> findByClientIdAndFyAndMonth(Long clientId, String fy, EFyMonths month);
 	
 	public List<EInvoice> findByClientIdAndGstStateAndFyAndMonth(Long clientId, String gstState, String fy, EFyMonths month);
 }

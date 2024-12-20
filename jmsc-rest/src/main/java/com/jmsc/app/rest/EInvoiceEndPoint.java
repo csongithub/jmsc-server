@@ -42,15 +42,50 @@ public class EInvoiceEndPoint {
 	
 	
 	
-	@GetMapping("/{clientId}/{state}/{fy}/{month}")
-	public ResponseEntity<List<EInvoiceDTO>> getAllBids(@PathVariable("clientId") Long clientId, 
-														@PathVariable("state") String gstState,
+	@GetMapping("/{clientId}/{gst}/{fy}/{month}")
+	public ResponseEntity<List<EInvoiceDTO>> getAllEInvoices(@PathVariable("clientId") Long clientId, 
+														@PathVariable("gst") String gstState,
 														@PathVariable("fy") String fy,
 														@PathVariable("month") EFyMonths month){
 		
 		
 		
 		List<EInvoiceDTO> invoices = service.getEInvloices(clientId, gstState, fy, month);
+		return ResponseEntity.ok(invoices);
+	}
+	
+	
+	@GetMapping("/{clientId}/{fy}")
+	public ResponseEntity<List<EInvoiceDTO>> getAllEInvoices(@PathVariable("clientId") Long clientId, @PathVariable("fy") String fy){
+		
+		
+		
+		List<EInvoiceDTO> invoices = service.getEInvoiceByFy(clientId, fy);
+		return ResponseEntity.ok(invoices);
+	}
+	
+	
+	@GetMapping("/{clientId}/{gst}/{fy}")
+	public ResponseEntity<List<EInvoiceDTO>> getAllEInvoices(@PathVariable("clientId") Long clientId, 
+															 @PathVariable("gst") String gstState,
+															 @PathVariable("fy") String fy){
+		
+		
+		
+		List<EInvoiceDTO> invoices = service.getEInvoiceByGstAndFy(clientId, gstState, fy);
+		return ResponseEntity.ok(invoices);
+	}
+	
+	
+	
+	@GetMapping("/by_fy_month/{clientId}/{fy}/{month}")
+	public ResponseEntity<List<EInvoiceDTO>> getAllEInvoices(@PathVariable("clientId") Long clientId, 
+															 @PathVariable("fy") String fy,
+															 @PathVariable("month") EFyMonths month){
+		
+		
+		
+		List<EInvoiceDTO> invoices = service.getEInvoiceByFyAndMonth(clientId, fy, month);
 		return ResponseEntity.ok(invoices);
 	}
 	

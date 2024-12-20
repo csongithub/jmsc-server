@@ -69,7 +69,75 @@ public class EInvoiceService extends AbstractService{
 		if(Collections.isNotNullOrEmpty(list)) {
 			results = ObjectMapperUtil.mapAll(list, EInvoiceDTO.class);
 			
-			results.forEach(r-> {
+			updateWithFiles(clientId, results);
+		}
+		
+		return results;
+	}
+	
+	
+	
+	public List<EInvoiceDTO> getEInvoiceByFy(Long clientId,String fy) {
+		
+		List<EInvoiceDTO> results = new ArrayList<EInvoiceDTO>();
+		
+		if(clientId == null || Strings.isNullOrEmpty(fy) ) {
+			throw new RuntimeException("Insufficient Data");
+		}
+		
+		List<EInvoice> list =  repository.findByClientIdAndFy(clientId, fy);
+		
+		if(Collections.isNotNullOrEmpty(list)) {
+			results = ObjectMapperUtil.mapAll(list, EInvoiceDTO.class);
+			
+			updateWithFiles(clientId, results);
+		}
+		
+		return results;
+	}
+	
+	
+	public List<EInvoiceDTO> getEInvoiceByGstAndFy(Long clientId,String gst, String fy) {
+		
+		List<EInvoiceDTO> results = new ArrayList<EInvoiceDTO>();
+		
+		if(clientId == null || Strings.isNullOrEmpty(fy) ) {
+			throw new RuntimeException("Insufficient Data");
+		}
+		
+		List<EInvoice> list =  repository.findByClientIdAndGstStateAndFy(clientId, gst, fy);
+		
+		if(Collections.isNotNullOrEmpty(list)) {
+			results = ObjectMapperUtil.mapAll(list, EInvoiceDTO.class);
+			
+			updateWithFiles(clientId, results);
+		}
+		
+		return results;
+	}
+	
+	
+	public List<EInvoiceDTO> getEInvoiceByFyAndMonth(Long clientId, String fy, EFyMonths month) {
+		
+		List<EInvoiceDTO> results = new ArrayList<EInvoiceDTO>();
+		
+		if(clientId == null || Strings.isNullOrEmpty(fy) ) {
+			throw new RuntimeException("Insufficient Data");
+		}
+		
+		List<EInvoice> list =  repository.findByClientIdAndFyAndMonth(clientId, fy, month);
+		
+		if(Collections.isNotNullOrEmpty(list)) {
+			results = ObjectMapperUtil.mapAll(list, EInvoiceDTO.class);
+			updateWithFiles(clientId, results);
+		}
+		
+		return results;
+	}
+	
+	
+	private void updateWithFiles(Long clientId, List<EInvoiceDTO> results){
+		results.forEach(r-> {
 				Optional<EInvoiceFiles> optional = filesRepository.findByClientIdAndInvoiceId(clientId, r.getId());
 				if(optional.isPresent()) {
 					EInvoiceFiles invoice = optional.get();
@@ -83,9 +151,7 @@ public class EInvoiceService extends AbstractService{
 					r.setInvoiceAttached(false);
 				}
 			});
-		}
 		
-		return results;
 	}
 	
 	
