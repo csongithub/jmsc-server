@@ -25,13 +25,4 @@ public class BaseDTO implements Serializable {
 	private Date createdTimestamp;
 	
 	private Date updatedTimestamp;
-	
-	
-//	public boolean isCreate() {
-//		return this.id == null ? true : false;
-//	}
-//	
-//	public boolean isUpdate() {
-//		return !this.isCreate();
-//	}
 }

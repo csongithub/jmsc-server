@@ -14,7 +14,7 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper=false)
-public class EInvoiceFileDTO implements Serializable{
+public class EInvoiceFilesDTO extends BaseDTO implements Serializable{
 
 	/**
 	 * 
@@ -23,11 +23,17 @@ public class EInvoiceFileDTO implements Serializable{
 	
 	private Long id;
 	
+	private Long invoiceId;
+	
+	private boolean memoAttached;
+	
 	private byte[] memo;
 	
 	private String memoFileName;
 
 	private String memoContentType;
+	
+	private boolean invoiceAttached;
 	
 	private byte[] invoice;
 	

@@ -59,4 +59,12 @@ public class EInvoiceDTO  extends BaseDTO implements Serializable{
 	private String projectName;
 	
 	private String description;
+	
+	private boolean memoAttached;
+	
+	private boolean invoiceAttached;
+	
+	private String memoFileName;
+	
+	private String invoiceFileName;
 }

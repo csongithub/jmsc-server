@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.jmsc.app.common.dto.BankGuaranteeDTO;
 import com.jmsc.app.common.rqrs.File;
 import com.jmsc.app.service.BankGuaranteeService;
+import com.jmsc.app.service.EInvoiceService;
 
 import io.swagger.annotations.Api;
 
@@ -31,25 +32,28 @@ public class FileUploadDownloadEndPoint {
 	@Autowired
 	private BankGuaranteeService bgService;
 	
+	@Autowired
+	private EInvoiceService eInvoiceService;
+	
 	
 	
 	@PostMapping("/upload/{client_id}/{file_type}/{file_id}")
-	 public ResponseEntity<BankGuaranteeDTO> uploadFile(@RequestParam("file") MultipartFile file, 
+	 public ResponseEntity<Boolean> uploadFile(@RequestParam("file") MultipartFile file, 
 			 										   @PathVariable("client_id") Long clientId, 
 			 										   @PathVariable("file_type") String filType,
 			 										   @PathVariable("file_id") Long fileId)throws Throwable {
-		BankGuaranteeDTO response = bgService.upload(file, clientId, fileId);
-		return ResponseEntity.ok(response);
-	 }
-	
-	@GetMapping("/hello/{client_id}/{file_type}/{file_id}")
-	 public ResponseEntity<String> uploadFile(@PathVariable("client_id") Long clientId, 
-			 										   @PathVariable("file_type") String filType,
-			 										   @PathVariable("file_id") Long fileId)throws Throwable {
 		
-		return ResponseEntity.ok("Hello");
+		if(filType.equals("BANK_GUARANTEE")) {
+			bgService.upload(file, clientId, fileId);
+		} else if(filType.equals("EINVOICE_MEMO")) {
+			eInvoiceService.upload(file, clientId, fileId, "memo");
+		}else if(filType.equals("EINVOICE")) {
+			eInvoiceService.upload(file, clientId, fileId, "invoice");
+		}
+		return ResponseEntity.ok(Boolean.TRUE);
 	 }
 	
+
 	
 	@GetMapping("/download/{client_id}/{file_type}/{file_id}")
 	 public ResponseEntity<File> downloadFile(@PathVariable("client_id") Long clientId, 
@@ -59,6 +63,10 @@ public class FileUploadDownloadEndPoint {
 		File file = null;
 		if(filType.equals("BANK_GUARANTEE")) {
 			file = bgService.download(clientId, fileId);
+		} else if(filType.equals("EINVOICE_MEMO")) {
+			file = eInvoiceService.download(clientId, fileId, "memo");
+		} else if(filType.equals("EINVOICE")) {
+			file = eInvoiceService.download(clientId, fileId, "invoice");
 		}
 		
 		return ResponseEntity.ok(file);
