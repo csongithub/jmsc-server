@@ -4,6 +4,7 @@
 package com.jmsc.app.service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,6 +14,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.jmsc.app.common.dto.EInvoiceDTO;
+import com.jmsc.app.common.dto.PaymentSummaryDTO;
 import com.jmsc.app.common.enums.EFyMonths;
 import com.jmsc.app.common.exception.ResourceNotFoundException;
 import com.jmsc.app.common.rqrs.File;
@@ -152,18 +154,31 @@ public class EInvoiceService extends AbstractService{
 				}
 			});
 		
+		
+		java.util.Collections.sort(results, new Comparator<EInvoiceDTO>() {
+	        public int compare(EInvoiceDTO emp1, EInvoiceDTO emp2) {
+	            return emp1.getPaymentDate().compareTo(emp2.getPaymentDate());
+	        }
+	    });
+		
 	}
 	
 	
 	
-	public Integer deleteEInvoice(Long clientId, Long id) {
+	public Integer deleteEInvoice(Long clientId, Long invoiceId) {
 		if(clientId == null) {
 			throw new RuntimeException("Insufficient Data");
 		}
 		
-		Optional<EInvoice> optional = repository.findByClientIdAndId(clientId, id);
+		Optional<EInvoice> optional = repository.findByClientIdAndId(clientId, invoiceId);
 		if(!optional.isPresent())
 			throw new ResourceNotFoundException("Bank guarantee does not exist");
+		
+		Optional<EInvoiceFiles> optionalFile = filesRepository.findByClientIdAndInvoiceId(clientId, invoiceId);
+		
+		if(optionalFile.isPresent()) {
+			filesRepository.delete(optionalFile.get());
+		}
 		
 		repository.delete(optional.get());
 		return 0;
