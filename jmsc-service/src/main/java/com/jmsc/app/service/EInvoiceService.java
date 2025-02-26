@@ -14,7 +14,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.jmsc.app.common.dto.EInvoiceDTO;
-import com.jmsc.app.common.dto.PaymentSummaryDTO;
 import com.jmsc.app.common.enums.EFyMonths;
 import com.jmsc.app.common.exception.ResourceNotFoundException;
 import com.jmsc.app.common.rqrs.File;
@@ -242,4 +241,26 @@ public class EInvoiceService extends AbstractService{
 			throw new ResourceNotFoundException("No attachements found for this invoice");
 		}
 	}
+	
+	
+	public boolean deleteFile(Long clientId, Long invoiceId, String whicFile) {
+		Optional<EInvoiceFiles> optional = filesRepository.findByClientIdAndInvoiceId(clientId, invoiceId);
+		
+		if(optional.isPresent()) {
+			EInvoiceFiles invoice = optional.get();
+			
+			if(whicFile.equals("memo")) {
+				invoice.setMemo(null);
+				
+			} else if(whicFile.equals("invoice")) {
+				invoice.setInvoice(null);
+			}
+			filesRepository.save(invoice);
+		} else {
+			throw new ResourceNotFoundException("No attachements found for this invoice");
+		}
+		return Boolean.TRUE;
+	}
+	
+	
 }

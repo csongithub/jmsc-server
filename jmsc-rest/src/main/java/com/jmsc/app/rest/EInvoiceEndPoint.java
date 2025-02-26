@@ -96,5 +96,15 @@ public class EInvoiceEndPoint {
 		Integer statusCode = service.deleteEInvoice(clientId, id);
 		return ResponseEntity.ok(statusCode);
 	}
+	
+	
+	
+	@DeleteMapping("/delete_file/{client_id}/{invoice_id}/{which_file}")
+	public ResponseEntity<Boolean> deleteEInvoice(@PathVariable("client_id")Long clientId,
+												  @PathVariable("invoice_id")Long id,
+												  @PathVariable("which_file") String whicFile) {
+		Boolean status = service.deleteFile(clientId, id, whicFile);
+		return ResponseEntity.ok(status);
+	}
 
 }
