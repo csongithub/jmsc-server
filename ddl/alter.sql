@@ -19,3 +19,5 @@ alter table jmsc.BANK_ACCOUNT add column DISPLAY_NAME character varying(100) NOT
 --Party Table
 alter table jmsc.PARTY add column STATUS character varying(25) NOT NULL default 'ACTIVE',
 alter table jmsc.PARTY_BANK_ACCOUNT add column STATUS character varying(25) NOT NULL default 'ACTIVE',
+alter table jmsc.PARTY add column KYC_REQUIRED boolean not null default true;
+alter table jmsc.PARTY add column KYC_STATUS boolean not null default false;

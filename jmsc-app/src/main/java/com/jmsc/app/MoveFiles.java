@@ -21,8 +21,8 @@ public class MoveFiles {
 	 */
 	public static void main(String[] args) throws Throwable {
 		 String sourceFolderPath = "C:\\Users\\anuhr\\OneDrive\\Pictures\\AnamikaIphone\\";
-	     String targetFolderPath = "D:\\Iphone\\Auto Moved";
-	     String targetFolderPathDuplicateNames = "D:\\Iphone\\Auto Moved\\DuplicateNamesFiles";
+	     String targetFolderPath = "D:\\Iphone\\Auto";
+	     String targetFolderPathDuplicateNames = "D:\\Iphone\\Auto\\DuplicateNamesFiles";
 	     int fileCount = 0;
 	     while(true) {
 	    	 try {

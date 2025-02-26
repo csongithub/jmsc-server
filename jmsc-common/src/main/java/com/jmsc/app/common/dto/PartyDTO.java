@@ -5,10 +5,13 @@ package com.jmsc.app.common.dto;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.jmsc.app.common.enums.EPartyStatus;
 import com.jmsc.app.common.enums.EPartyType;
+import com.sun.istack.NotNull;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -51,6 +54,12 @@ public class PartyDTO implements Serializable {
 	
 	@JsonProperty("status")
 	private EPartyStatus status;
+	
+	@JsonProperty("kyc_required")
+	private boolean kycRequired;
+	
+	@JsonProperty("kyc_status")
+	private boolean kycStatus;
 	
 	public void toUppercase() {
 		this.name = this.name.trim().toUpperCase();

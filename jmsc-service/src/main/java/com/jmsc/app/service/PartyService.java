@@ -124,6 +124,12 @@ public class PartyService {
 	
 	
 	public List<PartyBankAccountDTO> getAllLinkedAccounts(Long clientId, Long partyId) {
+		
+		Party party = repository.findByClientIdAndId(clientId, partyId).get();
+		if(party.isKycRequired() && !party.isKycStatus()) {
+			throw new RuntimeException("Party KYC Not Done.");
+		}
+		
 		List<PartyBankAccountDTO> list = new ArrayList<PartyBankAccountDTO>();
 		
 		List<PartyAccountsLinkage> linkages = linkageRepository.findByClientIdAndPartyId(clientId, partyId);

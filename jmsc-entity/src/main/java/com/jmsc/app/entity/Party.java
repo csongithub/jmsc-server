@@ -55,11 +55,18 @@ public class Party extends BaseEntity{
 	@Column(name = "ADDRESS")
 	private String address;
 	
-	
 	@NotNull
 	@Enumerated(EnumType.STRING)
 	@Column(name = "STATUS")
 	private EPartyStatus status;
+	
+	@NotNull
+	@Column(name = "KYC_REQUIRED")
+	private boolean kycRequired;
+	
+	@NotNull
+	@Column(name = "KYC_STATUS")
+	private boolean kycStatus;
 	
 	
 	@Override
