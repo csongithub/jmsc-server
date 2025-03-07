@@ -251,9 +251,15 @@ public class EInvoiceService extends AbstractService{
 			
 			if(whicFile.equals("memo")) {
 				invoice.setMemo(null);
+				invoice.setMemoAttached(false);
+				invoice.setMemoFileName(null);
+				invoice.setMemoContentType(null);
 				
 			} else if(whicFile.equals("invoice")) {
 				invoice.setInvoice(null);
+				invoice.setInvoiceAttached(false);
+				invoice.setInvoiceFileName(null);
+				invoice.setInvoiceContentType(null);
 			}
 			filesRepository.save(invoice);
 		} else {

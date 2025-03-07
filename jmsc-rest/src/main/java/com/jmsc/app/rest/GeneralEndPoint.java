@@ -96,7 +96,7 @@ public class GeneralEndPoint {
 		Calendar calendar = Calendar.getInstance();
         int month = calendar.get(Calendar.MONTH);
         int year = calendar.get(Calendar.YEAR);
-        int fyStart =  (month >= Calendar.MARCH) ? year : year - 1;
+        int fyStart =  (month > Calendar.MARCH) ? year : year - 1;
         String fy = fyStart + "-" + (fyStart%100 + 1);
         return fy;
 	}
