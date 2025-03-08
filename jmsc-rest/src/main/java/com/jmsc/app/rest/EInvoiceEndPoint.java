@@ -4,6 +4,7 @@
 package com.jmsc.app.rest;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jmsc.app.common.dto.EInvoiceDTO;
+import com.jmsc.app.common.dto.TurnOverDTO;
 import com.jmsc.app.common.enums.EFyMonths;
 import com.jmsc.app.service.EInvoiceService;
 
@@ -65,6 +67,7 @@ public class EInvoiceEndPoint {
 	}
 	
 	
+	
 	@GetMapping("/{clientId}/{gst}/{fy}")
 	public ResponseEntity<List<EInvoiceDTO>> getAllEInvoices(@PathVariable("clientId") Long clientId, 
 															 @PathVariable("gst") String gstState,
@@ -105,6 +108,23 @@ public class EInvoiceEndPoint {
 												  @PathVariable("which_file") String whicFile) {
 		Boolean status = service.deleteFile(clientId, id, whicFile);
 		return ResponseEntity.ok(status);
+	}
+	
+	
+	
+	
+	@GetMapping("/{clientId}/turnover")
+	public ResponseEntity<List<TurnOverDTO>> getAllEInvoices(@PathVariable("clientId") Long clientId){
+		List<TurnOverDTO> invoices = service.getTurnOver(clientId);
+		return ResponseEntity.ok(invoices);
+	}
+	
+	
+	@GetMapping("/{clientId}/current/turnover")
+	public ResponseEntity<String> getcurrentFyTurnover(@PathVariable("clientId") Long clientId){
+		String turnover = service.getcurrentFYTurnover(clientId);
+		System.out.println("==================: " + turnover);
+		return ResponseEntity.ok(turnover);
 	}
 
 }

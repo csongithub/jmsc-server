@@ -14,12 +14,14 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.jmsc.app.common.dto.EInvoiceDTO;
+import com.jmsc.app.common.dto.TurnOverDTO;
 import com.jmsc.app.common.enums.EFyMonths;
 import com.jmsc.app.common.exception.ResourceNotFoundException;
 import com.jmsc.app.common.rqrs.File;
 import com.jmsc.app.common.util.Collections;
 import com.jmsc.app.common.util.ObjectMapperUtil;
 import com.jmsc.app.common.util.Strings;
+import com.jmsc.app.config.jmsc.JmscGeneralConfig;
 import com.jmsc.app.entity.EInvoice;
 import com.jmsc.app.entity.EInvoiceFiles;
 import com.jmsc.app.repository.EInvoiceFilesRepository;
@@ -38,6 +40,9 @@ public class EInvoiceService extends AbstractService{
 	
 	@Autowired
 	private EInvoiceFilesRepository filesRepository;
+		
+	@Autowired
+	private JmscGeneralConfig config;
 	
 	
 	public EInvoiceDTO saveOrUpdate(EInvoiceDTO dto) {
@@ -75,6 +80,47 @@ public class EInvoiceService extends AbstractService{
 		
 		return results;
 	}
+	
+	
+	
+	public List<TurnOverDTO> getTurnOver(Long clientId){
+		List<TurnOverDTO> turnovers = new ArrayList<TurnOverDTO>();
+		List<String> fys = UtilityService.getFyForEInvoice(config.getEinvoiceStartYear());
+		fys.forEach(fy -> {
+			List<EInvoiceDTO> payments = getEInvoiceByFy(clientId, fy);
+			if(Collections.isNotNullOrEmpty(payments)) {
+				Double turnover = 0d;
+				for(EInvoiceDTO payment: payments){
+					turnover = turnover + payment.getGrossAmount();
+				}
+				String to = UtilityService.getCurrencyFormat(turnover);
+				TurnOverDTO turnoverDTO = new TurnOverDTO();
+				turnoverDTO.setYear(fy);
+				turnoverDTO.setLabel(fy);
+				turnoverDTO.setTurnover(to);
+				turnoverDTO.setValue(to);
+				turnovers.add(turnoverDTO);
+			}
+		});
+		
+		return turnovers;
+	}
+	
+	
+	
+	public String getcurrentFYTurnover(Long clientId){
+		String currentFy = UtilityService.getCurrentFinancialYear();
+		List<EInvoiceDTO> payments = getEInvoiceByFy(clientId, currentFy);
+		Double turnover = 0d;
+		if(Collections.isNotNullOrEmpty(payments)) {
+			for(EInvoiceDTO payment: payments){
+				turnover = turnover + payment.getGrossAmount();
+			}
+		}
+		String to = UtilityService.getCurrencyFormat(turnover);
+		return to;
+	}
+	
 	
 	
 	
