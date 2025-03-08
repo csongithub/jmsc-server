@@ -123,7 +123,6 @@ public class EInvoiceEndPoint {
 	@GetMapping("/{clientId}/current/turnover")
 	public ResponseEntity<String> getcurrentFyTurnover(@PathVariable("clientId") Long clientId){
 		String turnover = service.getcurrentFYTurnover(clientId);
-		System.out.println("==================: " + turnover);
 		return ResponseEntity.ok(turnover);
 	}
 
