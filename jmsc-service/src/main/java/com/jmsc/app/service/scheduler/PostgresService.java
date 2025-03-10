@@ -12,8 +12,6 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Map;
 import java.util.TimeZone;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,7 +90,7 @@ public class PostgresService {
 		String outputDitectory = config.getOutputDirectory();
 		String format = config.getFormat();
 		
-		String fileName = this.getFileName(format);
+		String fileName = this.getFileName(format, mode);
 		backup.setBackupFileName(fileName);
 		backup.setBackupFormat(format);
 		
@@ -103,7 +101,7 @@ public class PostgresService {
 		else
 			file = outputDitectory + "\\" + fileName;
 		
-		File fileObject = new File(file + "_"+ mode);
+		File fileObject = new File(file);
 		
 		backup.setBackupPath(fileObject.getAbsolutePath());
 		
@@ -149,7 +147,7 @@ public class PostgresService {
 	}
 	
 	
-	private String getFileName(String format) {
+	private String getFileName(String format, String mode) {
 		TimeZone zonah = TimeZone.getTimeZone("GMT+1");
 	    Calendar Calendario = GregorianCalendar.getInstance( zonah, new java.util.Locale("es"));
 	    SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy");
@@ -161,7 +159,7 @@ public class PostgresService {
 	    else if("prod".equals(instanceType))
 	    	fileName = "jmsc_local_prod_db_backup_";
 	    	
-	    StringBuffer file = new StringBuffer(fileName).append(date.toString()).append(".").append(format);
+	    StringBuffer file = new StringBuffer(fileName).append(date.toString()).append(mode).append(".").append(format);
 	    System.out.println(file.toString());
 	    return file.toString();
 	}
@@ -169,6 +167,6 @@ public class PostgresService {
 	
 	public static void main(String args[]) throws Throwable {
 		PostgresService service = new PostgresService();
-		service.getFileName("tar");
+		service.getFileName("tar", "user");
 	}
 }
