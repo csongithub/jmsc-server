@@ -56,7 +56,7 @@ public class PostActivationService {
 			}
 		}
 		
-		service.startBackup();
+		service.startBackup("auto");
 		
 		if(notification == null) {
 			notification = new Notification();

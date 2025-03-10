@@ -63,7 +63,7 @@ public class PostgresService {
 		Thread t1 = new Thread(() -> {
             lock.lock();
             try {
-                startBackup();
+                startBackup("user");
             } catch (Throwable e) {
 				e.printStackTrace();
 			} finally {
@@ -76,7 +76,7 @@ public class PostgresService {
 	}
 	
 	
-	public PostgresBackup startBackup() throws Throwable {
+	public PostgresBackup startBackup(String mode) throws Throwable {
 		log.debug(instanceType);
 		log.debug("Starting Data Backup...");
 		
@@ -103,7 +103,7 @@ public class PostgresService {
 		else
 			file = outputDitectory + "\\" + fileName;
 		
-		File fileObject = new File(file);
+		File fileObject = new File(file + "_"+ mode);
 		
 		backup.setBackupPath(fileObject.getAbsolutePath());
 		

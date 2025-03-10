@@ -32,7 +32,7 @@ public class PostgresEndPoint {
 	
 	@PostMapping("/backup")
 	public ResponseEntity<PostgresBackup> backup() throws Throwable{
-		PostgresBackup response = service.startBackup();
+		PostgresBackup response = service.startBackup("auto");
 		return ResponseEntity.ok(response);
 	}
 	
