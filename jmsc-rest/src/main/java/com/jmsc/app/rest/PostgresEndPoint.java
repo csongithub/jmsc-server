@@ -5,6 +5,7 @@ package com.jmsc.app.rest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -34,5 +35,17 @@ public class PostgresEndPoint {
 		PostgresBackup response = service.startBackup();
 		return ResponseEntity.ok(response);
 	}
-
+	
+	@PostMapping("/start_data_backup")
+	public ResponseEntity<Boolean> startDataBackup() throws Throwable{
+		Boolean response = service.doBackup();
+		return ResponseEntity.ok(response);
+	}
+	
+	
+	@GetMapping("/backup_status")
+	public ResponseEntity<Boolean> backupStatus() throws Throwable{
+		Boolean response = service.checkBackupStatus();
+		return ResponseEntity.ok(response);
+	}
 }

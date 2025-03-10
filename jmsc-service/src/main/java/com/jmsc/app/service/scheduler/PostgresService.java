@@ -12,6 +12,9 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Map;
 import java.util.TimeZone;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,6 +39,42 @@ public class PostgresService {
 	
 	@Value("${instanceType}")
 	private String instanceType;
+	
+	private static final ReentrantLock lock = new ReentrantLock();
+	
+	
+	public boolean checkBackupStatus() {
+		if(lock.isLocked())
+			return false;
+		else
+			return true;		
+	}
+	
+	public boolean doBackup() {
+		if(lock.isLocked()) {
+			return false;
+		}
+		startBackupThread();
+		return true;
+	}
+	
+	
+	private void startBackupThread() {
+		Thread t1 = new Thread(() -> {
+            lock.lock();
+            try {
+                startBackup();
+            } catch (Throwable e) {
+				e.printStackTrace();
+			} finally {
+                lock.unlock();
+               log.debug("Data backup completed successfully !");
+            }
+		});
+		
+		t1.start();
+	}
+	
 	
 	public PostgresBackup startBackup() throws Throwable {
 		log.debug(instanceType);
