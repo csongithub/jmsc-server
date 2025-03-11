@@ -18,8 +18,7 @@ public abstract class AbstractService {
 	}
 	
 	
-	public boolean isupdate(Long id) {
+	public boolean isUpdate(Long id) {
 		return !isCreate(id);
 	}
-
 }

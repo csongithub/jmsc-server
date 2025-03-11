@@ -75,7 +75,7 @@ public class BankGuaranteeService extends AbstractService{
 			entity.setStatus(EBankGuaranteeStatus.EXPIRED);
 		
 	
-		if(this.isupdate(dto.getId())) {
+		if(this.isUpdate(dto.getId())) {
 			Optional<BankGuarantee> optional = repository.findByClientIdAndId(dto.getClientId(), dto.getId());
 			if(optional.isPresent()) {
 				entity.setFile(optional.get().getFile());
