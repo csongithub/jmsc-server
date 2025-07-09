@@ -9,12 +9,14 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.jmsc.app.common.dto.CreditFacilityDTO;
 import com.jmsc.app.common.enums.EFacilityStatus;
 import com.jmsc.app.common.enums.ENotificationType;
 import com.jmsc.app.common.util.DateUtils;
+import com.jmsc.app.config.datasource.PostgresConfig;
 import com.jmsc.app.config.jmsc.ServiceLocator;
 import com.jmsc.app.entity.CreditFacility;
 import com.jmsc.app.entity.Notification;
@@ -36,11 +38,23 @@ public class PostActivationService {
 	
 	private final long gloab_client_id = 0l;
 	
+	@Autowired
+	private PostgresConfig config;
+	
 	/**
 	 * @throws Throwable 
 	 * 
 	 */
 	public void dataBackup() throws Throwable {
+		
+		if(!config.isBackupEnabled()) {
+			log.debug("Data backup is disabled");
+			System.out.println("*************************************************");
+			System.out.println("*         Data Backup is Disabled               *");
+			System.out.println("*************************************************");
+			return;
+		}
+			
 		PostgresService service  = ServiceLocator.getService(PostgresService.class);
 		
 		NotificationRepository notificationRepo =  ServiceLocator.getService(NotificationRepository.class);
@@ -52,6 +66,9 @@ public class PostActivationService {
 			Date lastUpdated = notification.getUpdatedTimestamp();
 			if(DateUtils.isToday(lastUpdated)) {
 				log.debug("Data-Backup Already done for the day");
+				System.out.println("*************************************************");
+				System.out.println("*         Data Backup Already Done              *");
+				System.out.println("*************************************************");
 				return;
 			}
 		}

@@ -23,6 +23,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class PostgresConfig extends DataSourceConfig {
 	
+	private boolean backupEnabled;
+	
 	private String pgDumpAgent;
 	
 	private String outputDirectory;

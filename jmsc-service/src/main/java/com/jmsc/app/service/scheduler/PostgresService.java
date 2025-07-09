@@ -69,17 +69,18 @@ public class PostgresService {
                log.debug("Data backup completed successfully !");
             }
 		});
-		
+	
 		t1.start();
 	}
 	
 	
-	public PostgresBackup startBackup(String mode) throws Throwable {
+	public PostgresBackup startBackup(String mode) throws Throwable {	 
+		
 		log.debug(instanceType);
 		log.debug("Starting Data Backup...");
 		
 		System.out.println("*************************************************");
-		System.out.println("*         Starting Database Backup Now");
+		System.out.println("*         Data Backup Started");
 		System.out.println("*************************************************");
 		
 		long startTime = System.currentTimeMillis();
@@ -137,7 +138,9 @@ public class PostgresService {
 	        
 	        long executionTime = endTime - startTime;
 	        
-	        log.debug("Data Backup Completed Successfully...");
+	        System.out.println("*************************************************");
+			System.out.println("*         Data Backup Completed Successfully");
+			System.out.println("*************************************************");
 	        log.debug("Data Backup Took {} Millisecond.", executionTime);
 	        
 	    } catch (IOException | InterruptedException e) {

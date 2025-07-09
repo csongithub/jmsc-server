@@ -1,6 +1,10 @@
+/**
+ * 
+ */
 package com.jmsc.app.entity;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -8,34 +12,75 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import org.hibernate.annotations.Type;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 import com.sun.istack.NotNull;
 
 import lombok.Data;
+
+/**
+ * @author anuhr
+ *
+ */
 @Data
 @Entity
-@Table(name = "SUPPLIER")
-public class Supplier extends BaseEntity implements Serializable{
+@Table(name = "PURCHAGE_LEDGER")
+public class PurchageLedger extends BaseEntity implements Serializable{
 
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -7544951513808203017L;
+	private static final long serialVersionUID = 2766078192471518102L;
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "ID")
 	private Long id;
 	
-	@NotNull
-	@Column(name = "PARTY_ID")
-	private Long partyId;
 	
-	@Type(type="jsonb")
-	@Column(name = "SUPPLY_CONFIG")
-	private String supplyConfig;
+	@NotNull
+	@Column(name = "SUPPLIER_ID")
+	private Long supplierId;
+	
+	
+	@Temporal(TemporalType.DATE)
+	@Column(name = "DATE")
+	private Date date;
+	
+	
+	
+	@Column(name = "ITEM")
+	private String item;
+	
+	
+	
+	@Column(name = "QTY")
+	private Double quantity;
+	
+	
+
+	@Column(name = "RATE")
+	private Double rate;
+	
+	
+	@Column(name = "VEHICLE")
+	private String vehicle;
+	
+	
+	
+	@Column(name = "CREDIT_AMOUNT")
+	private Double creditAmount;
+	
+	
+
+	@Column(name = "DEBIT_AMOUNT")
+	private Double debitAmount;
+	
+	
+	@Column(name = "REMARK")
+	private String remark;
+	
 	
 	
 	@Override
@@ -54,13 +99,12 @@ public class Supplier extends BaseEntity implements Serializable{
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Supplier other = (Supplier) obj;
+		PurchageLedger other = (PurchageLedger) obj;
 		if (id == null) {
 			if (other.id != null)
 				return false;
 		} else if (!id.equals(other.id))
 			return false;
 		return true;
-	}	
-	
+	}
 }
