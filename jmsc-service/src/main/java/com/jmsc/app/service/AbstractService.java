@@ -21,4 +21,19 @@ public abstract class AbstractService {
 	public boolean isUpdate(Long id) {
 		return !isCreate(id);
 	}
+	
+	
+	public boolean isNull(Long val) {
+		return val == null ? true : false;
+	}
+	
+	
+	public boolean isNull(String val) {
+		return val == null ? true : false;
+	}
+	
+	
+	public boolean isNull(Object obj) {
+		return obj == null ? true : false;
+	}
 }
