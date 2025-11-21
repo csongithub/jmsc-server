@@ -14,8 +14,9 @@ import org.springframework.stereotype.Service;
 import com.jmsc.app.common.dto.PartyBankAccountDTO;
 import com.jmsc.app.common.dto.PartyDTO;
 import com.jmsc.app.common.dto.PaymentSummaryDTO;
+import com.jmsc.app.common.dto.accounting.Item;
+import com.jmsc.app.common.dto.accounting.ListDTO;
 import com.jmsc.app.common.enums.EPartyStatus;
-import com.jmsc.app.common.enums.EPaymentStatus;
 import com.jmsc.app.common.exception.ResourceNotFoundException;
 import com.jmsc.app.common.util.Collections;
 import com.jmsc.app.common.util.ObjectMapperUtil;
@@ -24,7 +25,6 @@ import com.jmsc.app.config.jmsc.ServiceLocator;
 import com.jmsc.app.entity.Party;
 import com.jmsc.app.entity.PartyAccountsLinkage;
 import com.jmsc.app.entity.PartyBankAccount;
-import com.jmsc.app.entity.Payment;
 import com.jmsc.app.repository.PartyAccountsLinkageRepository;
 import com.jmsc.app.repository.PartyBankAccountRepository;
 import com.jmsc.app.repository.PartyRepository;
@@ -162,6 +162,39 @@ public class PartyService {
 		} else {
 			throw new ResourceNotFoundException("Payment not found");
 		}
+	}
+	
+	
+	public ListDTO getAllParty(Long clientId) {
+	
+		ListDTO list = new ListDTO();
+		list.setListName("Party");
+		
+		if(clientId == null) {
+			throw new RuntimeException("Invalid Request");
+		}
+		
+		List<Party> parties  = repository.findByClientId(clientId);
+		
+		
+		if(Collections.isEmpty(parties))
+			return list;
+		
+		parties.forEach(c ->  {
+			Item item  = new Item();
+			item.setLabel(c.getName() + "(" + c.getNickName() + ")");
+			item.setValue(c.getId());
+			list.getList().add(item);
+		});
+		
+		java.util.Collections.sort(list.getList(), new Comparator<Item>() {
+	        public int compare(Item item1, Item item2) {
+	            return item1.getLabel().compareTo(item2.getLabel());
+	        }
+	    });
+		
+		return list;
+		
 	}
 
 }

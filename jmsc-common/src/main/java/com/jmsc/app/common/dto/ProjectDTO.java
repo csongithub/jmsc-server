@@ -25,6 +25,11 @@ public class ProjectDTO extends BaseDTO implements Serializable{
 
 	private Long id;
 	
+	/**
+	 * Name of division, for example:"Minor Irrigation Division Aurangabad"
+	 */
+	private String clientName;
+	
 	private String nickName;
 	
 	private String fullName;

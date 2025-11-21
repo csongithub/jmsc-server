@@ -39,6 +39,10 @@ public class Project extends BaseEntity implements Serializable{
 	private Long id;
 	
 	@NotNull
+	@Column(name = "CLIENT_NAME")
+	private String clientName;
+	
+	@NotNull
 	@Column(name = "NICK_NAME")
 	private String nickName;
 	

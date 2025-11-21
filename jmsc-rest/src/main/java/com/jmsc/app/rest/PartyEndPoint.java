@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.jmsc.app.common.dto.PartyBankAccountDTO;
 import com.jmsc.app.common.dto.PartyDTO;
+import com.jmsc.app.common.dto.accounting.ListDTO;
 import com.jmsc.app.common.enums.EPartyStatus;
 import com.jmsc.app.service.PartyService;
 
@@ -76,6 +77,17 @@ public class PartyEndPoint {
 		Integer statusCode = service.deleteParty(clientId, partyId);
 		return ResponseEntity.ok(statusCode);
 	}
-
-
+	
+	
+//	@GetMapping("/list/{clientId}")
+//	public ResponseEntity<ListDTO> parties(@PathVariable("clientId")Long clientId) {
+//		ListDTO list = service.getAllParty(clientId);
+//		return ResponseEntity.ok(list);
+//	}
+	
+	@GetMapping("/list/{client_id}")
+	public ResponseEntity<ListDTO> all(@PathVariable("client_id") Long clientId){
+		ListDTO list = service.getAllParty(clientId);
+		return ResponseEntity.ok(list);
+	}
 }
