@@ -10,7 +10,7 @@ public class RenameFiles {
 
     public static void main(String[] argv) throws IOException {
 
-		String filePath = "C:\\Users\\anuhr\\Desktop\\rename";
+		String filePath = "C:\\Users\\anuhr\\Desktop\\RRSMP\\Aurangabad 04 NIT 10\\all";
         File folder = new File(filePath);
         
         File[] files = folder.listFiles();
@@ -22,7 +22,7 @@ public class RenameFiles {
         	 if (file.isFile()) {
 
         		 String oldFileName = file.getName();
-        		 String newFileName = oldFileName.replace("_page", "");
+        		 String newFileName = "JMSC_" + oldFileName;
         		 File f = new File(filePath + "\\" + oldFileName); 
                  f.renameTo(new File(filePath + "\\" + newFileName));
              }

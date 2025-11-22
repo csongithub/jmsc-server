@@ -3,6 +3,8 @@
  */
 package com.jmsc.app.service;
 
+import java.util.Date;
+
 /**
  * @author anuhr
  *
@@ -35,5 +37,10 @@ public abstract class AbstractService {
 	
 	public boolean isNull(Object obj) {
 		return obj == null ? true : false;
+	}
+	
+	
+	public boolean isNull(Date val) {
+		return val == null ? true : false;
 	}
 }

@@ -3,6 +3,7 @@
  */
 package com.jmsc.app.service.accounting;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -12,10 +13,13 @@ import org.springframework.stereotype.Service;
 
 import com.jmsc.app.common.dto.accounting.CreditorDTO;
 import com.jmsc.app.common.dto.accounting.Item;
+import com.jmsc.app.common.dto.accounting.LedgerDTO;
 import com.jmsc.app.common.dto.accounting.ListDTO;
 import com.jmsc.app.common.util.Collections;
 import com.jmsc.app.common.util.ObjectMapperUtil;
 import com.jmsc.app.entity.accounting.Creditor;
+import com.jmsc.app.entity.accounting.Ledger;
+import com.jmsc.app.repository.LedgerRepository;
 import com.jmsc.app.repository.accounting.CreditorRepository;
 import com.jmsc.app.service.AbstractService;
 
@@ -30,9 +34,62 @@ public class AccountingService extends AbstractService{
 	@Autowired
 	private CreditorRepository creditorRepository;
 	
+	@Autowired
+	private LedgerRepository ledgerRepository;
+	
+	
+	
+	public LedgerDTO createOrUpdate(LedgerDTO dto) {
+		if(isNull(dto.getClientId()) || isNull(dto.getCode()) || isNull(dto.getCreditorId())
+				|| isNull(dto.getName()) || isNull(dto.getOpeningBalance()) || isNull(dto.getStartDate())) {
+			throw new RuntimeException("Invalid Request");
+		}
+		
+		Ledger entity= ObjectMapperUtil.map(dto, Ledger.class);
+		entity = ledgerRepository.save(entity);
+		
+		LedgerDTO savedLedger= ObjectMapperUtil.map(entity, LedgerDTO.class);
+		
+		return savedLedger;
+	}
+	
+	
+	public List<LedgerDTO> getLedgers(Long clientId, Long creditorId){
+		
+		if(isNull(clientId) || isNull(creditorId)) {
+			throw new RuntimeException("Invalid Request");
+		}
+		List<Ledger> ledgers =  ledgerRepository.findByClientIdAndCreditorId(clientId, creditorId);
+		
+		if(Collections.isEmpty(ledgers))
+			return new ArrayList<LedgerDTO>();
+		
+		List<LedgerDTO> allLedgers = ObjectMapperUtil.mapAll(ledgers, LedgerDTO.class);
+		
+		return allLedgers;
+	}
+	
+	
+	
+	public LedgerDTO getLedger(Long clientId, Long creditorId, Long ledgerId) {
+		if(isNull(clientId) || isNull(ledgerId)) {
+			throw new RuntimeException("Invalid Request");
+		}
+		
+		Optional<Ledger> optional = ledgerRepository.findByClientIdAndCreditorIdAndId(clientId, creditorId, ledgerId);
+		
+		if(!optional.isPresent()) {
+			throw new RuntimeException("Ledger Not Found");
+		}
+		
+		LedgerDTO ledger= ObjectMapperUtil.map(optional.get(), LedgerDTO.class);
+		
+		return ledger;
+	}
+	
 	
 	public CreditorDTO createOrUpdate(CreditorDTO dto) {
-		if(dto.getClientId() == null || isNull(dto.getName()) || isNull(dto.getAddress())
+		if(isNull(dto.getClientId()) || isNull(dto.getName()) || isNull(dto.getAddress())
 				|| isNull(dto.getPartyId())) {
 			throw new RuntimeException("Insufficient Data");
 		}

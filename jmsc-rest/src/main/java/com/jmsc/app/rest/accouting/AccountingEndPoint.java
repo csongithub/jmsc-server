@@ -3,6 +3,8 @@
  */
 package com.jmsc.app.rest.accouting;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jmsc.app.common.dto.accounting.CreditorDTO;
+import com.jmsc.app.common.dto.accounting.LedgerDTO;
 import com.jmsc.app.common.dto.accounting.ListDTO;
 import com.jmsc.app.service.accounting.AccountingService;
 
@@ -49,6 +52,28 @@ public class AccountingEndPoint {
 	@GetMapping("/creditors/{clientId}")
 	public ResponseEntity<ListDTO> getAllCreditors(@PathVariable("clientId")Long clientId) {
 		ListDTO list = accountingService.getAllCreditors(clientId);
+		return ResponseEntity.ok(list);
+	}
+	
+	
+	
+	@PostMapping("/ledger/create_or_update")
+	ResponseEntity<LedgerDTO> createOrUpdate(@RequestBody LedgerDTO ledgerDTO){
+		LedgerDTO response = accountingService.createOrUpdate(ledgerDTO);
+		return ResponseEntity.ok(response);
+	}
+	
+	
+	@GetMapping("/ledger/{clientId}/{creditorId}")
+	public ResponseEntity<List<LedgerDTO>> getLedgers(@PathVariable("clientId")Long clientId, @PathVariable("creditorId")Long creditorId) {
+		List<LedgerDTO> list = accountingService.getLedgers(clientId, creditorId);
+		return ResponseEntity.ok(list);
+	}
+	
+	
+	@GetMapping("/ledger/{clientId}/{creditorId}/{ledgerId}")
+	public ResponseEntity<LedgerDTO> getLedger(@PathVariable("clientId")Long clientId, @PathVariable("creditorId")Long creditorId, @PathVariable("ledgerId")Long ledgerId) {
+		LedgerDTO list = accountingService.getLedger(clientId, creditorId, ledgerId);
 		return ResponseEntity.ok(list);
 	}
 }
