@@ -4,7 +4,6 @@
 package com.jmsc.app.service.accounting;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,11 +13,16 @@ import org.springframework.stereotype.Service;
 import com.jmsc.app.common.dto.accounting.CreditorDTO;
 import com.jmsc.app.common.dto.accounting.Item;
 import com.jmsc.app.common.dto.accounting.LedgerDTO;
+import com.jmsc.app.common.dto.accounting.LedgerEntryDTO;
 import com.jmsc.app.common.dto.accounting.ListDTO;
+import com.jmsc.app.common.enums.LedgerEntryType;
 import com.jmsc.app.common.util.Collections;
 import com.jmsc.app.common.util.ObjectMapperUtil;
+import com.jmsc.app.common.util.Strings;
 import com.jmsc.app.entity.accounting.Creditor;
 import com.jmsc.app.entity.accounting.Ledger;
+import com.jmsc.app.entity.accounting.LedgerEntry;
+import com.jmsc.app.repository.LedgerEntryRepository;
 import com.jmsc.app.repository.LedgerRepository;
 import com.jmsc.app.repository.accounting.CreditorRepository;
 import com.jmsc.app.service.AbstractService;
@@ -36,6 +40,9 @@ public class AccountingService extends AbstractService{
 	
 	@Autowired
 	private LedgerRepository ledgerRepository;
+	
+	@Autowired
+	private LedgerEntryRepository entryRepository;
 	
 	
 	
@@ -142,12 +149,100 @@ public class AccountingService extends AbstractService{
 			list.getList().add(item);
 		});
 		
-		java.util.Collections.sort(list.getList(), new Comparator<Item>() {
-	        public int compare(Item item1, Item item2) {
-	            return item1.getLabel().compareTo(item2.getLabel());
-	        }
-	    });
+		ListDTO.sortByLevel(list);
 		
 		return list;
 	}
+	
+	
+	public String getMaterials(Long clientId, Long creditorId) {
+		if(isNull(clientId) || isNull(creditorId)) {
+			throw new RuntimeException("Invalid Request");
+		}
+		
+		Optional<Creditor> optional =  creditorRepository.findByClientIdAndId(clientId, creditorId);
+		if(!optional.isPresent()) {
+			throw new RuntimeException("Creditor Not Found");
+		}
+		
+		return optional.get().getItems();
+	}
+	
+	
+	
+	public Boolean postCreditEntries(List<LedgerEntryDTO> entries) {
+		
+		if(Collections.isNullOrEmpty(entries))
+			throw new RuntimeException("empty request");
+		
+		
+		
+		for(LedgerEntryDTO entry: entries) {
+			
+			if(isNull(entry.getClientId()) || isNull(entry.getCreditorId()) || isNull(entry.getLedgerId()) 
+							|| isNull(entry.getDate())) {
+				throw new RuntimeException("Invalid Request");
+			}
+			
+			
+			if(LedgerEntryType.CREDIT.equals(entry.getEntryType())) {
+				if(isNull(entry.getProjectId()) ||  Strings.isNullOrEmpty(entry.getReceipt()) 
+						|| isNull(entry.getItem()) || isNull(entry.getRate()) || isNull(entry.getQuantity()) || entry.getQuantity() == 0.0
+						|| isNull(entry.getCredit()) || entry.getCredit() ==0.0 || isNull(entry.getUnit())) {
+					throw new RuntimeException("Invalid Post Request");
+				}
+				Optional<LedgerEntry>	optional  = entryRepository.findByDateAndClientIdAndCreditorIdAndReceipt(entry.getDate(), 
+																												 entry.getClientId(),
+																												 entry.getCreditorId(),
+																												 entry.getReceipt());
+				if(optional.isPresent()) {
+					LedgerEntry old = optional.get();
+					throw new RuntimeException("Dublicate Entry Found for Receipt: "+ old.getReceipt() + ", Date-" + old.getDate() + ", Item:- " + old.getItem() + ", QTY:- " + old.getQuantity());
+				}
+				
+			} else if(LedgerEntryType.DEBIT.equals(entry.getEntryType())) {
+				if(isNull(entry.getDebit()) || isNull(entry.getNarration()))
+					throw new RuntimeException("empty request");
+			}
+		}
+		
+		List<LedgerEntry> allEntries = ObjectMapperUtil.mapAll(entries, LedgerEntry.class);
+		
+		try {
+			entryRepository.saveAll(allEntries);
+		}catch(Exception e) {
+			return Boolean.FALSE;
+		}
+		return Boolean.TRUE;
+	}
+	
+	 
+	public LedgerEntryDTO validateByChallan(LedgerEntryDTO request) {
+		
+		if(isNull(request.getClientId()) || request.getDate() == null || isNull(request.getCreditorId()) || isNull(request.getReceipt()))
+			throw new RuntimeException("Invalid Request");
+		
+		Optional<LedgerEntry>	optional  = entryRepository.findByDateAndClientIdAndCreditorIdAndReceipt(request.getDate(), 
+																	request.getClientId(),
+																	request.getCreditorId(),
+																	request.getReceipt());
+		
+		LedgerEntryDTO entry = new LedgerEntryDTO();
+		if(!optional.isPresent()) {
+			List<LedgerEntry> entries =  entryRepository.findByClientIdAndCreditorIdAndReceipt(request.getClientId(),
+																								request.getCreditorId(),
+																								request.getReceipt());
+			if(Collections.isNullOrEmpty(entries))
+				return entry ;
+			else
+				entry = ObjectMapperUtil.map(entries.get(0), LedgerEntryDTO.class);
+			
+			
+		} else {
+			entry = ObjectMapperUtil.map(optional.get(), LedgerEntryDTO.class);
+		}
+		
+		return entry;
+	}
+			
 }

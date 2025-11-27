@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.jmsc.app.common.dto.accounting.CreditorDTO;
 import com.jmsc.app.common.dto.accounting.LedgerDTO;
+import com.jmsc.app.common.dto.accounting.LedgerEntryDTO;
 import com.jmsc.app.common.dto.accounting.ListDTO;
 import com.jmsc.app.service.accounting.AccountingService;
 
@@ -56,6 +57,15 @@ public class AccountingEndPoint {
 	}
 	
 	
+	@GetMapping("/creditor/materials/{clientId}/{creditorId}")
+	public ResponseEntity<String> materials(@PathVariable("clientId") Long clientId, 
+												@PathVariable("creditorId") Long creditorId){
+		
+		String response = accountingService.getMaterials(clientId, creditorId);
+		return ResponseEntity.ok(response);
+	}
+	
+	
 	
 	@PostMapping("/ledger/create_or_update")
 	ResponseEntity<LedgerDTO> createOrUpdate(@RequestBody LedgerDTO ledgerDTO){
@@ -75,5 +85,19 @@ public class AccountingEndPoint {
 	public ResponseEntity<LedgerDTO> getLedger(@PathVariable("clientId")Long clientId, @PathVariable("creditorId")Long creditorId, @PathVariable("ledgerId")Long ledgerId) {
 		LedgerDTO list = accountingService.getLedger(clientId, creditorId, ledgerId);
 		return ResponseEntity.ok(list);
+	}
+	
+	
+	@PostMapping("/ledger/entries/post")
+	ResponseEntity<Boolean> postEntries(@RequestBody List<LedgerEntryDTO> entries){
+		Boolean status = accountingService.postCreditEntries(entries);
+		return ResponseEntity.ok(status);
+	}
+	
+	
+	@PostMapping("/ledger/entries/validate_by_date_and_challan")
+	ResponseEntity<LedgerEntryDTO> validateByChallan(@RequestBody LedgerEntryDTO req){
+		LedgerEntryDTO entry = accountingService.validateByChallan(req);
+		return ResponseEntity.ok(entry);
 	}
 }

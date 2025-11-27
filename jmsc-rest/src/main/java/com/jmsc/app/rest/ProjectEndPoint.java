@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jmsc.app.common.dto.ProjectDTO;
+import com.jmsc.app.common.dto.accounting.ListDTO;
 import com.jmsc.app.service.ProjectService;
 
 import io.swagger.annotations.Api;
@@ -45,5 +46,13 @@ public class ProjectEndPoint {
 	public ResponseEntity<List<ProjectDTO>> getAll(@PathVariable("client_id") Long clientId){
 		List<ProjectDTO> all = projectService.getAllProjects(clientId);
 		return ResponseEntity.ok(all);
+	}
+	
+	
+	
+	@GetMapping("/all/list/{client_id}")
+	public ResponseEntity<ListDTO> getProjectList(@PathVariable("client_id") Long clientId){
+		ListDTO list = projectService.getProjectList(clientId);
+		return ResponseEntity.ok(list);
 	}
 }
