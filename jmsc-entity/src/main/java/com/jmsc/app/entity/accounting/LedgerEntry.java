@@ -53,7 +53,7 @@ public class LedgerEntry extends BaseEntity implements Serializable{
 	@Column(name = "PROJECT_ID")
 	private Long projectId;
 	
-	
+	@NotNull
 	@Column(name = "RECEIPT_NO")
 	private String receipt;
 	
@@ -64,26 +64,26 @@ public class LedgerEntry extends BaseEntity implements Serializable{
 	private Date date;
 	
 	
-	@NotNull
+
 	@Column(name = "ITEM")
 	private String item;
 	
 	
-	@NotNull
+
 	@Column(name = "RATE")
 	private float rate;
 	
-	@NotNull
+
 	@Column(name = "QTY")
 	private float quantity;
 	
 	
-	@NotNull
+
 	@Column(name = "CREDIT")
 	private Double credit;
 	
 	
-	@NotNull
+
 	@Column(name = "UNIT")
 	private String unit;
 	
@@ -100,14 +100,24 @@ public class LedgerEntry extends BaseEntity implements Serializable{
 	@Column(name = "ENTRY_TYPE")
 	private LedgerEntryType entryType;
 	
+	@Column(name = "PAYMENT_MODE")
+	private String paymentMode; //Cheque, Online, Cash, UPI
 	
-	@NotNull
+//	link to @{PaymentDTO}
+	@Column(name = "PAYMENT_ID") 
+	private Long paymentId;
+	
+	@Column(name = "PAYMENT_REF_NO") 
+	private String paymentRefNo;
+	
 	@Column(name = "DEBIT")
 	private Double debit;
 	
-	
 	@Column(name = "NARRATION")
 	private String narration;
+	
+	@Column(name = "USER_NAME")
+	private String user; //who made this entry into system
 	
 	@Override
 	public int hashCode() {

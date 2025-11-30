@@ -67,8 +67,20 @@ public class LedgerEntryDTO extends BaseDTO implements Serializable{
 	private LedgerEntryType entryType;
 	
 	
+	private String paymentMode;
+	
+
+	private Long paymentId;
+	
+	
+	private String paymentRefNo;
+	
+
 	private Double debit;
 	
-	
+
 	private String narration;
+	
+
+	private String user;
 }

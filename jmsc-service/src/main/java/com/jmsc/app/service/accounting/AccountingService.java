@@ -187,8 +187,11 @@ public class AccountingService extends AbstractService{
 			
 			if(LedgerEntryType.CREDIT.equals(entry.getEntryType())) {
 				if(isNull(entry.getProjectId()) ||  Strings.isNullOrEmpty(entry.getReceipt()) 
-						|| isNull(entry.getItem()) || isNull(entry.getRate()) || isNull(entry.getQuantity()) || entry.getQuantity() == 0.0
-						|| isNull(entry.getCredit()) || entry.getCredit() ==0.0 || isNull(entry.getUnit())) {
+						|| Strings.isNullOrEmpty(entry.getItem()) || isNull(entry.getRate()) 
+						|| isNull(entry.getQuantity()) || entry.getQuantity() == 0.0
+						|| isNull(entry.getCredit()) || entry.getCredit() ==0.0 
+						|| Strings.isNullOrEmpty(entry.getUnit())) {
+					
 					throw new RuntimeException("Invalid Post Request");
 				}
 				Optional<LedgerEntry>	optional  = entryRepository.findByDateAndClientIdAndCreditorIdAndReceipt(entry.getDate(), 
@@ -200,9 +203,27 @@ public class AccountingService extends AbstractService{
 					throw new RuntimeException("Dublicate Entry Found for Receipt: "+ old.getReceipt() + ", Date-" + old.getDate() + ", Item:- " + old.getItem() + ", QTY:- " + old.getQuantity());
 				}
 				
+//				StringBuilder sb = new StringBuilder();
+				
+				entry.setNarration(entry.getItem() + "-" + entry.getQuantity() + entry.getUnit() + "@" + entry.getRate() + "-REC:" + entry.getReceipt() +(Strings.isNotNullOrEmpty(entry.getVehicle()) ? "-TRANS:" + entry.getVehicle()  : ""));
+				//20MM-22MT@545-RCPT:5423-TRANS:8111
 			} else if(LedgerEntryType.DEBIT.equals(entry.getEntryType())) {
-				if(isNull(entry.getDebit()) || isNull(entry.getNarration()))
+				if(isNull(entry.getDebit()) || Strings.isNullOrEmpty(entry.getPaymentMode()) 
+											|| Strings.isNullOrEmpty(entry.getRemark())) {
+					
 					throw new RuntimeException("empty request");
+				}
+				String narration = null;
+				if("CHEQUE".equalsIgnoreCase(entry.getPaymentMode()))
+					narration = "BY CHEQUE" + ((Strings.isNotNullOrEmpty(entry.getPaymentRefNo()) ? "-" + entry.getPaymentRefNo() : ""));
+				else if("ONLINE".equalsIgnoreCase(entry.getPaymentMode()))
+					narration = "ONLINE TRANSFR" + ((Strings.isNotNullOrEmpty(entry.getPaymentRefNo()) ? "-" + entry.getPaymentRefNo() : ""));
+				else if("UPI".equalsIgnoreCase(entry.getPaymentMode()))
+					narration = "UPI PAYMENT" + ((Strings.isNotNullOrEmpty(entry.getPaymentRefNo()) ? "-" + entry.getPaymentRefNo() : ""));
+				else if("CASH".equalsIgnoreCase(entry.getPaymentMode()))
+					narration = "CASH PAYMENT-" + ((Strings.isNotNullOrEmpty(entry.getPaymentRefNo()) ? "-" + entry.getPaymentRefNo() : ""));
+				
+				entry.setNarration(narration);
 			}
 		}
 		

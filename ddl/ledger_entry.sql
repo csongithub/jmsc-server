@@ -20,11 +20,11 @@ DROP TABLE IF EXISTS jmsc.LEDGER_ENTRY CASCADE;
 
 CREATE TABLE jmsc.LEDGER_ENTRY
 (
-    ID 							integer NOT NULL DEFAULT nextval('jmsc.ledger_seq'::regclass),
+    ID 							integer NOT NULL DEFAULT nextval('jmsc.ledger_entry_seq'::regclass),
     CLIENT_ID 					integer NOT NULL,
     CREDITOR_ID					integer NOT NULL,	
     LEDGER_ID					integer NOT NULL,	
-    PROJECT_ID					integer NOT NULL,
+    PROJECT_ID					integer,
     RECEIPT_NO					text,
     DATE						date NOT NULL,
     ITEM						text,
@@ -35,8 +35,12 @@ CREATE TABLE jmsc.LEDGER_ENTRY
     VEHICLE						text,
     REMARK						text,
     ENTRY_TYPE 					text NOT NULL,
+    PAYMENT_MODE				text,
+    PAYMENT_ID					integer,
+    PAYMENT_REF_NO				text,
     DEBIT						numeric,
     NARRATION					text,
+    USER_NAME					text,
    	CREATED_TS 					timestamp with time zone NOT NULL,
 	UPDATED_TS 					timestamp with time zone NOT NULL,
     CONSTRAINT eledger_entry_key PRIMARY KEY (ID)
