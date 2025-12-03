@@ -9,6 +9,6 @@ package com.jmsc.app.common.enums;
  */
 public enum LedgerEntryType {
 
-	CREDIT, DEBIT
+	CREDIT, DEBIT, ALL
 
 }

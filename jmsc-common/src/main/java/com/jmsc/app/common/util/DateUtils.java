@@ -6,6 +6,7 @@ package com.jmsc.app.common.util;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.ZoneId;
 /**
  * @author Chandan
  *
@@ -14,6 +15,9 @@ import java.util.Calendar;
 import java.util.Date;
 
 public class DateUtils {
+	
+	
+	public static String JMSC_DATE_FORMAT = "dd-MM-yyyy";
 	
 	
 	public static boolean isValidFormat(String date, String format) {
@@ -284,4 +288,22 @@ public class DateUtils {
         cal.set(Calendar.MILLISECOND, 0);
         return cal.getTime();
     }
+    
+    public static Date getDate(String date) {
+    	try {
+			return new SimpleDateFormat(JMSC_DATE_FORMAT).parse(date);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+    	return null;
+    }
+    
+    public static Date getNDaysBefore(String date, int beforeDays) {
+    	return Date.from(getDate(date).toInstant().atZone(ZoneId.systemDefault()).toLocalDate().minusDays(beforeDays).atStartOfDay(ZoneId.systemDefault()).toInstant());
+    }
+    
+    public static Date getNDaysBefore(Date date, int beforeDays) {
+    	return Date.from(date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().minusDays(beforeDays).atStartOfDay(ZoneId.systemDefault()).toInstant());
+    }
+    
 }

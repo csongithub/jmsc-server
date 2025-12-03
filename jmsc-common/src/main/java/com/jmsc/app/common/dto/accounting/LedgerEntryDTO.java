@@ -83,4 +83,8 @@ public class LedgerEntryDTO extends BaseDTO implements Serializable{
 	
 
 	private String user;
+	
+	private Double total;
+	
+	private String qtyRate;
 }

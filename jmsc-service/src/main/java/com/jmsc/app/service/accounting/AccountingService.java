@@ -4,6 +4,8 @@
 package com.jmsc.app.service.accounting;
 
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -11,12 +13,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.jmsc.app.common.dto.accounting.CreditorDTO;
+import com.jmsc.app.common.dto.accounting.GetLedgerEntryRequest;
 import com.jmsc.app.common.dto.accounting.Item;
 import com.jmsc.app.common.dto.accounting.LedgerDTO;
 import com.jmsc.app.common.dto.accounting.LedgerEntryDTO;
 import com.jmsc.app.common.dto.accounting.ListDTO;
 import com.jmsc.app.common.enums.LedgerEntryType;
 import com.jmsc.app.common.util.Collections;
+import com.jmsc.app.common.util.DateUtils;
 import com.jmsc.app.common.util.ObjectMapperUtil;
 import com.jmsc.app.common.util.Strings;
 import com.jmsc.app.entity.accounting.Creditor;
@@ -170,11 +174,155 @@ public class AccountingService extends AbstractService{
 	
 	
 	
+	public List<LedgerEntryDTO> getEntries(GetLedgerEntryRequest req){
+		
+		Date fromDate = DateUtils.getDate(req.getFrom());
+		Date toDate = DateUtils.getDate(req.getTo());
+		
+		List<LedgerEntry> entries = null;
+		
+		if(LedgerEntryType.ALL.equals(req.getEntryType())) {
+			entries = entryRepository.findAllByClientIdAndCreditorIdAndLedgerIdAndDateBetween(req.getClientId(), 
+					  req.getCreditorId(), 
+					  req.getLedgerId(),
+					  fromDate, 
+					  toDate);
+		} else {
+			entries = entryRepository.findAllByClientIdAndCreditorIdAndLedgerIdAndEntryTypeAndDateBetween(req.getClientId(), 
+																										  req.getCreditorId(), 
+																										  req.getLedgerId(), 
+																										  req.getEntryType(),
+																										  fromDate, 
+																										  toDate);
+		}
+		
+		if(Collections.isNullOrEmpty(entries))
+			return new ArrayList<LedgerEntryDTO>();
+		
+		List<LedgerEntryDTO> all = ObjectMapperUtil.mapAll(entries, LedgerEntryDTO.class);		
+		
+		
+		//Update narration only in case of ALL Records
+		if(LedgerEntryType.ALL.equals(req.getEntryType())) {
+			updateNarration(all); 
+		}
+		
+		java.util.Collections.sort(all, new Comparator<LedgerEntryDTO>() {
+	        public int compare(LedgerEntryDTO entry1, LedgerEntryDTO entry2) {
+	            return entry1.getDate().compareTo(entry2.getDate());
+	        }
+	    });
+		
+		if(LedgerEntryType.CREDIT.equals(req.getEntryType())) {
+			updateTotalBalanceForCredit(all);
+		} else if(LedgerEntryType.DEBIT.equals(req.getEntryType())) {
+			updateTotalBalanceForDebit(all);
+		}else if(LedgerEntryType.ALL.equals(req.getEntryType())) {
+			updateTotalBalanceForAll(req, all);
+		}
+		
+		return all;
+	}
+	
+	
+	public void updateTotalBalanceForAll(GetLedgerEntryRequest req, List<LedgerEntryDTO> entries) {
+		
+		Optional<Ledger> optional = ledgerRepository.findByClientIdAndCreditorIdAndId(req.getClientId(), req.getCreditorId(), req.getLedgerId());
+		
+		if(!optional.isPresent())
+			throw new RuntimeException("Ledger Not Found");
+		
+		Double openingBalance = 0.0;
+		
+		if(DateUtils.isSameDay(optional.get().getStartDate(), DateUtils.getDate(req.getFrom()))) {
+			openingBalance = optional.get().getOpeningBalance();
+		} else {
+			openingBalance = getOpeningBalance(req, optional.get());
+		}
+		
+
+		//TODO: Set first record as opengin balance
+		
+		for(int index = 0; index<entries.size(); index++) {
+			Double credit = entries.get(index).getCredit() != null ? entries.get(index).getCredit() : 0.0;
+			Double debit = entries.get(index).getDebit() != null ? entries.get(index).getDebit() : 0.0;
+			Double currentOpeningBalance = (index==0) ? openingBalance : entries.get(index-1).getTotal();
+			
+			entries.get(index).setTotal(currentOpeningBalance + credit - debit );
+		}
+	}
+	
+	
+	private Double getOpeningBalance(GetLedgerEntryRequest req, Ledger ledger ) {
+		
+		
+		Double openingBalance = ledger.getOpeningBalance();
+		Date ledgerStartDate =  ledger.getStartDate(); 
+		
+		Date oneDayBeforeFromDate = DateUtils.getNDaysBefore(req.getFrom(), 1);
+		
+		
+		List<LedgerEntry>  entries = entryRepository.findAllByClientIdAndCreditorIdAndLedgerIdAndDateBetween(req.getClientId(), 
+				  																							 req.getCreditorId(), 
+				  																							 req.getLedgerId(),
+				  																							 ledgerStartDate, 
+				  																							 oneDayBeforeFromDate);
+		for(int index = 0; index  <entries.size(); index++) {
+			Double credit = entries.get(index).getCredit() != null ? entries.get(index).getCredit() : 0.0;
+			Double debit = entries.get(index).getDebit() != null ? entries.get(index).getDebit() : 0.0;
+			openingBalance = openingBalance + credit - debit;
+		}
+		
+		return openingBalance;
+	}
+	
+
+	
+	
+	public void updateTotalBalanceForCredit(List<LedgerEntryDTO> entries) {
+		for(int index = 0; index<entries.size(); index++) {
+			if(index==0) {
+				entries.get(0).setTotal(entries.get(0).getCredit());
+				continue;
+			}
+			
+			entries.get(index).setTotal(entries.get(index).getCredit() + entries.get(index-1).getTotal());
+		}
+	}
+	
+	
+	public void updateTotalBalanceForDebit(List<LedgerEntryDTO> entries) {
+		for(int index = 0; index<entries.size(); index++) {
+			if(index==0) {
+				entries.get(0).setTotal(entries.get(0).getDebit());
+				continue;
+			}
+			
+			entries.get(index).setTotal(entries.get(index).getDebit() + entries.get(index-1).getDebit());
+		}
+	}
+	
+	
+	public void updateNarration(List<LedgerEntryDTO> all) {
+		
+		all.forEach(entry ->{
+			if(LedgerEntryType.CREDIT.equals(entry.getEntryType())) {
+				
+				entry.setNarration("[" + entry.getReceipt() + "]-[" + entry.getVehicle() + "]");
+				
+			} else if(LedgerEntryType.DEBIT.equals(entry.getEntryType())) { 
+				String narration = entry.getPaymentMode() + ((Strings.isNotNullOrEmpty(entry.getPaymentRefNo()) ? "-" + entry.getPaymentRefNo() : ""));
+				entry.setItem(narration + "-["+entry.getRemark()+"]");
+			}
+		});
+	}
+	
+	
+	
 	public Boolean postCreditEntries(List<LedgerEntryDTO> entries) {
 		
 		if(Collections.isNullOrEmpty(entries))
 			throw new RuntimeException("empty request");
-		
 		
 		
 		for(LedgerEntryDTO entry: entries) {
@@ -202,28 +350,13 @@ public class AccountingService extends AbstractService{
 					LedgerEntry old = optional.get();
 					throw new RuntimeException("Dublicate Entry Found for Receipt: "+ old.getReceipt() + ", Date-" + old.getDate() + ", Item:- " + old.getItem() + ", QTY:- " + old.getQuantity());
 				}
-				
-//				StringBuilder sb = new StringBuilder();
-				
-				entry.setNarration(entry.getItem() + "-" + entry.getQuantity() + entry.getUnit() + "@" + entry.getRate() + "-REC:" + entry.getReceipt() +(Strings.isNotNullOrEmpty(entry.getVehicle()) ? "-TRANS:" + entry.getVehicle()  : ""));
-				//20MM-22MT@545-RCPT:5423-TRANS:8111
+
 			} else if(LedgerEntryType.DEBIT.equals(entry.getEntryType())) {
 				if(isNull(entry.getDebit()) || Strings.isNullOrEmpty(entry.getPaymentMode()) 
 											|| Strings.isNullOrEmpty(entry.getRemark())) {
 					
 					throw new RuntimeException("empty request");
 				}
-				String narration = null;
-				if("CHEQUE".equalsIgnoreCase(entry.getPaymentMode()))
-					narration = "BY CHEQUE" + ((Strings.isNotNullOrEmpty(entry.getPaymentRefNo()) ? "-" + entry.getPaymentRefNo() : ""));
-				else if("ONLINE".equalsIgnoreCase(entry.getPaymentMode()))
-					narration = "ONLINE TRANSFR" + ((Strings.isNotNullOrEmpty(entry.getPaymentRefNo()) ? "-" + entry.getPaymentRefNo() : ""));
-				else if("UPI".equalsIgnoreCase(entry.getPaymentMode()))
-					narration = "UPI PAYMENT" + ((Strings.isNotNullOrEmpty(entry.getPaymentRefNo()) ? "-" + entry.getPaymentRefNo() : ""));
-				else if("CASH".equalsIgnoreCase(entry.getPaymentMode()))
-					narration = "CASH PAYMENT-" + ((Strings.isNotNullOrEmpty(entry.getPaymentRefNo()) ? "-" + entry.getPaymentRefNo() : ""));
-				
-				entry.setNarration(narration);
 			}
 		}
 		

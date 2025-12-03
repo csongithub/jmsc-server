@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jmsc.app.common.dto.accounting.CreditorDTO;
+import com.jmsc.app.common.dto.accounting.GetLedgerEntryRequest;
 import com.jmsc.app.common.dto.accounting.LedgerDTO;
 import com.jmsc.app.common.dto.accounting.LedgerEntryDTO;
 import com.jmsc.app.common.dto.accounting.ListDTO;
@@ -99,5 +100,12 @@ public class AccountingEndPoint {
 	ResponseEntity<LedgerEntryDTO> validateByChallan(@RequestBody LedgerEntryDTO req){
 		LedgerEntryDTO entry = accountingService.validateByChallan(req);
 		return ResponseEntity.ok(entry);
+	}
+	
+	
+	@PostMapping("/ledger/entries")
+	public ResponseEntity<List<LedgerEntryDTO>> getEntries(@RequestBody GetLedgerEntryRequest request) {
+		List<LedgerEntryDTO> list = accountingService.getEntries(request);
+		return ResponseEntity.ok(list);
 	}
 }
