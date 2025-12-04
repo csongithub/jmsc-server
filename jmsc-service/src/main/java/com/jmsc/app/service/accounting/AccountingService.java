@@ -12,6 +12,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.jmsc.app.common.dto.PaymentSummaryDTO;
 import com.jmsc.app.common.dto.accounting.CreditorDTO;
 import com.jmsc.app.common.dto.accounting.GetLedgerEntryRequest;
 import com.jmsc.app.common.dto.accounting.Item;
@@ -23,13 +24,17 @@ import com.jmsc.app.common.util.Collections;
 import com.jmsc.app.common.util.DateUtils;
 import com.jmsc.app.common.util.ObjectMapperUtil;
 import com.jmsc.app.common.util.Strings;
+import com.jmsc.app.config.jmsc.ServiceLocator;
 import com.jmsc.app.entity.accounting.Creditor;
+import com.jmsc.app.entity.accounting.CreditorPaymentLinkage;
 import com.jmsc.app.entity.accounting.Ledger;
 import com.jmsc.app.entity.accounting.LedgerEntry;
+import com.jmsc.app.repository.CreditorPaymentLinkageRepository;
 import com.jmsc.app.repository.LedgerEntryRepository;
 import com.jmsc.app.repository.LedgerRepository;
 import com.jmsc.app.repository.accounting.CreditorRepository;
 import com.jmsc.app.service.AbstractService;
+import com.jmsc.app.service.PaymentService2;
 
 /**
  * @author anuhr
@@ -47,6 +52,12 @@ public class AccountingService extends AbstractService{
 	
 	@Autowired
 	private LedgerEntryRepository entryRepository;
+	
+	@Autowired
+	private CreditorPaymentLinkageRepository paymentLinkageRepository;
+	
+	
+	
 	
 	
 	
@@ -397,6 +408,67 @@ public class AccountingService extends AbstractService{
 		}
 		
 		return entry;
+	}
+	
+	
+	public List<LedgerEntryDTO> getCreditorPayments(Long clientId, Long creditorId) {
+		
+		List<LedgerEntryDTO> entries  = new ArrayList<LedgerEntryDTO>();
+		
+		Optional<Creditor> optional =  creditorRepository.findByClientIdAndId(clientId, creditorId);
+		if(!optional.isPresent())
+			throw new RuntimeException("Invalid Request, Creditor Not Found");
+		
+		Long partyId = optional.get().getPartyId();
+		List<CreditorPaymentLinkage> paymentsLinkage = 
+				paymentLinkageRepository.findByClientIdAndPartyIdAndCreditorIdAndStatus(clientId, 
+																						partyId,
+																						creditorId, 
+																						"CREATED");
+		if(Collections.isNullOrEmpty(paymentsLinkage))
+			return entries; // return no payments
+		
+		PaymentService2 paymentService = ServiceLocator.getService(PaymentService2.class);
+		
+		paymentsLinkage.forEach(linkage ->{
+			PaymentSummaryDTO payment =  paymentService.getPaymentSummary(clientId, linkage.getPaymentId());
+			LedgerEntryDTO debitEntry = new LedgerEntryDTO();
+			debitEntry.setClientId(clientId);
+			debitEntry.setCreditorId(creditorId);
+			debitEntry.setLedgerId(null); // To be set on UI
+			debitEntry.setEntryType(LedgerEntryType.DEBIT);
+			debitEntry.setDate(payment.getPaymentDate());
+			debitEntry.setPaymentMode(payment.getMode());
+			debitEntry.setPaymentRefNo(payment.getTransactionRef());
+			debitEntry.setPaymentId(payment.getPaymentId());
+			debitEntry.setDebit(Double.valueOf(payment.getAmount()));
+			debitEntry.setRemark(payment.getRemark());
+			
+			debitEntry.setTempId(clientId + "#" + linkage.getId());
+			debitEntry.setStatus("CREATED");
+			
+			entries.add(debitEntry);
+		});
+		
+		return entries;
+	}
+	
+	
+	public Boolean updatePaymentEntries(LedgerEntryDTO entry) {
+		
+		LedgerEntry entity = ObjectMapperUtil.map(entry, LedgerEntry.class);
+		if("ACCEPTED".equals(entry.getStatus()))
+			entryRepository.save(entity);
+		String[] literals = entry.getTempId().split("#");
+		
+		Long clientId = Long.parseLong(literals[0]);
+		Long linkageId = Long.parseLong(literals[1]);
+		
+		CreditorPaymentLinkage linkage = paymentLinkageRepository.findByClientIdAndId(clientId, linkageId);
+		linkage.setStatus(entry.getStatus());
+		paymentLinkageRepository.save(linkage);
+		
+		return Boolean.TRUE;
 	}
 			
 }

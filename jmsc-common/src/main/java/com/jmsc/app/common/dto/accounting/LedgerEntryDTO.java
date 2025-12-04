@@ -87,4 +87,13 @@ public class LedgerEntryDTO extends BaseDTO implements Serializable{
 	private Double total;
 	
 	private String qtyRate;
+	
+	/**
+	 * This will not be stamp into the database.
+	 * This is used when there are payments detected for a creditor.
+	 * the value of this could be clientid#partyid#creditorid for example 1#12#10
+	 */
+	private String tempId;
+	
+	private String status; //CREATED, ACCEPTED, REJECTED
 }

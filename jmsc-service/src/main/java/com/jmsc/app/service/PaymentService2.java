@@ -27,10 +27,15 @@ import com.jmsc.app.common.rqrs.Range;
 import com.jmsc.app.common.util.Collections;
 import com.jmsc.app.common.util.ObjectMapperUtil;
 import com.jmsc.app.common.util.Strings;
+import com.jmsc.app.config.jmsc.ServiceLocator;
 import com.jmsc.app.entity.PartyBankAccount;
 import com.jmsc.app.entity.Payment;
+import com.jmsc.app.entity.accounting.Creditor;
+import com.jmsc.app.entity.accounting.CreditorPaymentLinkage;
+import com.jmsc.app.repository.CreditorPaymentLinkageRepository;
 import com.jmsc.app.repository.PartyBankAccountRepository;
 import com.jmsc.app.repository.PaymentRepository;
+import com.jmsc.app.repository.accounting.CreditorRepository;
 
 /**
  * @author Chandan
@@ -98,6 +103,16 @@ public class PaymentService2 {
 	}
 	
 	
+	public PaymentSummaryDTO getPaymentSummary(Long clientId, Long paymentId) {
+		Optional<Payment> optional  = paymentRepository.findAllByClientIdAndId(clientId, paymentId);
+		
+		if(!optional.isPresent())
+			return null;
+		PaymentSummaryDTO paymentSummary = ObjectMapperUtil.object(optional.get().getPaymentSummary(), PaymentSummaryDTO.class);
+		paymentSummary.setPaymentDate(optional.get().getPaymentDate());
+		return paymentSummary;
+	}
+	
 	
 	public Integer approvePayments(ApprovePaymentRequest req) {
 		
@@ -115,9 +130,33 @@ public class PaymentService2 {
 				
 				if(paymentSummary.getToAccountId() != null)
 					partyAccountService.linkPartyAccount(req.getClientId(), paymentSummary.getPartyId(), paymentSummary.getToAccountId());
+				
+				
+				//TODO: Post approval, check if the party for which this payment is made for exists as a creditor.
+				//If YES, then stamp this payment in creditor payment linkage table
+				this.linkCreditorPayment(req.getClientId(), paymentSummary.getPartyId(), payment.getId());
 			}
 		}
 		return 0;
+	}
+	
+	
+	private void linkCreditorPayment(Long clientId, Long partyId, Long paymentId) {
+		CreditorRepository repository = ServiceLocator.getService(CreditorRepository.class);
+		Optional<Creditor> optional  = repository.findByClientIdAndPartyId(clientId, partyId);
+		
+		if(!optional.isPresent())
+			return;
+		
+		CreditorPaymentLinkage paymentLinkage = new CreditorPaymentLinkage();
+		paymentLinkage.setClientId(clientId);
+		paymentLinkage.setPartyId(partyId);
+		paymentLinkage.setPaymentId(paymentId);
+		paymentLinkage.setCreditorId(optional.get().getId());
+		paymentLinkage.setStatus("CREATED");
+		
+		ServiceLocator.getService(CreditorPaymentLinkageRepository.class).save(paymentLinkage);
+		
 	}
 	
 	

@@ -108,4 +108,19 @@ public class AccountingEndPoint {
 		List<LedgerEntryDTO> list = accountingService.getEntries(request);
 		return ResponseEntity.ok(list);
 	}
+	
+	
+	@GetMapping("/creditor/payments/{clientId}/{creditorId}")
+	public ResponseEntity<List<LedgerEntryDTO>> getCreditorPayments(@PathVariable("clientId")Long clientId, @PathVariable("creditorId")Long creditorId) {
+		List<LedgerEntryDTO> entries = accountingService.getCreditorPayments(clientId, creditorId);
+		return ResponseEntity.ok(entries);
+	}
+	
+	
+	
+	@PostMapping("/creditor/payments/update")
+	public ResponseEntity<Boolean> updatePaymentEntries(@RequestBody LedgerEntryDTO entry) {
+		Boolean status = accountingService.updatePaymentEntries(entry);
+		return ResponseEntity.ok(status);
+	}
 }

@@ -20,4 +20,6 @@ public interface CreditorRepository extends JpaRepository<Creditor, Long> {
 	
 	
 	public List<Creditor> findByClientId(Long clientId);
+	
+	public Optional<Creditor> findByClientIdAndPartyId(Long clientId, Long partyId);
 }
