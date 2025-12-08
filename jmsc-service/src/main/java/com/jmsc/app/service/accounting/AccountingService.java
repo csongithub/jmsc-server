@@ -236,6 +236,19 @@ public class AccountingService extends AbstractService{
 	}
 	
 	
+	
+	public Boolean deleteEntry(Long clientId, Long creditorId, Long ledgerId, Long id) {
+		Optional<LedgerEntry> optional =  entryRepository.findByClientIdAndCreditorIdAndLedgerIdAndId(clientId, creditorId, ledgerId, id);
+		
+		if(!optional.isPresent())
+			throw new RuntimeException("Entry Not Found");
+		
+		entryRepository.delete(optional.get());
+		
+		return Boolean.TRUE;
+	}
+	
+	
 	public void updateTotalBalanceForAll(GetLedgerEntryRequest req, List<LedgerEntryDTO> entries) {
 		
 		Optional<Ledger> optional = ledgerRepository.findByClientIdAndCreditorIdAndId(req.getClientId(), req.getCreditorId(), req.getLedgerId());
@@ -353,13 +366,16 @@ public class AccountingService extends AbstractService{
 					
 					throw new RuntimeException("Invalid Post Request");
 				}
-				Optional<LedgerEntry>	optional  = entryRepository.findByDateAndClientIdAndCreditorIdAndReceipt(entry.getDate(), 
+				
+				
+				Optional<LedgerEntry>	optional  =  entryRepository.findByDateAndClientIdAndCreditorIdAndReceipt(entry.getDate(), 
 																												 entry.getClientId(),
 																												 entry.getCreditorId(),
 																												 entry.getReceipt());
 				if(optional.isPresent()) {
 					LedgerEntry old = optional.get();
-					throw new RuntimeException("Dublicate Entry Found for Receipt: "+ old.getReceipt() + ", Date-" + old.getDate() + ", Item:- " + old.getItem() + ", QTY:- " + old.getQuantity());
+					if(!entry.getId().equals(old.getId()))
+						throw new RuntimeException("Dublicate Entry Found for Receipt: "+ old.getReceipt() + ", Date-" + old.getDate() + ", Item:- " + old.getItem() + ", QTY:- " + old.getQuantity());
 				}
 
 			} else if(LedgerEntryType.DEBIT.equals(entry.getEntryType())) {

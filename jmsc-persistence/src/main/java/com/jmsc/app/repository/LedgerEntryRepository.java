@@ -38,4 +38,10 @@ public interface LedgerEntryRepository extends JpaRepository<LedgerEntry, Long> 
 			   Long ledgerId,
 			   Date paymentDateStart, 
 			   Date paymentDateEnd);
+	
+	
+	Optional<LedgerEntry> findByClientIdAndCreditorIdAndLedgerIdAndId(Long clientId,
+			   														  Long creditorId, 
+			   														  Long ledgerId,
+			   														  Long id);
 }

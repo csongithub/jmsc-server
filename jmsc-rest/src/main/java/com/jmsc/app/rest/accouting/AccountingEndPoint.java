@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -107,6 +108,16 @@ public class AccountingEndPoint {
 	public ResponseEntity<List<LedgerEntryDTO>> getEntries(@RequestBody GetLedgerEntryRequest request) {
 		List<LedgerEntryDTO> list = accountingService.getEntries(request);
 		return ResponseEntity.ok(list);
+	}
+	
+	
+	@DeleteMapping("/ledger/entries/delete/{clientId}/{creditorId}/{ledgerId}/{entryId}")
+	public ResponseEntity<Boolean> deleteEntry(@PathVariable Long clientId,  
+															@PathVariable Long creditorId,
+															@PathVariable Long ledgerId,
+															@PathVariable Long entryId) {
+		Boolean status = accountingService.deleteEntry(clientId, creditorId, ledgerId, entryId);
+		return ResponseEntity.ok(status);
 	}
 	
 	
