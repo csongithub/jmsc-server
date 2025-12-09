@@ -3,6 +3,7 @@
  */
 package com.jmsc.app.service.accounting;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
@@ -186,9 +187,29 @@ public class AccountingService extends AbstractService{
 	
 	
 	public List<LedgerEntryDTO> getEntries(GetLedgerEntryRequest req){
+		/**
+		 * Check if dates are not provided with with the request.
+		 * And if not the evaluate for the current month from 1st to today's date.
+		 */
+		if(req.getFrom() == null || req.getTo() == null) {
+			 LocalDate today = LocalDate.now();
+			 int firstDate = 1;
+			 int date = today.getDayOfMonth();
+			 int month = today.getMonthValue();
+			 int year  = today.getYear();
+			 
+			 
+			 String from = String.valueOf(firstDate) + "-"+String.valueOf(month)+"-"+String.valueOf(year);
+			 String to = String.valueOf(date) + "-"+String.valueOf(month)+"-"+String.valueOf(year);
+			 
+			 req.setFrom(from);
+			 req.setTo(to);
+		}
+		
 		
 		Date fromDate = DateUtils.getDate(req.getFrom());
 		Date toDate = DateUtils.getDate(req.getTo());
+		
 		
 		List<LedgerEntry> entries = null;
 		
