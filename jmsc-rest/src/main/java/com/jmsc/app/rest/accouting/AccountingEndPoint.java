@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.jmsc.app.common.dto.accounting.CapitalAccountDTO;
 import com.jmsc.app.common.dto.accounting.CreditorDTO;
 import com.jmsc.app.common.dto.accounting.GetLedgerEntryRequest;
 import com.jmsc.app.common.dto.accounting.LedgerDTO;
@@ -133,5 +134,19 @@ public class AccountingEndPoint {
 	public ResponseEntity<Boolean> updatePaymentEntries(@RequestBody LedgerEntryDTO entry) {
 		Boolean status = accountingService.updatePaymentEntries(entry);
 		return ResponseEntity.ok(status);
+	}
+	
+	
+	@PostMapping("/capital_account/create")
+	public ResponseEntity<CapitalAccountDTO> createCapitalAccount(@RequestBody CapitalAccountDTO account) {
+		CapitalAccountDTO response = accountingService.createOrUpdate(account);
+		return ResponseEntity.ok(response);
+	}
+	
+	
+	@GetMapping("/capital_account/{clientId}")
+	public ResponseEntity<List<CapitalAccountDTO>> getAllCapitalAccounts(@PathVariable("clientId") Long clientId){
+		List<CapitalAccountDTO> accounts = accountingService.getAllCapitalAccounts(clientId);
+		return ResponseEntity.ok(accounts);
 	}
 }

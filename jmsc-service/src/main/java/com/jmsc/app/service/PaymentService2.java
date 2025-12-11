@@ -32,9 +32,9 @@ import com.jmsc.app.entity.PartyBankAccount;
 import com.jmsc.app.entity.Payment;
 import com.jmsc.app.entity.accounting.Creditor;
 import com.jmsc.app.entity.accounting.CreditorPaymentLinkage;
-import com.jmsc.app.repository.CreditorPaymentLinkageRepository;
 import com.jmsc.app.repository.PartyBankAccountRepository;
 import com.jmsc.app.repository.PaymentRepository;
+import com.jmsc.app.repository.accounting.CreditorPaymentLinkageRepository;
 import com.jmsc.app.repository.accounting.CreditorRepository;
 
 /**

@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.jmsc.app.common.dto.PaymentSummaryDTO;
+import com.jmsc.app.common.dto.accounting.CapitalAccountDTO;
 import com.jmsc.app.common.dto.accounting.CreditorDTO;
 import com.jmsc.app.common.dto.accounting.GetLedgerEntryRequest;
 import com.jmsc.app.common.dto.accounting.Item;
@@ -26,14 +27,16 @@ import com.jmsc.app.common.util.DateUtils;
 import com.jmsc.app.common.util.ObjectMapperUtil;
 import com.jmsc.app.common.util.Strings;
 import com.jmsc.app.config.jmsc.ServiceLocator;
+import com.jmsc.app.entity.accounting.CapitalAccount;
 import com.jmsc.app.entity.accounting.Creditor;
 import com.jmsc.app.entity.accounting.CreditorPaymentLinkage;
 import com.jmsc.app.entity.accounting.Ledger;
 import com.jmsc.app.entity.accounting.LedgerEntry;
-import com.jmsc.app.repository.CreditorPaymentLinkageRepository;
-import com.jmsc.app.repository.LedgerEntryRepository;
-import com.jmsc.app.repository.LedgerRepository;
+import com.jmsc.app.repository.accounting.CapitalAccountRepository;
+import com.jmsc.app.repository.accounting.CreditorPaymentLinkageRepository;
 import com.jmsc.app.repository.accounting.CreditorRepository;
+import com.jmsc.app.repository.accounting.LedgerEntryRepository;
+import com.jmsc.app.repository.accounting.LedgerRepository;
 import com.jmsc.app.service.AbstractService;
 import com.jmsc.app.service.PaymentService2;
 
@@ -56,6 +59,9 @@ public class AccountingService extends AbstractService{
 	
 	@Autowired
 	private CreditorPaymentLinkageRepository paymentLinkageRepository;
+	
+	@Autowired
+	private CapitalAccountRepository capitalAccountRepository;
 	
 	
 	
@@ -439,7 +445,6 @@ public class AccountingService extends AbstractService{
 			else
 				entry = ObjectMapperUtil.map(entries.get(0), LedgerEntryDTO.class);
 			
-			
 		} else {
 			entry = ObjectMapperUtil.map(optional.get(), LedgerEntryDTO.class);
 		}
@@ -507,5 +512,59 @@ public class AccountingService extends AbstractService{
 		
 		return Boolean.TRUE;
 	}
+	
+	
+	public CapitalAccountDTO createOrUpdate(CapitalAccountDTO dto) {
+		
+		if(isNull(dto.getClientId()) || Strings.isNullOrEmpty(dto.getAccountName()) 
+				|| Strings.isNullOrEmpty(dto.getAccountType())) {
+			throw new RuntimeException("Invalid Request");
 			
+		}
+		
+		if(isNull(dto.getLastUpdated()))
+			dto.setLastUpdated(new Date());
+		
+		if("CASH".equalsIgnoreCase(dto.getAccountType()) && isNull(dto.getBalance()))
+			throw new RuntimeException("Balance can not be null");
+		
+		else if("BANK ACCOUNT".equalsIgnoreCase(dto.getAccountType()))
+			dto.setBalance(-1d);
+			
+		
+		CapitalAccount entity = ObjectMapperUtil.map(dto, CapitalAccount.class);
+		entity = capitalAccountRepository.save(entity);
+		
+		CapitalAccountDTO savedAccount = ObjectMapperUtil.map(entity, CapitalAccountDTO.class);
+		return savedAccount;
+	}
+	
+	
+	public List<CapitalAccountDTO> getAllCapitalAccounts(Long clientId){
+		if(isNull(clientId))
+			throw new RuntimeException("Invalid Request, Client Id is NULL");
+		
+		List<CapitalAccount> dbResult =  capitalAccountRepository.findAllByClientId(clientId);
+		
+		if(Collections.isNullOrEmpty(dbResult)) 
+			new ArrayList<CapitalAccountDTO>();
+		
+		List<CapitalAccountDTO> accounts = ObjectMapperUtil.mapAll(dbResult, CapitalAccountDTO.class);
+		
+		return accounts;
+	}
+	
+	
+	private Boolean updateLastUpdated(Long clientId, Long accountId, Date date) {
+		if(isNull(clientId) || isNull(accountId))
+			throw new RuntimeException("Invalid Request");
+		
+		Optional<CapitalAccount> optional = capitalAccountRepository.findByClientIdAndId(clientId, accountId);
+		if(!optional.isPresent())
+			throw new RuntimeException("Capital Account not found");
+		
+		optional.get().setLastUpdated(date);
+		capitalAccountRepository.save(optional.get());
+		return Boolean.TRUE;
+	}	
 }

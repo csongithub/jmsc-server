@@ -14,7 +14,7 @@ import com.jmsc.app.common.dto.accounting.ListDTO;
 import com.jmsc.app.common.util.Collections;
 import com.jmsc.app.common.util.ObjectMapperUtil;
 import com.jmsc.app.entity.Project;
-import com.jmsc.app.repository.ProjectRepository;
+import com.jmsc.app.repository.accounting.ProjectRepository;
 
 /**
  * @author anuhr

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.jmsc.app.repository;
+package com.jmsc.app.repository.accounting;
 
 import java.util.List;
 import java.util.Optional;
