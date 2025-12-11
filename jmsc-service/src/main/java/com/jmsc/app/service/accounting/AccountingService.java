@@ -15,23 +15,26 @@ import org.springframework.stereotype.Service;
 
 import com.jmsc.app.common.dto.PaymentSummaryDTO;
 import com.jmsc.app.common.dto.accounting.CapitalAccountDTO;
+import com.jmsc.app.common.dto.accounting.CapitalAccountEntryDTO;
 import com.jmsc.app.common.dto.accounting.CreditorDTO;
 import com.jmsc.app.common.dto.accounting.GetLedgerEntryRequest;
 import com.jmsc.app.common.dto.accounting.Item;
 import com.jmsc.app.common.dto.accounting.LedgerDTO;
 import com.jmsc.app.common.dto.accounting.LedgerEntryDTO;
 import com.jmsc.app.common.dto.accounting.ListDTO;
-import com.jmsc.app.common.enums.LedgerEntryType;
+import com.jmsc.app.common.enums.EEntryType;
 import com.jmsc.app.common.util.Collections;
 import com.jmsc.app.common.util.DateUtils;
 import com.jmsc.app.common.util.ObjectMapperUtil;
 import com.jmsc.app.common.util.Strings;
 import com.jmsc.app.config.jmsc.ServiceLocator;
 import com.jmsc.app.entity.accounting.CapitalAccount;
+import com.jmsc.app.entity.accounting.CapitalAccountEntry;
 import com.jmsc.app.entity.accounting.Creditor;
 import com.jmsc.app.entity.accounting.CreditorPaymentLinkage;
 import com.jmsc.app.entity.accounting.Ledger;
 import com.jmsc.app.entity.accounting.LedgerEntry;
+import com.jmsc.app.repository.accounting.CapitalAccountEntryRepository;
 import com.jmsc.app.repository.accounting.CapitalAccountRepository;
 import com.jmsc.app.repository.accounting.CreditorPaymentLinkageRepository;
 import com.jmsc.app.repository.accounting.CreditorRepository;
@@ -63,8 +66,8 @@ public class AccountingService extends AbstractService{
 	@Autowired
 	private CapitalAccountRepository capitalAccountRepository;
 	
-	
-	
+	@Autowired
+	private CapitalAccountEntryRepository capitalAccountEntryRepository;
 	
 	
 	
@@ -219,7 +222,7 @@ public class AccountingService extends AbstractService{
 		
 		List<LedgerEntry> entries = null;
 		
-		if(LedgerEntryType.ALL.equals(req.getEntryType())) {
+		if(EEntryType.ALL.equals(req.getEntryType())) {
 			entries = entryRepository.findAllByClientIdAndCreditorIdAndLedgerIdAndDateBetween(req.getClientId(), 
 					  req.getCreditorId(), 
 					  req.getLedgerId(),
@@ -241,7 +244,7 @@ public class AccountingService extends AbstractService{
 		
 		
 		//Update narration only in case of ALL Records
-		if(LedgerEntryType.ALL.equals(req.getEntryType())) {
+		if(EEntryType.ALL.equals(req.getEntryType())) {
 			updateNarration(all); 
 		}
 		
@@ -251,11 +254,11 @@ public class AccountingService extends AbstractService{
 	        }
 	    });
 		
-		if(LedgerEntryType.CREDIT.equals(req.getEntryType())) {
+		if(EEntryType.CREDIT.equals(req.getEntryType())) {
 			updateTotalBalanceForCredit(all);
-		} else if(LedgerEntryType.DEBIT.equals(req.getEntryType())) {
+		} else if(EEntryType.DEBIT.equals(req.getEntryType())) {
 			updateTotalBalanceForDebit(all);
-		}else if(LedgerEntryType.ALL.equals(req.getEntryType())) {
+		}else if(EEntryType.ALL.equals(req.getEntryType())) {
 			updateTotalBalanceForAll(req, all);
 		}
 		
@@ -357,11 +360,11 @@ public class AccountingService extends AbstractService{
 	public void updateNarration(List<LedgerEntryDTO> all) {
 		
 		all.forEach(entry ->{
-			if(LedgerEntryType.CREDIT.equals(entry.getEntryType())) {
+			if(EEntryType.CREDIT.equals(entry.getEntryType())) {
 				
 				entry.setNarration("[" + entry.getReceipt() + "]-[" + entry.getVehicle() + "]");
 				
-			} else if(LedgerEntryType.DEBIT.equals(entry.getEntryType())) { 
+			} else if(EEntryType.DEBIT.equals(entry.getEntryType())) { 
 				String narration = entry.getPaymentMode() + ((Strings.isNotNullOrEmpty(entry.getPaymentRefNo()) ? "-" + entry.getPaymentRefNo() : ""));
 				entry.setItem(narration + "-["+entry.getRemark()+"]");
 			}
@@ -384,7 +387,7 @@ public class AccountingService extends AbstractService{
 			}
 			
 			
-			if(LedgerEntryType.CREDIT.equals(entry.getEntryType())) {
+			if(EEntryType.CREDIT.equals(entry.getEntryType())) {
 				if(isNull(entry.getProjectId()) ||  Strings.isNullOrEmpty(entry.getReceipt()) 
 						|| Strings.isNullOrEmpty(entry.getItem()) || isNull(entry.getRate()) 
 						|| isNull(entry.getQuantity()) || entry.getQuantity() == 0.0
@@ -405,7 +408,7 @@ public class AccountingService extends AbstractService{
 						throw new RuntimeException("Dublicate Entry Found for Receipt: "+ old.getReceipt() + ", Date-" + old.getDate() + ", Item:- " + old.getItem() + ", QTY:- " + old.getQuantity());
 				}
 
-			} else if(LedgerEntryType.DEBIT.equals(entry.getEntryType())) {
+			} else if(EEntryType.DEBIT.equals(entry.getEntryType())) {
 				if(isNull(entry.getDebit()) || Strings.isNullOrEmpty(entry.getPaymentMode()) 
 											|| Strings.isNullOrEmpty(entry.getRemark())) {
 					
@@ -478,7 +481,7 @@ public class AccountingService extends AbstractService{
 			debitEntry.setClientId(clientId);
 			debitEntry.setCreditorId(creditorId);
 			debitEntry.setLedgerId(null); // To be set on UI
-			debitEntry.setEntryType(LedgerEntryType.DEBIT);
+			debitEntry.setEntryType(EEntryType.DEBIT);
 			debitEntry.setDate(payment.getPaymentDate());
 			debitEntry.setPaymentMode(payment.getMode());
 			debitEntry.setPaymentRefNo(payment.getTransactionRef());
@@ -514,29 +517,59 @@ public class AccountingService extends AbstractService{
 	}
 	
 	
-	public CapitalAccountDTO createOrUpdate(CapitalAccountDTO dto) {
+	public CapitalAccountDTO createOrUpdate(CapitalAccountDTO account) {
 		
-		if(isNull(dto.getClientId()) || Strings.isNullOrEmpty(dto.getAccountName()) 
-				|| Strings.isNullOrEmpty(dto.getAccountType())) {
+		if(isNull(account.getClientId()) || Strings.isNullOrEmpty(account.getAccountName()) 
+				|| Strings.isNullOrEmpty(account.getAccountType())) {
 			throw new RuntimeException("Invalid Request");
 			
 		}
 		
-		if(isNull(dto.getLastUpdated()))
-			dto.setLastUpdated(new Date());
+		if(isNull(account.getLastUpdated()))
+			account.setLastUpdated(new Date());
 		
-		if("CASH".equalsIgnoreCase(dto.getAccountType()) && isNull(dto.getBalance()))
+		if("CASH".equalsIgnoreCase(account.getAccountType()) && isNull(account.getBalance()))
 			throw new RuntimeException("Balance can not be null");
 		
-		else if("BANK ACCOUNT".equalsIgnoreCase(dto.getAccountType()))
-			dto.setBalance(-1d);
+		else if("BANK ACCOUNT".equalsIgnoreCase(account.getAccountType()))
+			account.setBalance(-1d);
 			
 		
-		CapitalAccount entity = ObjectMapperUtil.map(dto, CapitalAccount.class);
+		CapitalAccount entity = ObjectMapperUtil.map(account, CapitalAccount.class);
 		entity = capitalAccountRepository.save(entity);
 		
 		CapitalAccountDTO savedAccount = ObjectMapperUtil.map(entity, CapitalAccountDTO.class);
+		
+		if(isNull(account.getId()) && "CASH".equalsIgnoreCase(account.getAccountType()))
+			this.updateEntry(savedAccount);
+		
 		return savedAccount;
+	}
+	
+	/**
+	 * Call this method to make the first entry in the 
+	 * CapitalAccountEntry as soon as the new CapitalAccount is created
+	 *
+	 * @param dto
+	 */
+	private void updateEntry(CapitalAccountDTO account) {
+		CapitalAccountEntry entry = new CapitalAccountEntry();
+		entry.setClientId(account.getClientId());
+		entry.setAccountId(account.getId());
+		entry.setDate(account.getLastUpdated());
+		entry.setNote("New Account Opening Balance");
+		entry.setDebit(0d);
+		entry.setCredit(account.getBalance());
+		entry.setBalance(account.getBalance());
+		entry.setEntryType(EEntryType.CREDIT);
+		entry.setTransactionRefNo(null);
+		
+		capitalAccountEntryRepository.save(entry);
+	}
+	
+	
+	private void updateEntry(CapitalAccountEntry entry) {
+		capitalAccountEntryRepository.save(entry);
 	}
 	
 	
@@ -566,5 +599,5 @@ public class AccountingService extends AbstractService{
 		optional.get().setLastUpdated(date);
 		capitalAccountRepository.save(optional.get());
 		return Boolean.TRUE;
-	}	
+	}
 }

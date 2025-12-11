@@ -9,7 +9,7 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.jmsc.app.common.enums.LedgerEntryType;
+import com.jmsc.app.common.enums.EEntryType;
 import com.jmsc.app.entity.accounting.LedgerEntry;
 
 /**
@@ -29,7 +29,7 @@ public interface LedgerEntryRepository extends JpaRepository<LedgerEntry, Long> 
 	List<LedgerEntry> findAllByClientIdAndCreditorIdAndLedgerIdAndEntryTypeAndDateBetween(Long clientId, 
 																	   Long creditorId, 
 																	   Long ledgerId,
-																	   LedgerEntryType entryType,
+																	   EEntryType entryType,
 																	   Date paymentDateStart, 
 																	   Date paymentDateEnd);
 	

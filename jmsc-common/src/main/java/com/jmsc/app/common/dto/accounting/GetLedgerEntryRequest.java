@@ -5,7 +5,7 @@ package com.jmsc.app.common.dto.accounting;
 
 import java.io.Serializable;
 
-import com.jmsc.app.common.enums.LedgerEntryType;
+import com.jmsc.app.common.enums.EEntryType;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -29,7 +29,7 @@ public class GetLedgerEntryRequest implements Serializable{
 	
 	private long ledgerId;
 	
-	private LedgerEntryType entryType;
+	private EEntryType entryType;
 	
 	private String from;
 	

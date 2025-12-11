@@ -7,7 +7,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 import com.jmsc.app.common.dto.BaseDTO;
-import com.jmsc.app.common.enums.LedgerEntryType;
+import com.jmsc.app.common.enums.EEntryType;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -64,7 +64,7 @@ public class LedgerEntryDTO extends BaseDTO implements Serializable{
 	private String remark;
 
 	
-	private LedgerEntryType entryType;
+	private EEntryType entryType;
 	
 	
 	private String paymentMode;

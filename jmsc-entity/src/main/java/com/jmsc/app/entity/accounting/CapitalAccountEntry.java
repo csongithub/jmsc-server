@@ -29,33 +29,23 @@ import lombok.Data;
  */
 @Data
 @Entity
-@Table(name = "LEDGER_ENTRY")
-public class LedgerEntry extends BaseEntity implements Serializable{
+@Table(name = "CAPITAL_ACCOUNT_ENTRY")
+public class CapitalAccountEntry extends BaseEntity implements Serializable{
+
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -5991743985282940438L;
+	private static final long serialVersionUID = 7349658742759305361L;
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "ID")
 	private Long id;
 	
-	@NotNull
-	@Column(name = "CREDITOR_ID")
-	private Long creditorId;
 	
 	@NotNull
-	@Column(name = "LEDGER_ID")
-	private Long ledgerId;
-	
-	@NotNull
-	@Column(name = "PROJECT_ID")
-	private Long projectId;
-	
-	@NotNull
-	@Column(name = "RECEIPT_NO")
-	private String receipt;
+	@Column(name = "ACCOUNT_ID")
+	private Long accountId;
 	
 	
 	@NotNull
@@ -64,60 +54,39 @@ public class LedgerEntry extends BaseEntity implements Serializable{
 	private Date date;
 	
 	
-
-	@Column(name = "ITEM")
-	private String item;
+	@NotNull
+	@Column(name = "NOTE")
+	private String note;
 	
 	
-
-	@Column(name = "RATE")
-	private float rate;
-	
-
-	@Column(name = "QTY")
-	private float quantity;
+	@NotNull
+	@Column(name = "DEBIT")
+	private Double debit;
 	
 	
-
+	@NotNull
 	@Column(name = "CREDIT")
 	private Double credit;
 	
 	
-
-	@Column(name = "UNIT")
-	private String unit;
+	@NotNull
+	@Column(name = "BALANCE")
+	private Double balance;
 	
-	
-	@Column(name = "VEHICLE")
-	private String vehicle;
-	
-	
-	@Column(name = "REMARK")
-	private String remark;
 	
 	@NotNull
 	@Enumerated(EnumType.STRING)
 	@Column(name = "ENTRY_TYPE")
 	private EEntryType entryType;
 	
-	@Column(name = "PAYMENT_MODE")
-	private String paymentMode; //Cheque, Online, Cash, UPI
 	
-//	link to @{PaymentDTO}
-	@Column(name = "PAYMENT_ID") 
-	private Long paymentId;
+	/**
+	 * This could be either voucher no (in case of debit type), 
+	 * or the payment id (in case of credit type).
+	 */
+	@Column(name = "TRANS_REF_NO")
+	private Long transactionRefNo;
 	
-	@Column(name = "PAYMENT_REF_NO") 
-	private String paymentRefNo;
-	
-	@Column(name = "DEBIT")
-	private Double debit;
-	
-	@Column(name = "NARRATION")
-	private String narration;
-	
-	@Column(name = "USER_NAME")
-	private String user; //who made this entry into system
 	
 	@Override
 	public int hashCode() {
@@ -135,7 +104,7 @@ public class LedgerEntry extends BaseEntity implements Serializable{
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		LedgerEntry other = (LedgerEntry) obj;
+		CapitalAccountEntry other = (CapitalAccountEntry) obj;
 		if (id == null) {
 			if (other.id != null)
 				return false;
