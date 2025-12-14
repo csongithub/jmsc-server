@@ -38,5 +38,7 @@ public class LoginResponse implements Serializable{
 	
 	private String token;
 	
+	private String refreshToken;
+	
 	private boolean isAdmin;
 }

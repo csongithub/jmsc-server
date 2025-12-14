@@ -3,6 +3,11 @@
  */
 package com.jmsc.app.service;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,12 +24,15 @@ import com.jmsc.app.common.rqrs.ResetPasswordRequest;
 import com.jmsc.app.common.rqrs.UpdateAdminPasswordRequest;
 import com.jmsc.app.common.rqrs.UpdatePasswordRequest;
 import com.jmsc.app.common.rqrs.UpdatePasswordResponse;
+import com.jmsc.app.common.util.Collections;
 import com.jmsc.app.common.util.ObjectMapperUtil;
 import com.jmsc.app.common.util.Strings;
 import com.jmsc.app.config.jmsc.ServiceLocator;
 import com.jmsc.app.entity.Client;
+import com.jmsc.app.entity.RefreshToken;
 import com.jmsc.app.entity.User;
 import com.jmsc.app.repository.ClientRepository;
+import com.jmsc.app.repository.RefreshTokenRepository;
 import com.jmsc.app.repository.UserRepository;
 import com.jmsc.app.service.jwt.JwtProvider;
 import com.jmsc.app.service.jwt.JwtTokenUtil;
@@ -56,6 +64,9 @@ public class AuthService {
 	
 	@Autowired
 	private UserPermissionService permissionsService;
+	
+	@Autowired
+	private RefreshTokenRepository refreshTokenRepository;
 	
 	public LoginResponse login(LoginRequest request) {
 		
@@ -89,10 +100,13 @@ public class AuthService {
 				response.setLoginSuccess(true);
 				response.setClientDTO(client);
 				
-				final String token = jwtProvider.generateToken(client.getLogonId());
-				log.debug("Issued token: {} for logon request by: {}",token,request.getLogonId());
+//				final String token = jwtProvider.generateToken(client.getLogonId());
+//				final String refreshToken = jwtProvider.generateRefreshToken(client.getLogonId());
+//				log.debug("Issued token: {} for logon request by: {}",token,request.getLogonId());
 				
-				response.setToken(token);
+//				response.setToken(token);
+//				response.setRefreshToken(refreshToken);
+				this.setTokens(response, client.getLogonId(),null,client.getId());
 				response.setAdmin(true);
 				response.setMessage("Login Successful");
 			} else {
@@ -160,10 +174,17 @@ public class AuthService {
 				response.setUserDTO(userDTO);
 				response.setPermissions(permissions);
 				
-				final String token = jwtProvider.generateToken(client.getLogonId());
-				log.debug("Issued token: {} for logon request by: {}",token,request.getLogonId());
 				
-				response.setToken(token);
+				
+//				final String token = jwtProvider.generateToken(client.getLogonId());
+//				final String refreshToken = jwtProvider.generateRefreshToken(client.getLogonId());
+//				log.debug("Issued Token: {} for logon request by: {}",token,request.getLogonId());
+//				log.debug("Refresh Token: {} for logon request by: {}",refreshToken,request.getLogonId());
+				
+//				response.setToken(token);
+//				response.setRefreshToken(refreshToken);
+				
+				this.setTokens(response, client.getLogonId(),userDTO.getLogonId(), client.getId());
 				response.setAdmin(false);
 				response.setMessage("Login Successful");
 			} else {
@@ -172,6 +193,43 @@ public class AuthService {
 			}
 		}
 		return response;
+	}
+	
+	
+	private void setTokens(LoginResponse response, String key, String username, Long clientId) {
+		Map<String, String> tokens = jwtProvider.generateTokens(key);
+		
+		String token = tokens.get(JwtProvider.TOKEN);
+		String refreshToken = tokens.get(JwtProvider.REFRESH_TOKEN);
+		
+//		final String token = jwtProvider.generateToken(key);
+//		final String refreshToken = jwtProvider.generateRefreshToken(key);
+		log.debug("Issued Token: {} for logon request by: {}",token,key);
+		log.debug("Refresh Token: {} for logon request by: {}",refreshToken,key);
+		
+		/**
+		 * Check if any old RefreshToken is present in the DB, if yes then delete all and then create new entry.
+		 * This concept make sure that for a user there will be only one refresh token in the db.
+		 */
+		if(Strings.isNullOrEmpty(username))
+			username = key;
+		
+	    List<RefreshToken> oldTokens =  refreshTokenRepository.findByClientIdAndUsername(clientId, username);
+		
+	    if(Collections.isNotNullOrEmpty(oldTokens))
+	    	oldTokens.stream().forEach(oldToken ->{
+	    		refreshTokenRepository.delete(oldToken);
+	    	});
+	    
+		RefreshToken newToken = new RefreshToken();
+		newToken.setClientId(clientId);
+		newToken.setToken(refreshToken);
+		newToken.setUsername(username);
+		newToken.setExpiryDate(Instant.now().plus(1, ChronoUnit.DAYS));
+		refreshTokenRepository.save(newToken);
+		
+		response.setToken(token);
+		response.setRefreshToken(refreshToken);
 	}
 	
 	
@@ -405,6 +463,55 @@ public class AuthService {
 		}
 		return response;
 	}
+	
+	
+	public Map<String, String> refreshToken(String token, String clientIdString, String user) {
+		
+		if(Strings.isNullOrEmpty(clientIdString))
+			throw new RuntimeException("Invalid client id");
+		
+		Long clientId = Long.parseLong(clientIdString);
+
+        // 1. Check refresh token in DB
+        RefreshToken tokenEntity = refreshTokenRepository.findByClientIdAndUsernameAndToken(clientId, user, token)
+                .orElseThrow(() -> new RuntimeException("Invalid refresh token"));
+
+        // 2. Validate expiration
+        if (tokenEntity.getExpiryDate().isBefore(Instant.now())) {
+            refreshTokenRepository.delete(tokenEntity);
+            throw new RuntimeException("Refresh token expired. Login again.");
+        }
+
+        // 3. Validate JWT signature
+        if (!jwtProvider.validateToken(token)) {
+            throw new RuntimeException("Invalid refresh token");
+        }
+        
+        String key = jwtUtil.getUsernameFromToken(token);
+//        String username = tokenEntity.getUsername();
+
+        // 4. Generate new tokens
+        Map<String, String> tokens = jwtProvider.generateTokens(key);
+        String newAccessToken = tokens.get(JwtProvider.TOKEN);
+        String newRefreshToken = tokens.get(JwtProvider.REFRESH_TOKEN);
+
+        // 5. Store new refresh token (delete previous)
+        refreshTokenRepository.delete(tokenEntity);
+
+        RefreshToken newToken = new RefreshToken();
+        newToken.setClientId(clientId);
+        newToken.setToken(newRefreshToken);
+        newToken.setUsername(user);
+        newToken.setExpiryDate(Instant.now().plus(7, ChronoUnit.DAYS));
+        refreshTokenRepository.save(newToken);
+
+        // 6. Return both tokens
+        Map<String, String> map = new HashMap<>();
+        map.put("token", newAccessToken);
+        map.put("refreshToken", newRefreshToken);
+
+        return map;
+    }
 	
 
 }

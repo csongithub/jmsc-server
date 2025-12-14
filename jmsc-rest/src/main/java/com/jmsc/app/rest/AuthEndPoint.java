@@ -3,6 +3,8 @@
  */
 package com.jmsc.app.rest;
 
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,7 +36,22 @@ public class AuthEndPoint {
 	
 	@Autowired
 	private AuthService service;
+	
+	
 
+    @PostMapping("/refresh")
+    public ResponseEntity<?> refreshToken(@RequestBody Map<String, String> request) {
+
+        String refreshToken = request.get("refreshToken");
+        String clientId = request.get("clientId");
+        String user = request.get("user");
+
+        Map<String, String> tokens = service.refreshToken(refreshToken,clientId, user);
+
+        return ResponseEntity.ok(tokens);
+    }
+
+    
 	@PostMapping("/login")
 	 public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request)throws Throwable {
 		LoginResponse response = service.login(request);

@@ -27,6 +27,10 @@ import lombok.extern.slf4j.Slf4j;
 public class JwtProvider {
 	
 	
+	public static final String TOKEN = "TOKEN";
+	public static final String REFRESH_TOKEN = "REFRESH_TOKEN";
+	
+	
 	private static final long  DEFAULT_EXPIRY_TIME_IN_MINUTE = 5 * 60 * 1000;
 	
 	/**
@@ -47,24 +51,58 @@ public class JwtProvider {
 	@Value("${jwt.token.expiry.time}")
 	private String jwtTokenExpiryTime;
 	
+	
+	@Value("${jwt.refresh.token.expiry.time}")
+	private String jwtRefreshTokenExpiryTime;
+	
 	@Value("${jwt.signature.algo}")
 	private SignatureAlgorithm signatureAlgorithm;
 	
 	
 	private long tokenExpiryTime;
 	
+	private long refreshTokenExpiryTime;
+	
 	
 	
 	@PostConstruct
 	public void init() {
 		log.debug("Activated: " + JwtProvider.class.getName());
-		this.tokenExpiryTime = getTokenExpiryTime();
+		this.tokenExpiryTime = getExpiryTime(jwtTokenExpiryTime);
+		this.refreshTokenExpiryTime = getExpiryTime(jwtRefreshTokenExpiryTime);
 	}
 	
+	public boolean validateToken(String token) {
+        try {
+            Jwts.parser().setSigningKey(jwtSecretKey).parseClaimsJws(token);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+	
 	//generate token for user
-	public String generateToken(String logonId) {
-		Map<String, Object> claims = new HashMap<>();
-		return doGenerateToken(claims, logonId);
+//	public String generateToken(String logonId) {
+//		Map<String, Object> claims = new HashMap<>();
+//		return doGenerateToken(claims, logonId, this.tokenExpiryTime);
+//	}
+//	
+//	
+//	public String generateRefreshToken(String logonId) {
+//		Map<String, Object> claims = new HashMap<>();
+//		return doGenerateToken(claims, logonId, refreshTokenExpiryTime);
+//	}
+	
+	
+	public Map<String, String> generateTokens(String key) {
+		String token = doGenerateToken(new HashMap<>(), key, this.tokenExpiryTime);
+		String refreshToken = doGenerateToken(new HashMap<>(), key, this.refreshTokenExpiryTime);
+		
+		Map<String, String> tokens = new HashMap<>();
+		tokens.put(TOKEN, token);
+		tokens.put(REFRESH_TOKEN, refreshToken);
+		
+		return tokens;
 	}
 	
 	/*
@@ -75,25 +113,27 @@ public class JwtProvider {
 	 * 3. According to JWS Compact Serialization(https://tools.ietf.org/html/draft-ietf-jose-json-web-signature-41#section-3.1)
 	 *	compaction of the JWT to a URL-safe string 
 	 */
-	private String doGenerateToken(Map<String, Object> claims, String subject) {
+	private String doGenerateToken(Map<String, Object> claims, String subject, long tokenExpiryTime) {
 		long currentTimeMillis = System.currentTimeMillis();
-		Date tokenExpiryTime = new Date(currentTimeMillis + this.tokenExpiryTime);
+		Date totalExpiryTime = new Date(currentTimeMillis + tokenExpiryTime);
 		
 		log.debug("Token Issuing Date: " + new Date(currentTimeMillis));
-		log.debug("Token Expiry Date: " + tokenExpiryTime);
+		log.debug("Token Expiry Date: " + totalExpiryTime);
 		
-		String token= Jwts.builder().setClaims(claims)
+		String token= Jwts.builder().setClaims(new HashMap<>())
 				   					.setSubject(subject)
 				   					.setIssuedAt(new Date(System.currentTimeMillis()))
-				   					.setExpiration(tokenExpiryTime)
+				   					.setExpiration(totalExpiryTime)
 				   					.signWith(signatureAlgorithm, jwtSecretKey).compact();
 		return token;
 	}
 	
 	
 	
-	private long getTokenExpiryTime() {		
-		long expiryTimeMillis	= System.currentTimeMillis();
+	private long getExpiryTime(String jwtTokenExpiryTime) {
+		
+		long expiryTimeMillis = DEFAULT_EXPIRY_TIME_IN_MINUTE;
+		
 		
 		if(jwtTokenExpiryTime != null && jwtTokenExpiryTime.contains("-")) {
 			
@@ -115,7 +155,6 @@ public class JwtProvider {
 		}else {
 			expiryTimeMillis = DEFAULT_EXPIRY_TIME_IN_MINUTE;
 		}
-		
 		return expiryTimeMillis;
 	}
 
