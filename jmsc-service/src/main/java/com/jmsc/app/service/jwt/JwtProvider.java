@@ -27,6 +27,10 @@ import lombok.extern.slf4j.Slf4j;
 public class JwtProvider {
 	
 	
+	public static final String TOKEN = "TOKEN";
+	public static final String REFRESH_TOKEN = "REFRESH_TOKEN";
+	
+	
 	private static final long  DEFAULT_EXPIRY_TIME_IN_MINUTE = 5 * 60 * 1000;
 	
 	/**
@@ -78,15 +82,27 @@ public class JwtProvider {
     }
 	
 	//generate token for user
-	public String generateToken(String logonId) {
-		Map<String, Object> claims = new HashMap<>();
-		return doGenerateToken(claims, logonId, this.tokenExpiryTime);
-	}
+//	public String generateToken(String logonId) {
+//		Map<String, Object> claims = new HashMap<>();
+//		return doGenerateToken(claims, logonId, this.tokenExpiryTime);
+//	}
+//	
+//	
+//	public String generateRefreshToken(String logonId) {
+//		Map<String, Object> claims = new HashMap<>();
+//		return doGenerateToken(claims, logonId, refreshTokenExpiryTime);
+//	}
 	
 	
-	public String generateRefreshToken(String logonId) {
-		Map<String, Object> claims = new HashMap<>();
-		return doGenerateToken(claims, logonId, refreshTokenExpiryTime);
+	public Map<String, String> generateTokens(String key) {
+		String token = doGenerateToken(new HashMap<>(), key, this.tokenExpiryTime);
+		String refreshToken = doGenerateToken(new HashMap<>(), key, this.refreshTokenExpiryTime);
+		
+		Map<String, String> tokens = new HashMap<>();
+		tokens.put(TOKEN, token);
+		tokens.put(REFRESH_TOKEN, refreshToken);
+		
+		return tokens;
 	}
 	
 	/*
@@ -104,7 +120,7 @@ public class JwtProvider {
 		log.debug("Token Issuing Date: " + new Date(currentTimeMillis));
 		log.debug("Token Expiry Date: " + totalExpiryTime);
 		
-		String token= Jwts.builder().setClaims(claims)
+		String token= Jwts.builder().setClaims(new HashMap<>())
 				   					.setSubject(subject)
 				   					.setIssuedAt(new Date(System.currentTimeMillis()))
 				   					.setExpiration(totalExpiryTime)

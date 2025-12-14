@@ -196,18 +196,23 @@ public class AuthService {
 	}
 	
 	
-	private void setTokens(LoginResponse response, String clientLogonId, String username, Long clientId) {
-		final String token = jwtProvider.generateToken(clientLogonId);
-		final String refreshToken = jwtProvider.generateRefreshToken(clientLogonId);
-		log.debug("Issued Token: {} for logon request by: {}",token,clientLogonId);
-		log.debug("Refresh Token: {} for logon request by: {}",refreshToken,clientLogonId);
+	private void setTokens(LoginResponse response, String key, String username, Long clientId) {
+		Map<String, String> tokens = jwtProvider.generateTokens(key);
+		
+		String token = tokens.get(JwtProvider.TOKEN);
+		String refreshToken = tokens.get(JwtProvider.REFRESH_TOKEN);
+		
+//		final String token = jwtProvider.generateToken(key);
+//		final String refreshToken = jwtProvider.generateRefreshToken(key);
+		log.debug("Issued Token: {} for logon request by: {}",token,key);
+		log.debug("Refresh Token: {} for logon request by: {}",refreshToken,key);
 		
 		/**
 		 * Check if any old RefreshToken is present in the DB, if yes then delete all and then create new entry.
 		 * This concept make sure that for a user there will be only one refresh token in the db.
 		 */
 		if(Strings.isNullOrEmpty(username))
-			username = clientLogonId;
+			username = key;
 		
 	    List<RefreshToken> oldTokens =  refreshTokenRepository.findByClientIdAndUsername(clientId, username);
 		
@@ -482,12 +487,13 @@ public class AuthService {
             throw new RuntimeException("Invalid refresh token");
         }
         
-        String clientLogonId = jwtUtil.getUsernameFromToken(token);
+        String key = jwtUtil.getUsernameFromToken(token);
 //        String username = tokenEntity.getUsername();
 
         // 4. Generate new tokens
-        String newAccessToken = jwtProvider.generateToken(clientLogonId);
-        String newRefreshToken = jwtProvider.generateRefreshToken(clientLogonId);
+        Map<String, String> tokens = jwtProvider.generateTokens(key);
+        String newAccessToken = tokens.get(JwtProvider.TOKEN);
+        String newRefreshToken = tokens.get(JwtProvider.REFRESH_TOKEN);
 
         // 5. Store new refresh token (delete previous)
         refreshTokenRepository.delete(tokenEntity);
