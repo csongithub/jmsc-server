@@ -15,13 +15,13 @@ import org.springframework.stereotype.Service;
 
 import com.jmsc.app.common.dto.PaymentSummaryDTO;
 import com.jmsc.app.common.dto.accounting.CapitalAccountDTO;
-import com.jmsc.app.common.dto.accounting.CapitalAccountEntryDTO;
 import com.jmsc.app.common.dto.accounting.CreditorDTO;
 import com.jmsc.app.common.dto.accounting.GetLedgerEntryRequest;
 import com.jmsc.app.common.dto.accounting.Item;
 import com.jmsc.app.common.dto.accounting.LedgerDTO;
 import com.jmsc.app.common.dto.accounting.LedgerEntryDTO;
 import com.jmsc.app.common.dto.accounting.ListDTO;
+import com.jmsc.app.common.dto.accounting.VoucherDTO;
 import com.jmsc.app.common.enums.EEntryType;
 import com.jmsc.app.common.util.Collections;
 import com.jmsc.app.common.util.DateUtils;
@@ -34,12 +34,14 @@ import com.jmsc.app.entity.accounting.Creditor;
 import com.jmsc.app.entity.accounting.CreditorPaymentLinkage;
 import com.jmsc.app.entity.accounting.Ledger;
 import com.jmsc.app.entity.accounting.LedgerEntry;
+import com.jmsc.app.entity.accounting.Voucher;
 import com.jmsc.app.repository.accounting.CapitalAccountEntryRepository;
 import com.jmsc.app.repository.accounting.CapitalAccountRepository;
 import com.jmsc.app.repository.accounting.CreditorPaymentLinkageRepository;
 import com.jmsc.app.repository.accounting.CreditorRepository;
 import com.jmsc.app.repository.accounting.LedgerEntryRepository;
 import com.jmsc.app.repository.accounting.LedgerRepository;
+import com.jmsc.app.repository.accounting.VoucherRepository;
 import com.jmsc.app.service.AbstractService;
 import com.jmsc.app.service.PaymentService2;
 
@@ -68,6 +70,9 @@ public class AccountingService extends AbstractService{
 	
 	@Autowired
 	private CapitalAccountEntryRepository capitalAccountEntryRepository;
+	
+	@Autowired
+	private VoucherRepository voucherRepository;
 	
 	
 	
@@ -541,7 +546,7 @@ public class AccountingService extends AbstractService{
 		CapitalAccountDTO savedAccount = ObjectMapperUtil.map(entity, CapitalAccountDTO.class);
 		
 		if(isNull(account.getId()) && "CASH".equalsIgnoreCase(account.getAccountType()))
-			this.updateEntry(savedAccount);
+			this.updateFirstCapitalAccountEntry(savedAccount);
 		
 		return savedAccount;
 	}
@@ -552,7 +557,7 @@ public class AccountingService extends AbstractService{
 	 *
 	 * @param dto
 	 */
-	private void updateEntry(CapitalAccountDTO account) {
+	private void updateFirstCapitalAccountEntry(CapitalAccountDTO account) {
 		CapitalAccountEntry entry = new CapitalAccountEntry();
 		entry.setClientId(account.getClientId());
 		entry.setAccountId(account.getId());
@@ -568,8 +573,31 @@ public class AccountingService extends AbstractService{
 	}
 	
 	
-	private void updateEntry(CapitalAccountEntry entry) {
-		capitalAccountEntryRepository.save(entry);
+	
+	public ListDTO getAllCapitalAccountList(Long clientId){
+		if(isNull(clientId))
+			throw new RuntimeException("Invalid Request, Client Id is NULL");
+		
+		ListDTO list = new ListDTO();
+		list.setListName("CapitalAccount");
+		
+		List<CapitalAccount> capitals =  capitalAccountRepository.findAllByClientId(clientId);
+		
+		if(Collections.isNullOrEmpty(capitals)) 
+			new ArrayList<CapitalAccountDTO>();
+		
+//		List<CapitalAccountDTO> accounts = ObjectMapperUtil.mapAll(dbResult, CapitalAccountDTO.class);
+		
+		capitals.forEach(c ->  {
+			Item item  = new Item();
+			item.setLabel(c.getAccountName());
+			item.setValue(c.getId());
+			list.getList().add(item);
+		});
+		
+		ListDTO.sortByLevel(list);
+		
+		return list;
 	}
 	
 	
@@ -577,27 +605,50 @@ public class AccountingService extends AbstractService{
 		if(isNull(clientId))
 			throw new RuntimeException("Invalid Request, Client Id is NULL");
 		
-		List<CapitalAccount> dbResult =  capitalAccountRepository.findAllByClientId(clientId);
+		List<CapitalAccount> capitals =  capitalAccountRepository.findAllByClientId(clientId);
 		
-		if(Collections.isNullOrEmpty(dbResult)) 
+		if(Collections.isNullOrEmpty(capitals)) 
 			new ArrayList<CapitalAccountDTO>();
 		
-		List<CapitalAccountDTO> accounts = ObjectMapperUtil.mapAll(dbResult, CapitalAccountDTO.class);
+		List<CapitalAccountDTO> accounts = ObjectMapperUtil.mapAll(capitals, CapitalAccountDTO.class);
 		
 		return accounts;
 	}
 	
 	
-	private Boolean updateLastUpdated(Long clientId, Long accountId, Date date) {
-		if(isNull(clientId) || isNull(accountId))
+	public VoucherDTO createVuocher(VoucherDTO dto) {
+		
+		if(isNull(dto.getClientId()) || Strings.isNullOrEmpty(dto.getVoucherNo())
+				|| isNull(dto.getDate()) || Strings.isNullOrEmpty(dto.getItems()) 
+				|| isNull(dto.getAmount())
+				|| isNull(dto.getProjectId()) || isNull(dto.getCapitalAccountId())) {
 			throw new RuntimeException("Invalid Request");
+		}
 		
-		Optional<CapitalAccount> optional = capitalAccountRepository.findByClientIdAndId(clientId, accountId);
-		if(!optional.isPresent())
-			throw new RuntimeException("Capital Account not found");
+		CapitalAccount account =  capitalAccountRepository.findByClientIdAndId(dto.getClientId(), dto.getCapitalAccountId()).orElseThrow(() -> new RuntimeException("invalid request"));
 		
-		optional.get().setLastUpdated(date);
-		capitalAccountRepository.save(optional.get());
-		return Boolean.TRUE;
+		Voucher voucher = ObjectMapperUtil.map(dto, Voucher.class);
+		voucher = voucherRepository.save(voucher);
+		
+		VoucherDTO voucherDTO = ObjectMapperUtil.map(voucher, VoucherDTO.class);
+		
+		//Block to update capital account
+		{
+			CapitalAccountEntry entry = new CapitalAccountEntry();
+			entry.setClientId(dto.getClientId());
+			entry.setAccountId(dto.getCapitalAccountId());
+			entry.setDate(dto.getDate());
+			entry.setNote(dto.getVoucherNo());
+			entry.setDebit(dto.getAmount());
+			entry.setCredit(0d);
+			entry.setBalance(account.getBalance() - voucher.getAmount());
+			entry.setEntryType(EEntryType.DEBIT);
+			entry.setTransactionRefNo(voucher.getId());
+			
+			capitalAccountEntryRepository.save(entry);
+		}
+		
+		
+		return voucherDTO;
 	}
 }

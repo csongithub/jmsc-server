@@ -21,6 +21,7 @@ import com.jmsc.app.common.dto.accounting.GetLedgerEntryRequest;
 import com.jmsc.app.common.dto.accounting.LedgerDTO;
 import com.jmsc.app.common.dto.accounting.LedgerEntryDTO;
 import com.jmsc.app.common.dto.accounting.ListDTO;
+import com.jmsc.app.common.dto.accounting.VoucherDTO;
 import com.jmsc.app.service.accounting.AccountingService;
 
 import io.swagger.annotations.Api;
@@ -129,7 +130,6 @@ public class AccountingEndPoint {
 	}
 	
 	
-	
 	@PostMapping("/creditor/payments/update")
 	public ResponseEntity<Boolean> updatePaymentEntries(@RequestBody LedgerEntryDTO entry) {
 		Boolean status = accountingService.updatePaymentEntries(entry);
@@ -148,5 +148,18 @@ public class AccountingEndPoint {
 	public ResponseEntity<List<CapitalAccountDTO>> getAllCapitalAccounts(@PathVariable("clientId") Long clientId){
 		List<CapitalAccountDTO> accounts = accountingService.getAllCapitalAccounts(clientId);
 		return ResponseEntity.ok(accounts);
+	}
+	
+	@GetMapping("/capital_account/list/{clientId}")
+	public ResponseEntity<ListDTO> getAllCapitalAccountList(@PathVariable("clientId") Long clientId){
+		ListDTO accounts = accountingService.getAllCapitalAccountList(clientId);
+		return ResponseEntity.ok(accounts);
+	}
+	
+	
+	@PostMapping("/vlucher/create")
+	public ResponseEntity<VoucherDTO> createVoucher(@RequestBody VoucherDTO voucher) {
+		VoucherDTO response = accountingService.createVuocher(voucher);
+		return ResponseEntity.ok(response);
 	}
 }

@@ -68,7 +68,7 @@ public class ProjectService extends AbstractService{
 		
 		projects.forEach(c ->  {
 			Item item  = new Item();
-			item.setLabel(c.getNickName() + "- [" + c.getFullName() + "]");
+			item.setLabel(c.getNickName());
 			item.setValue(c.getId());
 			list.getList().add(item);
 		});
