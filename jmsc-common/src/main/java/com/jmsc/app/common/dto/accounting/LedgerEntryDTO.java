@@ -70,6 +70,9 @@ public class LedgerEntryDTO extends BaseDTO implements Serializable{
 	private String paymentMode;
 	
 
+	/**
+	 * This could be either payment id or voucher id just in case if it is paid in cash on site
+	 */
 	private Long paymentId;
 	
 	

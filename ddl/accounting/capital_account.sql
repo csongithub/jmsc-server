@@ -26,7 +26,9 @@ CREATE TABLE jmsc.CAPITAL_ACCOUNT
     ACCOUNT_NAME		text NOT NULL,
     ACCOUNT_TYPE		text NOT NULL,
     BALANCE				numeric NOT NULL,
+    ACC_OPEN_DATE		date NOT NULL,
     LAST_UPDATED		date NOT NULL,
+    STATUS				text NOT NULL,
 	CREATED_TS 			timestamp with time zone NOT NULL,
 	UPDATED_TS 			timestamp with time zone NOT NULL,
     CONSTRAINT CAPITAL_ACCOUNT_KEY PRIMARY KEY (ID)

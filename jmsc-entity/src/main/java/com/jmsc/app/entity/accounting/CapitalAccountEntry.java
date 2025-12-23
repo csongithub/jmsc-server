@@ -69,9 +69,9 @@ public class CapitalAccountEntry extends BaseEntity implements Serializable{
 	private Double credit;
 	
 	
-	@NotNull
-	@Column(name = "BALANCE")
-	private Double balance;
+//	@NotNull
+//	@Column(name = "BALANCE")
+//	private Double balance;
 	
 	
 	@NotNull

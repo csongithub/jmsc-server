@@ -45,9 +45,14 @@ public class CapitalAccountDTO extends BaseDTO implements Serializable{
 	private Double balance;   
 	
 	
+	private Date accountOpeningDate;
+	
+	
 	/**
 	 * Last Transaction Date, either debit or credit
 	 */
 	private Date lastUpdated;
+	
+	private String status; //ACTIVE, INACTIVE
 
 }

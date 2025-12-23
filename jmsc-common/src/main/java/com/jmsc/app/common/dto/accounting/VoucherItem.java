@@ -4,6 +4,7 @@
 package com.jmsc.app.common.dto.accounting;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import lombok.Data;
 
@@ -18,6 +19,8 @@ public class VoucherItem implements Serializable{
 	 */
 	private static final long serialVersionUID = 502492788845488827L;
 
+	private String date;
+	
 	private String item;
 	
 	private Double amount;

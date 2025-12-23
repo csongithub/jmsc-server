@@ -3,6 +3,7 @@
  */
 package com.jmsc.app.repository.accounting;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -18,6 +19,8 @@ public interface CapitalAccountEntryRepository extends JpaRepository<CapitalAcco
 	
 	public List<CapitalAccountEntry> findAllByClientIdAndAccountId(Long clientId, Long accountId);
 	
-	
-	
+	public List<CapitalAccountEntry> findAllByClientIdAndAccountIdAndDateBetween(Long clientId, 
+			   																	 Long accountId, 
+			   																	 Date fromDate, 
+			   																	 Date toDate);
 }

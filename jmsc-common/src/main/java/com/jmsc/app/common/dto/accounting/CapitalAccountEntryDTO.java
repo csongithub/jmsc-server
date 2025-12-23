@@ -3,6 +3,8 @@ package com.jmsc.app.common.dto.accounting;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.persistence.Transient;
+
 import com.jmsc.app.common.dto.BaseDTO;
 import com.jmsc.app.common.enums.EEntryType;
 
@@ -39,7 +41,10 @@ public class CapitalAccountEntryDTO extends BaseDTO implements Serializable{
 	private Double credit;
 	
 	
-
+	/**
+	 * will be set only during statement fetching for a period
+	 */
+	@Transient
 	private Double balance;
 	
 	

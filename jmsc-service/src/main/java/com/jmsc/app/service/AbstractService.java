@@ -28,19 +28,32 @@ public abstract class AbstractService {
 	public boolean isNull(Long val) {
 		return val == null ? true : false;
 	}
+	public boolean isNotNull(Long val) {
+		return !isNull(val);
+	}
 	
 	
 	public boolean isNull(String val) {
-		return val == null ? true : false;
+		return !isNull(val);
+	}
+	public boolean isNotNull(String val) {
+		return !isNull(val);
 	}
 	
 	
 	public boolean isNull(Object obj) {
 		return obj == null ? true : false;
 	}
+	public boolean isnotNull(Object obj) {
+		return !isNull(obj);
+	}
+	
 	
 	
 	public boolean isNull(Date val) {
 		return val == null ? true : false;
+	}
+	public boolean isNotNull(Date val) {
+		return !isNull(val);
 	}
 }

@@ -16,7 +16,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jmsc.app.common.dto.accounting.CapitalAccountDTO;
+import com.jmsc.app.common.dto.accounting.CapitalAccountEntryDTO;
 import com.jmsc.app.common.dto.accounting.CreditorDTO;
+import com.jmsc.app.common.dto.accounting.GetCapAccountEntryRequest;
 import com.jmsc.app.common.dto.accounting.GetLedgerEntryRequest;
 import com.jmsc.app.common.dto.accounting.LedgerDTO;
 import com.jmsc.app.common.dto.accounting.LedgerEntryDTO;
@@ -157,9 +159,26 @@ public class AccountingEndPoint {
 	}
 	
 	
-	@PostMapping("/vlucher/create")
+	@PostMapping("/capital_account/statement")
+	public ResponseEntity< List<CapitalAccountEntryDTO>> createVoucher(@RequestBody GetCapAccountEntryRequest req) {
+		 List<CapitalAccountEntryDTO> response = accountingService.getCapitalAccountStatements(req);
+		return ResponseEntity.ok(response);
+	}
+	
+	
+	@PostMapping("/voucher/create")
 	public ResponseEntity<VoucherDTO> createVoucher(@RequestBody VoucherDTO voucher) {
 		VoucherDTO response = accountingService.createVuocher(voucher);
+		return ResponseEntity.ok(response);
+	}
+	
+	
+	@GetMapping("/voucher/get/{clientId}/{voucherId}/{accountId}")
+	public ResponseEntity<VoucherDTO> getVoucher(@PathVariable("clientId") Long clientId, 
+												 @PathVariable("voucherId") Long voucherId, 
+												 @PathVariable("accountId") Long accountId) {
+		
+		VoucherDTO response = accountingService.getVoucher(clientId, voucherId, accountId);
 		return ResponseEntity.ok(response);
 	}
 }

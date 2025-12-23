@@ -56,6 +56,12 @@ public class CapitalAccount extends BaseEntity implements Serializable{
 	@Column(name = "BALANCE")
 	private Double balance;   
 	
+	
+	@NotNull
+	@Temporal(TemporalType.DATE)
+	@Column(name = "ACC_OPEN_DATE")
+	private Date accountOpeningDate;
+	
 	/**
 	 * Last Transaction Date, either debit or credit
 	 */
@@ -63,6 +69,9 @@ public class CapitalAccount extends BaseEntity implements Serializable{
 	@Temporal(TemporalType.DATE)
 	@Column(name = "LAST_UPDATED")
 	private Date lastUpdated;
+	
+	
+	private String status; //ACTIVE, INACTIVE
 	
 	
 	

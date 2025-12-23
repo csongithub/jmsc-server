@@ -28,7 +28,6 @@ CREATE TABLE jmsc.CAPITAL_ACCOUNT_ENTRY
     NOTE				tet NOT NULL,
     DEBIT				numeric NOT NULL,
     CREDIT				numeric NOT NULL,
-    BALANCE				numeric NOT NULL,
     ENTRY_TYPE			text NOT NULL,
     TRANS_REF_NO		integer,
 	CREATED_TS 			timestamp with time zone NOT NULL,
@@ -41,3 +40,7 @@ WITH (
 
 ALTER TABLE jmsc.CAPITAL_ACCOUNT_ENTRY OWNER to jmscdev;
 GRANT ALL ON TABLE jmsc.CAPITAL_ACCOUNT_ENTRY TO jmscdev;
+
+
+CREATE INDEX index_cae_id_clientid_date
+ON jmsc.capital_account_entry(id, client_id,date);

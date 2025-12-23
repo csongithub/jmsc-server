@@ -61,6 +61,19 @@ public class Voucher extends BaseEntity implements Serializable{
 	@Column(name = "PROJECT_ID")
 	private Long projectId;
 	
+	@NotNull
+	@Column(name = "CREATOR")
+	private String creator; // Name of the creator
+	
+	@NotNull
+	@Column(name = "APPROVER")
+	private String approver; //Name of the user who approves it
+	
+	
+	@NotNull
+	@Column(name = "STATUS")
+	private String status; //CREATED, APPROVED
+	
 	
 	@Override
 	public int hashCode() {

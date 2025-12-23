@@ -29,6 +29,9 @@ CREATE TABLE jmsc.VOUCHER
     AMOUNT						numeric NOT NULL,
     CAP_ACC_ID					integer NOT NULL,
     PROJECT_ID					integer NOT NULL,
+    CREATOR						text NOT NULL,
+    APPROVER					text,
+    STATUS						text NOT NULL,
    	CREATED_TS 					timestamp with time zone NOT NULL,
 	UPDATED_TS 					timestamp with time zone NOT NULL,
     CONSTRAINT VOUCHER_KEY PRIMARY KEY (ID)

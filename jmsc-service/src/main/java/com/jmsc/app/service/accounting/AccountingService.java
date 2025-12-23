@@ -15,7 +15,9 @@ import org.springframework.stereotype.Service;
 
 import com.jmsc.app.common.dto.PaymentSummaryDTO;
 import com.jmsc.app.common.dto.accounting.CapitalAccountDTO;
+import com.jmsc.app.common.dto.accounting.CapitalAccountEntryDTO;
 import com.jmsc.app.common.dto.accounting.CreditorDTO;
+import com.jmsc.app.common.dto.accounting.GetCapAccountEntryRequest;
 import com.jmsc.app.common.dto.accounting.GetLedgerEntryRequest;
 import com.jmsc.app.common.dto.accounting.Item;
 import com.jmsc.app.common.dto.accounting.LedgerDTO;
@@ -541,6 +543,7 @@ public class AccountingService extends AbstractService{
 			
 		
 		CapitalAccount entity = ObjectMapperUtil.map(account, CapitalAccount.class);
+		entity.setLastUpdated(entity.getAccountOpeningDate());
 		entity = capitalAccountRepository.save(entity);
 		
 		CapitalAccountDTO savedAccount = ObjectMapperUtil.map(entity, CapitalAccountDTO.class);
@@ -559,13 +562,14 @@ public class AccountingService extends AbstractService{
 	 */
 	private void updateFirstCapitalAccountEntry(CapitalAccountDTO account) {
 		CapitalAccountEntry entry = new CapitalAccountEntry();
+		
 		entry.setClientId(account.getClientId());
 		entry.setAccountId(account.getId());
 		entry.setDate(account.getLastUpdated());
-		entry.setNote("New Account Opening Balance");
+		entry.setNote("New A/c Open");
 		entry.setDebit(0d);
 		entry.setCredit(account.getBalance());
-		entry.setBalance(account.getBalance());
+//		entry.setBalance(account.getBalance());
 		entry.setEntryType(EEntryType.CREDIT);
 		entry.setTransactionRefNo(null);
 		
@@ -620,35 +624,178 @@ public class AccountingService extends AbstractService{
 		
 		if(isNull(dto.getClientId()) || Strings.isNullOrEmpty(dto.getVoucherNo())
 				|| isNull(dto.getDate()) || Strings.isNullOrEmpty(dto.getItems()) 
-				|| isNull(dto.getAmount())
-				|| isNull(dto.getProjectId()) || isNull(dto.getCapitalAccountId())) {
+				|| isNull(dto.getAmount()) || isNull(dto.getProjectId()) || isNull(dto.getCapitalAccountId())) {
 			throw new RuntimeException("Invalid Request");
 		}
 		
-		CapitalAccount account =  capitalAccountRepository.findByClientIdAndId(dto.getClientId(), dto.getCapitalAccountId()).orElseThrow(() -> new RuntimeException("invalid request"));
+		Voucher voucher = null;
+		CapitalAccount account = null;
+		CapitalAccountEntry entry = null;
+		List<Long> entries = new ArrayList<Long>();
+		try {
+			account =  capitalAccountRepository.findByClientIdAndId(dto.getClientId(), dto.getCapitalAccountId()).orElseThrow(() -> new RuntimeException("invalid request"));
+			
+			//Check voucher Date
+			if(DateUtils.isBeforeDay(dto.getDate(), account.getAccountOpeningDate())) {
+				throw new RuntimeException("Voucher date can not be before A/c Openeing Date: " + account.getAccountOpeningDate());
+			}
+			
+			final String accountName = account.getAccountName();
+			voucher = ObjectMapperUtil.map(dto, Voucher.class);
+			voucher = voucherRepository.save(voucher);
+			
+			VoucherDTO voucherDTO = ObjectMapperUtil.map(voucher, VoucherDTO.class);
+			
+			//Block to update capital account entry
+			{
+				entry = new CapitalAccountEntry();
+				entry.setClientId(dto.getClientId());
+				entry.setAccountId(dto.getCapitalAccountId());
+				entry.setDate(dto.getDate());
+				entry.setNote("VOUCHER-"+dto.getVoucherNo());
+				entry.setDebit(dto.getAmount());
+				entry.setCredit(0d);
+//				entry.setBalance(account.getBalance() - dto.getAmount());
+				entry.setEntryType(EEntryType.DEBIT);
+				entry.setTransactionRefNo(voucher.getId());
+				
+				capitalAccountEntryRepository.save(entry);
+				
+				//Update capital account balance
+				if("CASH".equalsIgnoreCase(account.getAccountType())) {
+					account.setBalance(account.getBalance() - dto.getAmount());
+					account.setLastUpdated(voucher.getDate());
+					capitalAccountRepository.save(account);
+				}
+				
+			}
+			
+			//Block to update creditor ledger if any party.creditor payment is found
+			{
+				if(Collections.isNotNullOrEmpty(dto.getList())){
+					dto.getList().forEach(item -> {
+						if(isNotNull(item.getCreditorId()) && isNotNull(item.getLedgerId())) {
+							LedgerEntry debitEntry = new LedgerEntry();
+							debitEntry.setClientId(dto.getClientId());
+							
+							debitEntry.setCreditorId(item.getCreditorId());
+							debitEntry.setLedgerId(item.getLedgerId()); 
+							debitEntry.setEntryType(EEntryType.DEBIT);
+							debitEntry.setDate(dto.getDate());
+							debitEntry.setPaymentMode("VCHR"); //VCHR-> VOUCHER
+							debitEntry.setPaymentRefNo(accountName);
+							debitEntry.setPaymentId(dto.getId());
+							debitEntry.setDebit(Double.valueOf(item.getAmount()));
+							debitEntry.setRemark("");
+							
+							entries.add(entryRepository.save(debitEntry).getId());
+						}
+					});
+				}
+			}
+			
+			
+			return voucherDTO;
+		}catch(Exception e) {
+//			if(!isNull(voucher.getId()))
+//				voucherRepository.delete(voucher);
+//			
+//			if(!isNull(account.getId()))
+//				capitalAccountRepository.delete(account);
+//			
+//			if(!isNull(entry.getId()))
+//				capitalAccountEntryRepository.delete(entry);
+//			
+//			if(Collections.isNotNullOrEmpty(entries)) {
+//				entries.forEach(id ->{
+//					entryRepository.deleteById(id);
+//				});
+//			}			
+			throw new RuntimeException(e);
+		}
+	}
+	
+	
+	public List<CapitalAccountEntryDTO> getCapitalAccountStatements(GetCapAccountEntryRequest req){
+		Date fromDate = DateUtils.getDate(req.getFrom());
+		Date toDate = DateUtils.getDate(req.getTo());
 		
-		Voucher voucher = ObjectMapperUtil.map(dto, Voucher.class);
-		voucher = voucherRepository.save(voucher);
+		List<CapitalAccountEntry> records =  capitalAccountEntryRepository.findAllByClientIdAndAccountIdAndDateBetween(req.getClientId(), req.getAccountId(), fromDate, toDate);
+		
+		if(Collections.isNullOrEmpty(records)) 
+			return new ArrayList<CapitalAccountEntryDTO>();
+		
+		List<CapitalAccountEntryDTO> rows = ObjectMapperUtil.mapAll(records, CapitalAccountEntryDTO.class);
+		
+		java.util.Collections.sort(rows, new Comparator<CapitalAccountEntryDTO>() {
+	        public int compare(CapitalAccountEntryDTO entry1, CapitalAccountEntryDTO entry2) {
+	            return entry1.getDate().compareTo(entry2.getDate());
+	        }
+	    });
+		
+		
+		List<CapitalAccountEntryDTO> result =  new ArrayList<CapitalAccountEntryDTO>();
+		
+		CapitalAccount account = capitalAccountRepository.findByClientIdAndId(req.getClientId(), req.getAccountId()).orElseThrow(() -> new RuntimeException("capital account not found"));
+		Double openingBalance = 0d;
+		
+		boolean fromDateIsAfterAccountOpeneingDate = DateUtils.isAfterDay(fromDate, account.getAccountOpeningDate());
+		
+		if(fromDateIsAfterAccountOpeneingDate) {
+			
+			openingBalance = this.getOpeneingBalance(req, account);
+			CapitalAccountEntryDTO openingBalaceRow =  new CapitalAccountEntryDTO();
+			openingBalaceRow.setBalance(openingBalance);
+			openingBalaceRow.setNote("Openeing Balance");
+			
+			result.add(0, openingBalaceRow);
+		}
+		
+		for(int index = 0; index<rows.size(); index++) {
+			openingBalance = (index == 0) ? openingBalance : rows.get(index-1).getBalance();
+			rows.get(index).setBalance(openingBalance + rows.get(index).getCredit() - rows.get(index).getDebit());
+			
+			result.add(fromDateIsAfterAccountOpeneingDate? index+1 : index, rows.get(index));
+		}
+		
+		return result;		
+	}
+	
+	
+	
+	private Double getOpeneingBalance(GetCapAccountEntryRequest req, CapitalAccount account) {
+		
+		
+		
+		Date accountOpeneingDate = account.getAccountOpeningDate();
+		
+		Date oneDayBeforeFromDate = DateUtils.getNDaysBefore(req.getFrom(), 1);
+		
+	    List<CapitalAccountEntry> records = capitalAccountEntryRepository
+	    											.findAllByClientIdAndAccountIdAndDateBetween(req.getClientId(), 
+																				  				 req.getAccountId(), 
+																				  				 accountOpeneingDate, 
+																				  				 oneDayBeforeFromDate);
+	    
+	    Double openingBalance = 0d;
+	    
+	    for(CapitalAccountEntry record: records) {
+	    	openingBalance = openingBalance + record.getCredit() - record.getDebit();
+	    }
+	    
+	
+		return openingBalance;
+	}
+	
+	
+	public VoucherDTO getVoucher(Long clientId, Long voucherId, Long accountId) {
+		
+		Voucher voucher = voucherRepository.findByClientIdAndIdAndCapitalAccountId(clientId, voucherId, accountId)
+															.orElseThrow(() -> new RuntimeException("voucher not found"));
 		
 		VoucherDTO voucherDTO = ObjectMapperUtil.map(voucher, VoucherDTO.class);
 		
-		//Block to update capital account
-		{
-			CapitalAccountEntry entry = new CapitalAccountEntry();
-			entry.setClientId(dto.getClientId());
-			entry.setAccountId(dto.getCapitalAccountId());
-			entry.setDate(dto.getDate());
-			entry.setNote(dto.getVoucherNo());
-			entry.setDebit(dto.getAmount());
-			entry.setCredit(0d);
-			entry.setBalance(account.getBalance() - voucher.getAmount());
-			entry.setEntryType(EEntryType.DEBIT);
-			entry.setTransactionRefNo(voucher.getId());
-			
-			capitalAccountEntryRepository.save(entry);
-		}
-		
-		
 		return voucherDTO;
+		
 	}
 }

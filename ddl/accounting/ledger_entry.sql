@@ -51,3 +51,4 @@ WITH (
 
 ALTER TABLE jmsc.LEDGER_ENTRY OWNER to jmscdev;
 GRANT ALL ON TABLE jmsc.LEDGER_ENTRY TO jmscdev;
+

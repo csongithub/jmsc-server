@@ -46,5 +46,11 @@ public class VoucherDTO extends BaseDTO implements Serializable{
 	private Long capitalAccountId;
 	
 	private Long projectId;
+	
+	private String status; //CREATED, APPROVED
+	
+	private String creator; // Name of the creator
+	
+	private String approver; //Name of the user who approves it
 
 }

@@ -73,7 +73,7 @@ public class PaymentSummaryDTO implements Serializable{
 	/**
 	 * machine id / site id etc
 	 */
-	private String reasonId;
+	private Long reasonId;
 	
 	private String mode;
 	

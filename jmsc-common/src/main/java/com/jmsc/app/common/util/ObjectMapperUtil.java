@@ -12,7 +12,10 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.modelmapper.convention.MatchingStrategies;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
@@ -22,6 +25,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class ObjectMapperUtil {
 
 	private static ModelMapper modelMapper = new ModelMapper();
+	
+	private static ObjectMapper mapper = new ObjectMapper();
 
 	static {
 		modelMapper = new ModelMapper();
@@ -99,6 +104,27 @@ public class ObjectMapperUtil {
 			e.printStackTrace();
 		}
 		return null;
+    }
+    
+    
+    public static <T> T getAttribute(String json, String atrr, Class<T> type) {
+    	JsonNode rootNode = null;
+		try {
+			rootNode = mapper.readTree(json);
+		} catch (JsonMappingException e) {
+			
+			e.printStackTrace();
+		} catch (JsonProcessingException e) {
+			
+			e.printStackTrace();
+		}
+    	if(type == String.class)
+    		return  type.cast(rootNode.path(atrr).asText());
+    	else if(type == Long.class)
+    		return  type.cast(rootNode.path(atrr).asLong());
+    	
+    	else return null;
+    	
     }
 
 }

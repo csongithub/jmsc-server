@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import com.jmsc.app.common.dto.PaymentDTO;
 import com.jmsc.app.common.dto.PaymentFilterCriteria;
 import com.jmsc.app.common.dto.PaymentSummaryDTO;
+import com.jmsc.app.common.enums.EEntryType;
 import com.jmsc.app.common.enums.EPaymentStatus;
 import com.jmsc.app.common.exception.ResourceNotFoundException;
 import com.jmsc.app.common.rqrs.ApprovePaymentRequest;
@@ -30,10 +31,14 @@ import com.jmsc.app.common.util.Strings;
 import com.jmsc.app.config.jmsc.ServiceLocator;
 import com.jmsc.app.entity.PartyBankAccount;
 import com.jmsc.app.entity.Payment;
+import com.jmsc.app.entity.accounting.CapitalAccount;
+import com.jmsc.app.entity.accounting.CapitalAccountEntry;
 import com.jmsc.app.entity.accounting.Creditor;
 import com.jmsc.app.entity.accounting.CreditorPaymentLinkage;
 import com.jmsc.app.repository.PartyBankAccountRepository;
 import com.jmsc.app.repository.PaymentRepository;
+import com.jmsc.app.repository.accounting.CapitalAccountEntryRepository;
+import com.jmsc.app.repository.accounting.CapitalAccountRepository;
 import com.jmsc.app.repository.accounting.CreditorPaymentLinkageRepository;
 import com.jmsc.app.repository.accounting.CreditorRepository;
 
@@ -135,9 +140,55 @@ public class PaymentService2 {
 				//TODO: Post approval, check if the party for which this payment is made for exists as a creditor.
 				//If YES, then stamp this payment in creditor payment linkage table
 				this.linkCreditorPayment(req.getClientId(), paymentSummary.getPartyId(), payment.getId());
+				
+				if("capital".equals(paymentSummary.getReason())) {
+					Long capitalAccountId = ObjectMapperUtil.getAttribute(payment.getPaymentSummary(), "reasonId", Long.class);
+					Date paymentDate = payment.getPaymentDate();
+					Long amount = paymentSummary.getAmount();
+					Long id = payment.getId();
+					String mode = paymentSummary.getMode();
+					this.updateCapitalAccountEntry(req.getClientId(), capitalAccountId, paymentDate, amount, id, mode);
+				}
 			}
 		}
 		return 0;
+	}
+	
+	private void updateCapitalAccountEntry(Long clientId, Long capitalAccountId, 
+											Date paymentDate, 
+											long amount, 
+											Long paymentId,
+											String mode) {
+		
+		CapitalAccountRepository repository = ServiceLocator.getService(CapitalAccountRepository.class);
+		
+		CapitalAccount account= repository.findByClientIdAndId(clientId, capitalAccountId).orElseThrow(() ->new RuntimeException("Capital Account not Found"));
+		
+		if("BANK ACCOUNT".equalsIgnoreCase(account.getAccountType()))
+			return;
+		
+		account.setLastUpdated(paymentDate);
+		account.setBalance(account.getBalance() + amount);
+		repository.save(account);
+		
+		CapitalAccountEntry entry = new CapitalAccountEntry();
+		
+		entry.setClientId(clientId);
+		entry.setAccountId(capitalAccountId);
+		entry.setDate(account.getLastUpdated());
+		entry.setNote(mode);
+		entry.setDebit(0d);
+		entry.setCredit(amount + 0d); //just to cast double adding +0d
+//		entry.setBalance(ca.getBalance());
+		entry.setEntryType(EEntryType.CREDIT);
+		entry.setTransactionRefNo(paymentId);
+		
+		ServiceLocator.getService(CapitalAccountEntryRepository.class).save(entry);
+		
+		
+		account.setLastUpdated(paymentDate);
+		account.setBalance(account.getBalance() + amount);
+		
 	}
 	
 	
