@@ -127,6 +127,7 @@ public class AccountingService extends AbstractService{
 	}
 	
 	
+	
 	public CreditorDTO createOrUpdate(CreditorDTO dto) {
 		if(isNull(dto.getClientId()) || isNull(dto.getName()) || isNull(dto.getAddress())
 				|| isNull(dto.getPartyId())) {
@@ -369,11 +370,11 @@ public class AccountingService extends AbstractService{
 		all.forEach(entry ->{
 			if(EEntryType.CREDIT.equals(entry.getEntryType())) {
 				
-				entry.setNarration("[" + entry.getReceipt() + "]-[" + entry.getVehicle() + "]");
+//				entry.setNarration("[" + entry.getReceipt() + "]-[" + entry.getVehicle() + "]");
 				
 			} else if(EEntryType.DEBIT.equals(entry.getEntryType())) { 
-				String narration = entry.getPaymentMode() + ((Strings.isNotNullOrEmpty(entry.getPaymentRefNo()) ? "-" + entry.getPaymentRefNo() : ""));
-				entry.setItem(narration + "-["+entry.getRemark()+"]");
+				String item = entry.getPaymentMode() + ((Strings.isNotNullOrEmpty(entry.getPaymentRefNo()) ? "-" + entry.getPaymentRefNo() : ""));
+				entry.setItem(item );
 			}
 		});
 	}

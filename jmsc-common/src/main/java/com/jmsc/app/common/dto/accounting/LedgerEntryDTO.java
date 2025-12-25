@@ -6,6 +6,7 @@ package com.jmsc.app.common.dto.accounting;
 import java.io.Serializable;
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.jmsc.app.common.dto.BaseDTO;
 import com.jmsc.app.common.enums.EEntryType;
 
@@ -18,6 +19,7 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper=false)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class LedgerEntryDTO extends BaseDTO implements Serializable{
 
 	/**
@@ -82,7 +84,7 @@ public class LedgerEntryDTO extends BaseDTO implements Serializable{
 	private Double debit;
 	
 
-	private String narration;
+//	private String narration;
 	
 
 	private String user;

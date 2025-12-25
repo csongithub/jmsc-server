@@ -15,6 +15,8 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import org.hibernate.annotations.Type;
+
 import com.jmsc.app.entity.BaseEntity;
 import com.sun.istack.NotNull;
 
@@ -69,6 +71,12 @@ public class Ledger extends BaseEntity implements Serializable{
 	@NotNull
 	@Column(name = "REMARK")
 	private String remark;
+	
+	
+	@NotNull
+	@Type(type="jsonb")
+	@Column(name = "COLUMNS")
+	private String columns;
 	
 	
 	@Override

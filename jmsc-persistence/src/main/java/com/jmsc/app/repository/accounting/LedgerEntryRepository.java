@@ -20,7 +20,7 @@ public interface LedgerEntryRepository extends JpaRepository<LedgerEntry, Long> 
 	
 	Optional<LedgerEntry> findByDateAndClientIdAndCreditorIdAndReceipt(Date date, 
 																	   Long clientId,
-																	   Long creditorId, 
+																	   Long creditorId,
 																	   String receipt);
 	
 	List<LedgerEntry> findByClientIdAndCreditorIdAndReceipt(Long clientId, Long creditorId, String receipt);

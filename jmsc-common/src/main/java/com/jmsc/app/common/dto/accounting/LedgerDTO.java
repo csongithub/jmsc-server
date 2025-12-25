@@ -44,4 +44,7 @@ public class LedgerDTO extends BaseDTO implements Serializable{
 	
 	
 	private String remark;
+	
+	
+	private String columns;
 }

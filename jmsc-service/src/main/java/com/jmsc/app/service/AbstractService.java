@@ -34,7 +34,7 @@ public abstract class AbstractService {
 	
 	
 	public boolean isNull(String val) {
-		return !isNull(val);
+		return val == null;
 	}
 	public boolean isNotNull(String val) {
 		return !isNull(val);

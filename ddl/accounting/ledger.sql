@@ -28,6 +28,7 @@ CREATE TABLE jmsc.LEDGER
     START_DATE					date NOT NULL,
     OPENING_BALALCE				numeric NOT NULL,
     REMARK						text,
+    COLUMNS						json,
    	CREATED_TS 					timestamp with time zone NOT NULL,
 	UPDATED_TS 					timestamp with time zone NOT NULL,
     CONSTRAINT eledger_key PRIMARY KEY (ID)
