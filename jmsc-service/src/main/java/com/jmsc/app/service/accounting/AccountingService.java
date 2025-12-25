@@ -412,7 +412,8 @@ public class AccountingService extends AbstractService{
 																												 entry.getReceipt());
 				if(optional.isPresent()) {
 					LedgerEntry old = optional.get();
-					if(!entry.getId().equals(old.getId()))
+					
+					if(old.getLedgerId().equals(entry.getLedgerId())&& entry.getId()!= null && !(entry.getId().equals(old.getId())))
 						throw new RuntimeException("Dublicate Entry Found for Receipt: "+ old.getReceipt() + ", Date-" + old.getDate() + ", Item:- " + old.getItem() + ", QTY:- " + old.getQuantity());
 				}
 
