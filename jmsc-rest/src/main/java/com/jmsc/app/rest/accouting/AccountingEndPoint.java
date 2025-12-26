@@ -96,7 +96,7 @@ public class AccountingEndPoint {
 	
 	@PostMapping("/ledger/entries/post")
 	ResponseEntity<Boolean> postEntries(@RequestBody List<LedgerEntryDTO> entries){
-		Boolean status = accountingService.postCreditEntries(entries);
+		Boolean status = accountingService.createLedgerEntries(entries);
 		return ResponseEntity.ok(status);
 	}
 	

@@ -36,6 +36,8 @@ import com.jmsc.app.entity.accounting.Creditor;
 import com.jmsc.app.entity.accounting.CreditorPaymentLinkage;
 import com.jmsc.app.entity.accounting.Ledger;
 import com.jmsc.app.entity.accounting.LedgerEntry;
+import com.jmsc.app.entity.accounting.ProjectCreditorLinkage;
+import com.jmsc.app.entity.accounting.ProjectCreditorLinkageId;
 import com.jmsc.app.entity.accounting.Voucher;
 import com.jmsc.app.repository.accounting.CapitalAccountEntryRepository;
 import com.jmsc.app.repository.accounting.CapitalAccountRepository;
@@ -43,6 +45,7 @@ import com.jmsc.app.repository.accounting.CreditorPaymentLinkageRepository;
 import com.jmsc.app.repository.accounting.CreditorRepository;
 import com.jmsc.app.repository.accounting.LedgerEntryRepository;
 import com.jmsc.app.repository.accounting.LedgerRepository;
+import com.jmsc.app.repository.accounting.ProjectCreditorLinkageRepository;
 import com.jmsc.app.repository.accounting.VoucherRepository;
 import com.jmsc.app.service.AbstractService;
 import com.jmsc.app.service.PaymentService2;
@@ -75,6 +78,9 @@ public class AccountingService extends AbstractService{
 	
 	@Autowired
 	private VoucherRepository voucherRepository;
+	
+	@Autowired
+	private ProjectCreditorLinkageRepository projectCreditorLinkageRepository;
 	
 	
 	
@@ -382,11 +388,12 @@ public class AccountingService extends AbstractService{
 	
 	
 	
-	public Boolean postCreditEntries(List<LedgerEntryDTO> entries) {
+	public Boolean createLedgerEntries(List<LedgerEntryDTO> entries) {
 		
 		if(Collections.isNullOrEmpty(entries))
 			throw new RuntimeException("empty request");
 		
+		ProjectCreditorLinkageId linkageId = null; 
 		
 		for(LedgerEntryDTO entry: entries) {
 			
@@ -409,6 +416,14 @@ public class AccountingService extends AbstractService{
 					validateOnDuplicateVoucher(entry);
 				
 				
+				if(linkageId == null) {
+					linkageId = new ProjectCreditorLinkageId(entry.getClientId(), 
+															entry.getProjectId(), 
+															entry.getCreditorId(),
+															entry.getLedgerId());	
+				}
+				
+				
 
 			} else if(EEntryType.DEBIT.equals(entry.getEntryType())) {
 				if(isNull(entry.getDebit()) || Strings.isNullOrEmpty(entry.getPaymentMode()) 
@@ -423,6 +438,15 @@ public class AccountingService extends AbstractService{
 		
 		try {
 			entryRepository.saveAll(allEntries);
+			
+			if(linkageId != null) {
+				Optional<ProjectCreditorLinkage> optional = projectCreditorLinkageRepository.findById(linkageId);
+				if(!optional.isPresent()) {
+					ProjectCreditorLinkage pcl = new ProjectCreditorLinkage();
+					pcl.setId(linkageId);
+					projectCreditorLinkageRepository.save(pcl);
+				}
+			}
 		}catch(Exception e) {
 			return Boolean.FALSE;
 		}
