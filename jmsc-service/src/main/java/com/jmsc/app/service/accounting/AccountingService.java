@@ -396,7 +396,7 @@ public class AccountingService extends AbstractService{
 			
 			
 			if(EEntryType.CREDIT.equals(entry.getEntryType())) {
-				if(isNull(entry.getProjectId()) ||  Strings.isNullOrEmpty(entry.getReceipt()) 
+				if(isNull(entry.getProjectId()) || (entry.isValidateOnReceipt()&& Strings.isNullOrEmpty(entry.getReceipt())) 
 						|| Strings.isNullOrEmpty(entry.getItem()) || isNull(entry.getRate()) 
 						|| isNull(entry.getQuantity()) || entry.getQuantity() == 0.0
 						|| isNull(entry.getCredit()) || entry.getCredit() ==0.0 
@@ -404,18 +404,10 @@ public class AccountingService extends AbstractService{
 					
 					throw new RuntimeException("Invalid Post Request");
 				}
+				if(entry.isValidateOnReceipt())
+					validateOnDuplicateVoucher(entry);
 				
 				
-				Optional<LedgerEntry>	optional  =  entryRepository.findByDateAndClientIdAndCreditorIdAndReceipt(entry.getDate(), 
-																												 entry.getClientId(),
-																												 entry.getCreditorId(),
-																												 entry.getReceipt());
-				if(optional.isPresent()) {
-					LedgerEntry old = optional.get();
-					
-					if(old.getLedgerId().equals(entry.getLedgerId())&& entry.getId()!= null && !(entry.getId().equals(old.getId())))
-						throw new RuntimeException("Dublicate Entry Found for Receipt: "+ old.getReceipt() + ", Date-" + old.getDate() + ", Item:- " + old.getItem() + ", QTY:- " + old.getQuantity());
-				}
 
 			} else if(EEntryType.DEBIT.equals(entry.getEntryType())) {
 				if(isNull(entry.getDebit()) || Strings.isNullOrEmpty(entry.getPaymentMode()) 
@@ -436,19 +428,34 @@ public class AccountingService extends AbstractService{
 		return Boolean.TRUE;
 	}
 	
+	
+	private void validateOnDuplicateVoucher(LedgerEntryDTO entry) {
+		Optional<LedgerEntry>	optional  =  entryRepository.findByDateAndClientIdAndCreditorIdAndLedgerIdAndReceipt(entry.getDate(), 
+	 			 																									 entry.getClientId(),
+	 			 																									 entry.getCreditorId(),
+	 			 																									 entry.getLedgerId(),
+	 			 																									 entry.getReceipt());
+		if(optional.isPresent()) {
+			LedgerEntry old = optional.get();
+
+			if(entry.getId()== null || !old.getId().equals(entry.getId()))
+				throw new RuntimeException("Dublicate Entry Found for Receipt: "+ old.getReceipt() + ", Date-" + old.getDate() + ", Item:- " + old.getItem() + ", QTY:- " + old.getQuantity());
+		}
+	}
+	
 	 
 	public LedgerEntryDTO validateByChallan(LedgerEntryDTO request) {
 		
 		if(isNull(request.getClientId()) || request.getDate() == null || isNull(request.getCreditorId()) || isNull(request.getReceipt()))
 			throw new RuntimeException("Invalid Request");
 		
-		Optional<LedgerEntry>	optional  = entryRepository.findByDateAndClientIdAndCreditorIdAndReceipt(request.getDate(), 
+		List<LedgerEntry>	list  = entryRepository.findByDateAndClientIdAndCreditorIdAndReceipt(request.getDate(), 
 																	request.getClientId(),
 																	request.getCreditorId(),
 																	request.getReceipt());
 		
 		LedgerEntryDTO entry = new LedgerEntryDTO();
-		if(!optional.isPresent()) {
+		if(Collections.isNullOrEmpty(list)) {
 			List<LedgerEntry> entries =  entryRepository.findByClientIdAndCreditorIdAndReceipt(request.getClientId(),
 																								request.getCreditorId(),
 																								request.getReceipt());
@@ -458,7 +465,7 @@ public class AccountingService extends AbstractService{
 				entry = ObjectMapperUtil.map(entries.get(0), LedgerEntryDTO.class);
 			
 		} else {
-			entry = ObjectMapperUtil.map(optional.get(), LedgerEntryDTO.class);
+			entry = ObjectMapperUtil.map(list.get(0), LedgerEntryDTO.class);
 		}
 		
 		return entry;
@@ -618,6 +625,12 @@ public class AccountingService extends AbstractService{
 		
 		List<CapitalAccountDTO> accounts = ObjectMapperUtil.mapAll(capitals, CapitalAccountDTO.class);
 		
+		java.util.Collections.sort(accounts, new Comparator<CapitalAccountDTO>() {
+	        public int compare(CapitalAccountDTO entry1, CapitalAccountDTO entry2) {
+	            return entry1.getAccountName().compareTo(entry2.getAccountName());
+	        }
+	    });
+		
 		return accounts;
 	}
 	
@@ -748,6 +761,8 @@ public class AccountingService extends AbstractService{
 			openingBalance = this.getOpeneingBalance(req, account);
 			CapitalAccountEntryDTO openingBalaceRow =  new CapitalAccountEntryDTO();
 			openingBalaceRow.setBalance(openingBalance);
+			openingBalaceRow.setDebit(0d);
+			openingBalaceRow.setCredit(0d);
 			openingBalaceRow.setNote("Openeing Balance");
 			
 			result.add(0, openingBalaceRow);

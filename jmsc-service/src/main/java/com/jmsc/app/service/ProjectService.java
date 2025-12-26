@@ -3,6 +3,7 @@
  */
 package com.jmsc.app.service;
 
+import java.util.Comparator;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +50,12 @@ public class ProjectService extends AbstractService{
 		List<Project> projects = projectRepository.findAllByClientId(clientId);
 		
 		List<ProjectDTO> all = ObjectMapperUtil.mapAll(projects, ProjectDTO.class);
+		
+		java.util.Collections.sort(all, new Comparator<ProjectDTO>() {
+	        public int compare(ProjectDTO entry1, ProjectDTO entry2) {
+	            return entry1.getNickName().compareTo(entry2.getNickName());
+	        }
+	    });
 		
 		return all;
 	}

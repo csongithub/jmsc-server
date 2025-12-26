@@ -24,4 +24,8 @@ public class Item implements Serializable{
 	private String label;
 	
 	private Long value;
+	
+	private String text1;
+	
+	private String text2;
 }

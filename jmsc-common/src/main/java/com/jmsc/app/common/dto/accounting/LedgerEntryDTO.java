@@ -101,4 +101,6 @@ public class LedgerEntryDTO extends BaseDTO implements Serializable{
 	private String tempId;
 	
 	private String status; //CREATED, ACCEPTED, REJECTED
+	
+	private boolean validateOnReceipt;
 }

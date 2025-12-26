@@ -143,11 +143,13 @@ public class PaymentService2 {
 				
 				if("capital".equals(paymentSummary.getReason())) {
 					Long capitalAccountId = ObjectMapperUtil.getAttribute(payment.getPaymentSummary(), "reasonId", Long.class);
+					String remark = ObjectMapperUtil.getAttribute(payment.getPaymentSummary(), "remark", String.class);
+					String transRefNo = ObjectMapperUtil.getAttribute(payment.getPaymentSummary(), "transaction_ref", String.class);
 					Date paymentDate = payment.getPaymentDate();
 					Long amount = paymentSummary.getAmount();
 					Long id = payment.getId();
 					String mode = paymentSummary.getMode();
-					this.updateCapitalAccountEntry(req.getClientId(), capitalAccountId, paymentDate, amount, id, mode);
+					this.updateCapitalAccountEntry(req.getClientId(), capitalAccountId, paymentDate, amount, id, mode, remark, transRefNo);
 				}
 			}
 		}
@@ -158,7 +160,9 @@ public class PaymentService2 {
 											Date paymentDate, 
 											long amount, 
 											Long paymentId,
-											String mode) {
+											String mode,
+											String remark,
+											String transRefNo) {
 		
 		CapitalAccountRepository repository = ServiceLocator.getService(CapitalAccountRepository.class);
 		
@@ -176,7 +180,13 @@ public class PaymentService2 {
 		entry.setClientId(clientId);
 		entry.setAccountId(capitalAccountId);
 		entry.setDate(account.getLastUpdated());
-		entry.setNote(mode);
+		String text = remark != null && remark.length() >=20 ? remark.substring(0,20) : remark;
+		String note = mode;
+		if(transRefNo != null && transRefNo != "null")
+			note = note + "-" + transRefNo;
+		if(text != null &&  text != "null")
+			note = note + "-" + text;
+		entry.setNote(note);
 		entry.setDebit(0d);
 		entry.setCredit(amount + 0d); //just to cast double adding +0d
 //		entry.setBalance(ca.getBalance());
@@ -190,6 +200,8 @@ public class PaymentService2 {
 		account.setBalance(account.getBalance() + amount);
 		
 	}
+	
+	
 	
 	
 	private void linkCreditorPayment(Long clientId, Long partyId, Long paymentId) {

@@ -18,10 +18,16 @@ import com.jmsc.app.entity.accounting.LedgerEntry;
  */
 public interface LedgerEntryRepository extends JpaRepository<LedgerEntry, Long> {
 	
-	Optional<LedgerEntry> findByDateAndClientIdAndCreditorIdAndReceipt(Date date, 
+	List<LedgerEntry> findByDateAndClientIdAndCreditorIdAndReceipt(Date date, 
 																	   Long clientId,
 																	   Long creditorId,
 																	   String receipt);
+	
+	Optional<LedgerEntry> findByDateAndClientIdAndCreditorIdAndLedgerIdAndReceipt(Date date, 
+			   																	  Long clientId,
+			   																	  Long creditorId,
+			   																	  Long ledgerId,
+			   																	  String receipt);
 	
 	List<LedgerEntry> findByClientIdAndCreditorIdAndReceipt(Long clientId, Long creditorId, String receipt);
 	
