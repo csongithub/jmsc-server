@@ -179,6 +179,7 @@ public class AccountingService extends AbstractService{
 			Item item  = new Item();
 			item.setLabel(c.getName());
 			item.setValue(c.getId());
+			item.setText1(c.getAddress());
 			list.getList().add(item);
 		});
 		
