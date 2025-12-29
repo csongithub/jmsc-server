@@ -3,7 +3,7 @@
 -----------------------------------------------------------------
 DROP SEQUENCE IF EXISTS jmsc.creditor_pl_seq;
 
-CREATE SEQUENCE jmsc.creditor_seq
+CREATE SEQUENCE jmsc.creditor_pl_seq
     INCREMENT 1
     START 1
     MINVALUE 1
@@ -26,7 +26,7 @@ CREATE TABLE jmsc.CREDITOR_PAYMENT_LINKAGE
    	PARTY_ID			integer NOT NULL,
    	CREDITOR_ID			integer NOT NULL,
    	PAYMENT_ID			integer NOT NULL,
-   	STATUS				text NOT NULL
+   	STATUS				text NOT NULL,
 	CREATED_TS 			timestamp with time zone NOT NULL,
 	UPDATED_TS 			timestamp with time zone NOT NULL,
     CONSTRAINT CREDITOR_PL_KEY PRIMARY KEY (ID)

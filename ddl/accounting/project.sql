@@ -22,7 +22,7 @@ CREATE TABLE jmsc.PROJECT
 (
     ID 							integer NOT NULL DEFAULT nextval('jmsc.project_seq'::regclass),
     CLIENT_ID 					integer NOT NULL,
-    
+    CLIENT_NAME					text NOT NULL,
     NICK_NAME					text NOT NULL,
     FULL_NAME					text NOT NULL,
     PACKAGE_NO					text NOT NULL,

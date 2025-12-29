@@ -3,7 +3,7 @@
 -----------------------------------------------------------------
 DROP SEQUENCE IF EXISTS jmsc.refresh_token_seq;
 
-CREATE SEQUENCE jmsc.loan_seq
+CREATE SEQUENCE jmsc.refresh_token_seq
     INCREMENT 1
     START 1
     MINVALUE 1
