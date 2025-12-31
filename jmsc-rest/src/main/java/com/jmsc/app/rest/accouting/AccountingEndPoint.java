@@ -23,6 +23,7 @@ import com.jmsc.app.common.dto.accounting.GetLedgerEntryRequest;
 import com.jmsc.app.common.dto.accounting.LedgerDTO;
 import com.jmsc.app.common.dto.accounting.LedgerEntryDTO;
 import com.jmsc.app.common.dto.accounting.ListDTO;
+import com.jmsc.app.common.dto.accounting.StockDTO;
 import com.jmsc.app.common.dto.accounting.VoucherDTO;
 import com.jmsc.app.service.accounting.AccountingService;
 
@@ -180,5 +181,20 @@ public class AccountingEndPoint {
 		
 		VoucherDTO response = accountingService.getVoucher(clientId, voucherId, accountId);
 		return ResponseEntity.ok(response);
+	}
+	
+	
+	
+	@PostMapping("/stock/create")
+	public ResponseEntity<StockDTO> createStock(@RequestBody StockDTO stock) {
+		StockDTO response = accountingService.createOrUpdate(stock);
+		return ResponseEntity.ok(response);
+	}
+	
+	
+	@GetMapping("/stocks/{clientId}")
+	public ResponseEntity<List<StockDTO>> getStocks(@PathVariable("clientId") Long clientId){
+		List<StockDTO> accounts = accountingService.getAllStocks(clientId);
+		return ResponseEntity.ok(accounts);
 	}
 }

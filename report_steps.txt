@@ -1,0 +1,28 @@
+If Entry Date is after 5th,
+	Check if report is generated for previous month
+		Yes=>	then allow entry
+		No=>	openeing date is of current month ? allow Entry: generate report
+	END
+	
+END
+	
+	
+Generate
+
+if previous month is acount openeing month, then start date = openeing date else start date = 1st 
+
+
+CLIENT_ID
+CREDITOR_ID
+LEDGER_ID
+PERIOD (JAN-2026)
+
+TOTAL_CR
+TOTAL_DR
+BALANCE (CR/DR)
+GEN_DT
+GEN_BY
+
+
+
+

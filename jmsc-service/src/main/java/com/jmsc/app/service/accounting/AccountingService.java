@@ -23,6 +23,7 @@ import com.jmsc.app.common.dto.accounting.Item;
 import com.jmsc.app.common.dto.accounting.LedgerDTO;
 import com.jmsc.app.common.dto.accounting.LedgerEntryDTO;
 import com.jmsc.app.common.dto.accounting.ListDTO;
+import com.jmsc.app.common.dto.accounting.StockDTO;
 import com.jmsc.app.common.dto.accounting.VoucherDTO;
 import com.jmsc.app.common.enums.EEntryType;
 import com.jmsc.app.common.util.Collections;
@@ -38,6 +39,8 @@ import com.jmsc.app.entity.accounting.Ledger;
 import com.jmsc.app.entity.accounting.LedgerEntry;
 import com.jmsc.app.entity.accounting.ProjectCreditorLinkage;
 import com.jmsc.app.entity.accounting.ProjectCreditorLinkageId;
+import com.jmsc.app.entity.accounting.Stock;
+import com.jmsc.app.entity.accounting.StockTransaction;
 import com.jmsc.app.entity.accounting.Voucher;
 import com.jmsc.app.repository.accounting.CapitalAccountEntryRepository;
 import com.jmsc.app.repository.accounting.CapitalAccountRepository;
@@ -46,6 +49,8 @@ import com.jmsc.app.repository.accounting.CreditorRepository;
 import com.jmsc.app.repository.accounting.LedgerEntryRepository;
 import com.jmsc.app.repository.accounting.LedgerRepository;
 import com.jmsc.app.repository.accounting.ProjectCreditorLinkageRepository;
+import com.jmsc.app.repository.accounting.StockRepository;
+import com.jmsc.app.repository.accounting.StockTransactionRepository;
 import com.jmsc.app.repository.accounting.VoucherRepository;
 import com.jmsc.app.service.AbstractService;
 import com.jmsc.app.service.PaymentService2;
@@ -81,6 +86,13 @@ public class AccountingService extends AbstractService{
 	
 	@Autowired
 	private ProjectCreditorLinkageRepository projectCreditorLinkageRepository;
+	
+	@Autowired
+	private StockRepository stockRepository;
+	
+	
+	@Autowired
+	private StockTransactionRepository stockTransactionRepository;
 	
 	
 	
@@ -839,5 +851,67 @@ public class AccountingService extends AbstractService{
 		
 		return voucherDTO;
 		
+	}
+	
+	
+	public StockDTO createOrUpdate(StockDTO stockDTO) {
+		
+		if(isNull(stockDTO.getClientId()) || Strings.isNullOrEmpty(stockDTO.getStockName())
+				|| Strings.isNullOrEmpty(stockDTO.getStockUnit())) {
+			throw new RuntimeException("Invalid Request");
+		}
+		
+		if(isNull(stockDTO.getLastUpdated()))
+			stockDTO.setLastUpdated(stockDTO.getCreationDate());
+			
+		
+		Stock entity = ObjectMapperUtil.map(stockDTO, Stock.class);
+		
+		entity = stockRepository.save(entity);
+		
+		StockDTO stock = ObjectMapperUtil.map(entity, StockDTO.class);
+		
+		if(isNull(stockDTO.getId()))
+			updateFirstTransaction(stock);
+		
+		return stock;
+	}
+
+
+	private void updateFirstTransaction(StockDTO stockDTO) {
+		StockTransaction trans = new StockTransaction();
+		
+		trans.setClientId(stockDTO.getClientId());
+		trans.setStockId(stockDTO.getId());
+		trans.setDate(stockDTO.getLastUpdated());
+		trans.setNote("New Stock Open");
+		
+		trans.setDebit(0d);
+		trans.setCredit(stockDTO.getBalance());
+		trans.setEntryType(EEntryType.CREDIT);
+		trans.setTransactionRefNo(null);
+		stockTransactionRepository.save(trans);
+		
+	}
+	
+	
+	public List<StockDTO> getAllStocks(Long clientId){
+		if(isNull(clientId))
+			throw new RuntimeException("Invalid Request, Client Id is NULL");
+		
+		List<Stock> list =  stockRepository.findAllByClientId(clientId);
+		
+		if(Collections.isNullOrEmpty(list)) 
+			new ArrayList<CapitalAccountDTO>();
+		
+		List<StockDTO> stocks = ObjectMapperUtil.mapAll(list, StockDTO.class);
+		
+		java.util.Collections.sort(stocks, new Comparator<StockDTO>() {
+	        public int compare(StockDTO entry1, StockDTO entry2) {
+	            return entry1.getStockName().compareTo(entry2.getStockName());
+	        }
+	    });
+		
+		return stocks;
 	}
 }
