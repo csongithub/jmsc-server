@@ -83,7 +83,6 @@ public class AccountingService extends AbstractService{
 	private ProjectCreditorLinkageRepository projectCreditorLinkageRepository;
 	
 	
-	
 	public LedgerDTO createOrUpdate(LedgerDTO dto) {
 		if(isNull(dto.getClientId()) || isNull(dto.getCode()) || isNull(dto.getCreditorId())
 				|| isNull(dto.getName()) || isNull(dto.getOpeningBalance()) || isNull(dto.getStartDate())) {
@@ -94,11 +93,34 @@ public class AccountingService extends AbstractService{
 		entity = ledgerRepository.save(entity);
 		
 		LedgerDTO savedLedger= ObjectMapperUtil.map(entity, LedgerDTO.class);
+		if(savedLedger.getOpeningBalance() != 0d)
+			updateOpeneingBalance(savedLedger);
 		
 		return savedLedger;
 	}
 	
 	
+	private void updateOpeneingBalance(LedgerDTO savedLedger) {
+		LedgerEntry le =  new LedgerEntry();
+		le.setClientId(savedLedger.getClientId());
+		le.setCreditorId(savedLedger.getCreditorId());
+		le.setLedgerId(savedLedger.getId());
+		
+		le.setDate(savedLedger.getStartDate());
+		if(savedLedger.getOpeningBalance() < 0) {
+			le.setDebit(Math.abs(savedLedger.getOpeningBalance()));
+			le.setEntryType(EEntryType.DEBIT);
+			le.setPaymentMode("Opening Balance");
+		} else if(savedLedger.getOpeningBalance() > 0) {
+			le.setDebit(savedLedger.getOpeningBalance());
+			le.setEntryType(EEntryType.CREDIT);
+			le.setItem("Opening Balance");
+		}
+		le.setRemark("Opening Balance");
+		entryRepository.save(le);
+	}
+
+
 	public List<LedgerDTO> getLedgers(Long clientId, Long creditorId){
 		
 		if(isNull(clientId) || isNull(creditorId)) {
@@ -301,16 +323,13 @@ public class AccountingService extends AbstractService{
 		if(!optional.isPresent())
 			throw new RuntimeException("Ledger Not Found");
 		
-		Double openingBalance = 0.0;
-		
-		if(DateUtils.isSameDay(optional.get().getStartDate(), DateUtils.getDate(req.getFrom()))) {
-			openingBalance = optional.get().getOpeningBalance();
-		} else {
+		Double openingBalance = 0d;
+		if(DateUtils.isAfterDay(DateUtils.getDate(req.getFrom()), optional.get().getStartDate())) {
 			openingBalance = getOpeningBalance(req, optional.get());
 		}
 		
 
-		//TODO: Set first record as opengin balance
+		//TODO: Set first record as opening balance
 		
 		for(int index = 0; index<entries.size(); index++) {
 			Double credit = entries.get(index).getCredit() != null ? entries.get(index).getCredit() : 0.0;
@@ -319,13 +338,23 @@ public class AccountingService extends AbstractService{
 			
 			entries.get(index).setTotal(currentOpeningBalance + credit - debit );
 		}
+		
+		if(openingBalance != 0) {
+			LedgerEntryDTO first = new LedgerEntryDTO();
+			first.setTotal(openingBalance);
+			first.setItem("Openeing Balance");
+			
+			entries.add(0, first);
+		}
 	}
 	
 	
 	private Double getOpeningBalance(GetLedgerEntryRequest req, Ledger ledger ) {
 		
 		
-		Double openingBalance = ledger.getOpeningBalance();
+//		Double openingBalance = ledger.getOpeningBalance();
+		
+		Double openingBalance = 0.0d;
 		Date ledgerStartDate =  ledger.getStartDate(); 
 		
 		Date oneDayBeforeFromDate = DateUtils.getNDaysBefore(req.getFrom(), 1);
