@@ -49,9 +49,11 @@ public class LedgerEntry extends BaseEntity implements Serializable{
 	@Column(name = "LEDGER_ID")
 	private Long ledgerId;
 	
-	@NotNull
 	@Column(name = "PROJECT_ID")
 	private Long projectId;
+	
+	@Column(name = "STOCK_ID")
+	private Long stockId;
 	
 	@NotNull
 	@Column(name = "RECEIPT_NO")
@@ -64,7 +66,6 @@ public class LedgerEntry extends BaseEntity implements Serializable{
 	private Date date;
 	
 	
-
 	@Column(name = "ITEM")
 	private String item;
 	

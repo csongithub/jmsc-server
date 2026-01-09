@@ -914,4 +914,32 @@ public class AccountingService extends AbstractService{
 		
 		return stocks;
 	}
+	
+	
+	public ListDTO getAllStocksList(Long clientId){
+		if(isNull(clientId))
+			throw new RuntimeException("Invalid Request, Client Id is NULL");
+		
+		List<Stock> result =  stockRepository.findAllByClientId(clientId);
+		
+		if(Collections.isNullOrEmpty(result)) 
+			new ArrayList<CapitalAccountDTO>();
+		
+		ListDTO list = new ListDTO();
+		list.setListName("STOCK");
+		
+		result.forEach(stock ->{
+			Item item = new Item();
+			
+			item.setLabel(stock.getStockName());
+			item.setValue(stock.getId());
+			item.setText1(stock.getBalance().toString());
+			
+			list.getList().add(item);
+		});
+		
+		ListDTO.sortByLevel(list);
+		
+		return list;
+	}
 }
