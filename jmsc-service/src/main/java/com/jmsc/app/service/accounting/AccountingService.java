@@ -112,7 +112,7 @@ public class AccountingService extends AbstractService{
 			le.setEntryType(EEntryType.DEBIT);
 			le.setPaymentMode("Opening Balance");
 		} else if(savedLedger.getOpeningBalance() > 0) {
-			le.setDebit(savedLedger.getOpeningBalance());
+			le.setCredit(savedLedger.getOpeningBalance());
 			le.setEntryType(EEntryType.CREDIT);
 			le.setItem("Opening Balance");
 		}
