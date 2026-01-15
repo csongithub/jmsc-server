@@ -506,6 +506,9 @@ public class AccountingService extends AbstractService{
 					trans.setCredit((double)entry.getQuantity());
 					trans.setEntryType(EEntryType.CREDIT);
 					trans.setTransactionRefNo(null);
+					
+					trans.setCreditorId(entry.getCreditorId());
+					trans.setLedgerId(entry.getLedgerId());
 					stockTransactionRepository.save(trans);
 					
 					//update stock balance

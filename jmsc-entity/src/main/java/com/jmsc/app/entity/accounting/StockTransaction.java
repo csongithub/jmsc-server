@@ -43,6 +43,18 @@ public class StockTransaction extends BaseEntity implements Serializable{/**
 	@Column(name = "STOCK_ID")
 	private Long stockId;
 	
+	//This will be set when a creditor provide the supply in or also when supply from this stock goes to a creditor
+	@Column(name = "CREDITOR_ID")
+	private Long creditorId;
+	
+	//This will be set when a creditor provide the supply in or also when supply from this stock goes to a creditor
+	@Column(name = "LEDGER_ID")
+	private Long ledgerId;
+	
+	//This will be set when supply from this stock goes to a project
+	@Column(name = "PROJECT_ID")
+	private Long projectId;
+	
 	@NotNull
 	@Temporal(TemporalType.DATE)
 	@Column(name = "DATE")
