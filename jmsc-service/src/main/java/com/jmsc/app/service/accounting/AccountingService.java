@@ -445,7 +445,12 @@ public class AccountingService extends AbstractService{
 			
 			
 			if(EEntryType.CREDIT.equals(entry.getEntryType())) {
-				if(isNull(entry.getProjectId()) || (entry.isValidateOnReceipt()&& Strings.isNullOrEmpty(entry.getReceipt())) 
+				
+				if(isNull(entry.getProjectId()) && isNull(entry.getStockId())) {
+					throw new RuntimeException("Invalid Post Request, Either Project or Stock not selected");
+				}
+				
+				if((entry.isValidateOnReceipt()&& Strings.isNullOrEmpty(entry.getReceipt())) 
 						|| Strings.isNullOrEmpty(entry.getItem()) || isNull(entry.getRate()) 
 						|| isNull(entry.getQuantity()) || entry.getQuantity() == 0.0
 						|| isNull(entry.getCredit()) || entry.getCredit() ==0.0 
@@ -457,12 +462,13 @@ public class AccountingService extends AbstractService{
 					validateOnDuplicateVoucher(entry);
 				
 				
-				if(linkageId == null) {
+				if(linkageId == null && isNotNull(entry.getProjectId())) {
 					linkageId = new ProjectCreditorLinkageId(entry.getClientId(), 
 															entry.getProjectId(), 
 															entry.getCreditorId(),
 															entry.getLedgerId());	
 				}
+				
 				
 				
 
@@ -479,6 +485,37 @@ public class AccountingService extends AbstractService{
 		
 		try {
 			entryRepository.saveAll(allEntries);
+			
+			//Check for stock dump, and if yes then updated stock transactions.
+			for(LedgerEntryDTO entry: entries) {
+				
+				if(isNotNull(entry.getStockId())) {
+//					
+//					String creditor = 	creditorRepository.findByClientIdAndId(entry.getClientId(), entry.getCreditorId())
+//																					.orElseThrow(()-> new RuntimeException("")).getName();
+					String ledger = ledgerRepository.findByClientIdAndCreditorIdAndId(entry.getClientId(), entry.getCreditorId(), entry.getLedgerId())
+																					.orElseThrow(() -> new RuntimeException("ledger not found")).getName();
+					
+					StockTransaction trans = new StockTransaction();
+					
+					trans.setClientId(entry.getClientId());
+					trans.setStockId(entry.getStockId());
+					trans.setDate(entry.getDate());
+					trans.setNote(ledger);
+					trans.setDebit(0d);
+					trans.setCredit((double)entry.getQuantity());
+					trans.setEntryType(EEntryType.CREDIT);
+					trans.setTransactionRefNo(null);
+					stockTransactionRepository.save(trans);
+					
+					//update stock balance
+					Stock stock = stockRepository.findByClientIdAndId(entry.getClientId(),entry.getStockId()).orElseThrow(() -> new RuntimeException("stock not found"));
+					stock.setBalance(stock.getBalance() + trans.getCredit());
+					stock.setLastUpdated(trans.getDate());
+					stockRepository.save(stock);
+				}
+			}
+			
 			
 			if(linkageId != null) {
 				Optional<ProjectCreditorLinkage> optional = projectCreditorLinkageRepository.findById(linkageId);

@@ -197,4 +197,11 @@ public class AccountingEndPoint {
 		List<StockDTO> accounts = accountingService.getAllStocks(clientId);
 		return ResponseEntity.ok(accounts);
 	}
+	
+	
+	@GetMapping("/stocks/list/{clientId}")
+	public ResponseEntity<ListDTO> getStocksList(@PathVariable("clientId") Long clientId){
+		ListDTO stocks = accountingService.getAllStocksList(clientId);
+		return ResponseEntity.ok(stocks);
+	}
 }

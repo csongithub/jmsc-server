@@ -39,6 +39,9 @@ public class LedgerEntryDTO extends BaseDTO implements Serializable{
 	private Long projectId;
 	
 	
+	private Long stockId;
+	
+	
 	private String receipt;
 	
 
