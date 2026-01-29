@@ -28,4 +28,6 @@ public class Item implements Serializable{
 	private String text1;
 	
 	private String text2;
+	
+	private String text3;
 }

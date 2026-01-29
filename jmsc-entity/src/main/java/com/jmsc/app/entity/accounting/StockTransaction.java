@@ -75,6 +75,11 @@ public class StockTransaction extends BaseEntity implements Serializable{/**
 	@Column(name = "CREDIT")
 	private Double credit;
 	
+	/**
+	 * This will be set in case of supply only, the value of total supply
+	 */
+	@Column(name = "AMOUNT")
+	private Double amount;
 	
 	@NotNull
 	@Enumerated(EnumType.STRING)

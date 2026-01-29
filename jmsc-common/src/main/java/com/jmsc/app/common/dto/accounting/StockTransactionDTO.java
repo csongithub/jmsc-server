@@ -4,6 +4,9 @@
 package com.jmsc.app.common.dto.accounting;
 
 import java.io.Serializable;
+import java.util.Date;
+
+import javax.persistence.Transient;
 
 import com.jmsc.app.common.dto.BaseDTO;
 import com.jmsc.app.common.enums.EEntryType;
@@ -28,6 +31,18 @@ public class StockTransactionDTO extends BaseDTO implements Serializable{
 	
 	private Long stockId;
 	
+	//This will be set when a creditor provide the supply in or also when supply from this stock goes to a creditor
+	private Long creditorId;
+		
+	//This will be set when a creditor provide the supply in or also when supply from this stock goes to a creditor
+	private Long ledgerId;
+		
+	//This will be set when supply from this stock goes to a project
+	private Long projectId;
+	
+	
+	private Date date;
+	
 	
 	private String note;
 	
@@ -37,9 +52,20 @@ public class StockTransactionDTO extends BaseDTO implements Serializable{
 	
 	private Double credit;
 	
+	/**
+	 * This will be set in case of supply only, the value of total supply
+	 */
+	private Double amount;
+	
 	
 	private EEntryType entryType;
 	
 	
 	private String transactionRefNo;
+	
+	/**
+	 * will be set only during statement fetching for a period
+	 */
+	@Transient
+	private Double balance;
 }

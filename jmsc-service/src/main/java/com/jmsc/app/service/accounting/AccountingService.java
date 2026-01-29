@@ -12,6 +12,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.jmsc.app.common.dto.PaymentSummaryDTO;
 import com.jmsc.app.common.dto.accounting.CapitalAccountDTO;
@@ -24,6 +25,8 @@ import com.jmsc.app.common.dto.accounting.LedgerDTO;
 import com.jmsc.app.common.dto.accounting.LedgerEntryDTO;
 import com.jmsc.app.common.dto.accounting.ListDTO;
 import com.jmsc.app.common.dto.accounting.StockDTO;
+import com.jmsc.app.common.dto.accounting.StockTransactionDTO;
+import com.jmsc.app.common.dto.accounting.StockTransactionsRequest;
 import com.jmsc.app.common.dto.accounting.VoucherDTO;
 import com.jmsc.app.common.enums.EEntryType;
 import com.jmsc.app.common.util.Collections;
@@ -95,6 +98,7 @@ public class AccountingService extends AbstractService{
 	private StockTransactionRepository stockTransactionRepository;
 	
 	
+	@Transactional
 	public LedgerDTO createOrUpdate(LedgerDTO dto) {
 		if(isNull(dto.getClientId()) || isNull(dto.getCode()) || isNull(dto.getCreditorId())
 				|| isNull(dto.getName()) || isNull(dto.getOpeningBalance()) || isNull(dto.getStartDate())) {
@@ -106,13 +110,13 @@ public class AccountingService extends AbstractService{
 		
 		LedgerDTO savedLedger= ObjectMapperUtil.map(entity, LedgerDTO.class);
 		if(savedLedger.getOpeningBalance() != 0d)
-			updateOpeneingBalance(savedLedger);
+			updateOpeningBalance(savedLedger);
 		
 		return savedLedger;
 	}
 	
 	
-	private void updateOpeneingBalance(LedgerDTO savedLedger) {
+	private void updateOpeningBalance(LedgerDTO savedLedger) {
 		LedgerEntry le =  new LedgerEntry();
 		le.setClientId(savedLedger.getClientId());
 		le.setCreditorId(savedLedger.getCreditorId());
@@ -201,7 +205,7 @@ public class AccountingService extends AbstractService{
 	}
 	
 	
-	public ListDTO getAllCreditors(Long clientId) {
+	public ListDTO getAllCreditorsList(Long clientId) {
 		
 		ListDTO list = new ListDTO();
 		list.setListName("Creditors");
@@ -226,6 +230,30 @@ public class AccountingService extends AbstractService{
 		ListDTO.sortByLevel(list);
 		
 		return list;
+	}
+	
+	public List<CreditorDTO> getAllCreditors(Long clientId) {
+		
+		List<CreditorDTO> all = null;
+	
+		if(isNull(clientId)) {
+			throw new RuntimeException("Invalid Request");
+		}
+		
+		List<Creditor> creditors  = creditorRepository.findByClientId(clientId);
+		
+		if(Collections.isEmpty(creditors))
+			return new ArrayList<CreditorDTO>();
+		
+		all = ObjectMapperUtil.mapAll(creditors, CreditorDTO.class);
+
+		java.util.Collections.sort(all, new Comparator<CreditorDTO>() {
+	        public int compare(CreditorDTO c1, CreditorDTO c2) {
+	            return c1.getName().compareTo(c2.getName());
+	        }
+	    });
+		
+		return all;
 	}
 	
 	
@@ -354,7 +382,7 @@ public class AccountingService extends AbstractService{
 		if(openingBalance != 0) {
 			LedgerEntryDTO first = new LedgerEntryDTO();
 			first.setTotal(openingBalance);
-			first.setItem("Openeing Balance");
+			first.setItem("Opening Balance");
 			
 			entries.add(0, first);
 		}
@@ -428,7 +456,7 @@ public class AccountingService extends AbstractService{
 	}
 	
 	
-	
+	@Transactional
 	public Boolean createLedgerEntries(List<LedgerEntryDTO> entries) {
 		
 		if(Collections.isNullOrEmpty(entries))
@@ -500,9 +528,12 @@ public class AccountingService extends AbstractService{
 					
 					trans.setClientId(entry.getClientId());
 					trans.setStockId(entry.getStockId());
+					trans.setCreditorId(entry.getCreditorId());
+					trans.setLedgerId(entry.getLedgerId());
 					trans.setDate(entry.getDate());
 					trans.setNote(ledger);
 					trans.setDebit(0d);
+					trans.setAmount(entry.getCredit());
 					trans.setCredit((double)entry.getQuantity());
 					trans.setEntryType(EEntryType.CREDIT);
 					trans.setTransactionRefNo(null);
@@ -511,11 +542,7 @@ public class AccountingService extends AbstractService{
 					trans.setLedgerId(entry.getLedgerId());
 					stockTransactionRepository.save(trans);
 					
-					//update stock balance
-					Stock stock = stockRepository.findByClientIdAndId(entry.getClientId(),entry.getStockId()).orElseThrow(() -> new RuntimeException("stock not found"));
-					stock.setBalance(stock.getBalance() + trans.getCredit());
-					stock.setLastUpdated(trans.getDate());
-					stockRepository.save(stock);
+					updateStockBalance(trans, false);
 				}
 			}
 			
@@ -869,7 +896,7 @@ public class AccountingService extends AbstractService{
 			openingBalaceRow.setBalance(openingBalance);
 			openingBalaceRow.setDebit(0d);
 			openingBalaceRow.setCredit(0d);
-			openingBalaceRow.setNote("Openeing Balance");
+			openingBalaceRow.setNote("Opening Balance");
 			
 			result.add(0, openingBalaceRow);
 		}
@@ -925,8 +952,8 @@ public class AccountingService extends AbstractService{
 	
 	public StockDTO createOrUpdate(StockDTO stockDTO) {
 		
-		if(isNull(stockDTO.getClientId()) || Strings.isNullOrEmpty(stockDTO.getStockName())
-				|| Strings.isNullOrEmpty(stockDTO.getStockUnit())) {
+		if(isNull(stockDTO.getClientId()) || Strings.isNullOrEmpty(stockDTO.getName())
+				|| Strings.isNullOrEmpty(stockDTO.getUnit())) {
 			throw new RuntimeException("Invalid Request");
 		}
 		
@@ -957,8 +984,13 @@ public class AccountingService extends AbstractService{
 		
 		trans.setDebit(0d);
 		trans.setCredit(stockDTO.getBalance());
+		trans.setAmount(0d);
 		trans.setEntryType(EEntryType.CREDIT);
 		trans.setTransactionRefNo(null);
+		trans.setCreditorId(null);
+		trans.setLedgerId(null);
+		trans.setProjectId(null);
+		
 		stockTransactionRepository.save(trans);
 		
 	}
@@ -977,7 +1009,7 @@ public class AccountingService extends AbstractService{
 		
 		java.util.Collections.sort(stocks, new Comparator<StockDTO>() {
 	        public int compare(StockDTO entry1, StockDTO entry2) {
-	            return entry1.getStockName().compareTo(entry2.getStockName());
+	            return entry1.getName().compareTo(entry2.getName());
 	        }
 	    });
 		
@@ -1000,9 +1032,10 @@ public class AccountingService extends AbstractService{
 		result.forEach(stock ->{
 			Item item = new Item();
 			
-			item.setLabel(stock.getStockName());
+			item.setLabel(stock.getName());
 			item.setValue(stock.getId());
 			item.setText1(stock.getBalance().toString());
+			item.setText2(stock.getUnit());
 			
 			list.getList().add(item);
 		});
@@ -1010,5 +1043,114 @@ public class AccountingService extends AbstractService{
 		ListDTO.sortByLevel(list);
 		
 		return list;
+	}
+	
+	@Transactional
+	public Boolean addStockTransaction(StockTransactionDTO dto) {
+		StockTransaction transaction =  ObjectMapperUtil.map(dto, StockTransaction.class);
+		stockTransactionRepository.save(transaction);
+		
+		updateStockBalance(transaction, true);
+		
+		if(isNotNull(dto.getCreditorId()) && isNotNull(dto.getLedgerId())) {
+			LedgerEntry ledger = new LedgerEntry();
+			ledger.setClientId(dto.getClientId());
+			ledger.setCreditorId(dto.getCreditorId());
+			ledger.setLedgerId(dto.getLedgerId());
+			
+			ledger.setDate(dto.getDate());
+			ledger.setDebit(dto.getAmount());
+			ledger.setEntryType(EEntryType.DEBIT);
+			ledger.setPaymentMode(dto.getNote());
+			
+			entryRepository.save(ledger);
+		}
+		
+		return Boolean.TRUE;
+	}
+	
+	
+	private void updateStockBalance(StockTransaction trans, boolean isDebit){
+		
+		Stock stock = stockRepository.findByClientIdAndId(trans.getClientId(),trans.getStockId()).orElseThrow(() -> new RuntimeException("stock not found"));
+		
+		if(isDebit)
+			stock.setBalance(stock.getBalance() - trans.getDebit());
+		else
+			stock.setBalance(stock.getBalance() + trans.getCredit());
+		stock.setLastUpdated(trans.getDate());
+		stockRepository.save(stock);
+	}
+	
+	
+	
+	public List<StockTransactionDTO> getStockTransactions(StockTransactionsRequest req){
+		Date fromDate = DateUtils.getDate(req.getFrom());
+		Date toDate = DateUtils.getDate(req.getTo());
+		
+		List<StockTransaction> records =  stockTransactionRepository.findAllByClientIdAndStockIdAndDateBetween(req.getClientId(), req.getStockId(), fromDate, toDate);
+		
+		if(Collections.isNullOrEmpty(records)) 
+			return new ArrayList<StockTransactionDTO>();
+		
+		List<StockTransactionDTO> rows = ObjectMapperUtil.mapAll(records, StockTransactionDTO.class);
+		
+		java.util.Collections.sort(rows, new Comparator<StockTransactionDTO>() {
+	        public int compare(StockTransactionDTO entry1, StockTransactionDTO entry2) {
+	            return entry1.getDate().compareTo(entry2.getDate());
+	        }
+	    });
+		
+		
+		List<StockTransactionDTO> result =  new ArrayList<StockTransactionDTO>();
+		
+		Stock stock = stockRepository.findByClientIdAndId(req.getClientId(), req.getStockId()).orElseThrow(() -> new RuntimeException(""));
+		Double openingBalance = 0d;
+		boolean fromDateIsAfterAccountOpeneingDate = DateUtils.isAfterDay(fromDate, stock.getCreationDate());
+		
+		if(fromDateIsAfterAccountOpeneingDate) {
+			
+			openingBalance = this.getOpeningBalance(req, stock);
+			StockTransactionDTO openingBalaceRow =  new StockTransactionDTO();
+			openingBalaceRow.setBalance(openingBalance);
+			openingBalaceRow.setDebit(0d);
+			openingBalaceRow.setCredit(0d);
+			openingBalaceRow.setNote("Opening Balance");
+			
+			result.add(0, openingBalaceRow);
+		}
+		
+		for(int index = 0; index<rows.size(); index++) {
+			openingBalance = (index == 0) ? openingBalance : rows.get(index-1).getBalance();
+			rows.get(index).setBalance(openingBalance + rows.get(index).getCredit() - rows.get(index).getDebit());
+			
+			result.add(fromDateIsAfterAccountOpeneingDate? index+1 : index, rows.get(index));
+		}
+		
+		return result;		
+	}
+
+
+	
+	private Double getOpeningBalance(StockTransactionsRequest req, Stock stock) {
+		
+		Date stockOpeningDate = stock.getCreationDate();
+		
+		Date oneDayBeforeFromDate = DateUtils.getNDaysBefore(req.getFrom(), 1);
+		
+	    List<StockTransaction> records = stockTransactionRepository
+	    											.findAllByClientIdAndStockIdAndDateBetween(req.getClientId(), 
+																				  				 req.getStockId(), 
+																				  				 stockOpeningDate, 
+																				  				 oneDayBeforeFromDate);
+	    
+	    Double openingBalance = 0d;
+	    
+	    for(StockTransaction record: records) {
+	    	openingBalance = openingBalance + record.getCredit() - record.getDebit();
+	    }
+	    
+	
+		return openingBalance;
 	}
 }

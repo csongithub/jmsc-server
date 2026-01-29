@@ -10,19 +10,19 @@ public class RenameFiles {
 
     public static void main(String[] argv) throws IOException {
 
-		String filePath = "C:\\Users\\anuhr\\Desktop\\RRSMP\\Aurangabad 04 NIT 10\\all";
+		String filePath = "H:\\Mukhiya Ji Chandan\\organized 2021-22\\";
         File folder = new File(filePath);
         
         File[] files = folder.listFiles();
         List<File>	list = Arrays.asList(files);
         list.sort(new GraduationCeremonyComparator());
         
-        int index = 0;
+        int index = 4;
         for(File file: list) {
         	 if (file.isFile()) {
 
         		 String oldFileName = file.getName();
-        		 String newFileName = "JMSC_" + oldFileName;
+        		 String newFileName = "Audit_" + index +"_" + oldFileName;
         		 File f = new File(filePath + "\\" + oldFileName); 
                  f.renameTo(new File(filePath + "\\" + newFileName));
              }

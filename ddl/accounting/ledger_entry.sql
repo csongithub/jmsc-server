@@ -25,6 +25,7 @@ CREATE TABLE jmsc.LEDGER_ENTRY
     CREDITOR_ID					integer NOT NULL,	
     LEDGER_ID					integer NOT NULL,	
     PROJECT_ID					integer,
+    STOCK_ID					integer,
     RECEIPT_NO					text,
     DATE						date NOT NULL,
     ITEM						text,

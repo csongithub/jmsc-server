@@ -24,7 +24,9 @@ CREATE TABLE jmsc.STOCK
     ID 					integer NOT NULL DEFAULT nextval('jmsc.stock_seq'::regclass),
     CLIENT_ID			integer NOT NULL,
     STOCK_NAME			text NOT NULL,
+    ITEM				text NOT NULL,
     UNIT				text NOT NULL,
+    PRICE				numeric NOT NULL,
     BALANCE				numeric NOT NULL,
     CREATION_DATE		date NOT NULL,
     LAST_UPDATED		date NOT NULL,
@@ -37,5 +39,5 @@ WITH (
     OIDS = FALSE
 )TABLESPACE pg_default;
 
-ALTER TABLE jmsc.STOCK_KEY OWNER to jmscdev;
-GRANT ALL ON TABLE jmsc.STOCK_KEY TO jmscdev;
+ALTER TABLE jmsc.STOCK OWNER to jmscdev;
+GRANT ALL ON TABLE jmsc.STOCK TO jmscdev;

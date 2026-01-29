@@ -27,9 +27,13 @@ public class StockDTO extends BaseDTO implements Serializable{
 	
 	private Long id;
 	
-	private String stockName;
+	private String name;
 	
-	private String stockUnit;
+	private String item;
+	
+	private String unit;
+	
+	private Long price;
 	
 	private Double balance;
 	

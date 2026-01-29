@@ -40,11 +40,21 @@ public class Stock extends BaseEntity implements Serializable{
 	
 	@NotNull
 	@Column(name = "STOCK_NAME")
-	private String stockName;
+	private String name;
+	
+	
+	@NotNull
+	@Column(name = "ITEM")
+	private String item;
 	
 	@NotNull
 	@Column(name = "UNIT")
-	private String stockUnit;
+	private String unit;
+	
+	
+	@NotNull
+	@Column(name = "PRICE")
+	private Long price;
 	
 	
 	/**

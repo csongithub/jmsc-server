@@ -24,6 +24,8 @@ import com.jmsc.app.common.dto.accounting.LedgerDTO;
 import com.jmsc.app.common.dto.accounting.LedgerEntryDTO;
 import com.jmsc.app.common.dto.accounting.ListDTO;
 import com.jmsc.app.common.dto.accounting.StockDTO;
+import com.jmsc.app.common.dto.accounting.StockTransactionDTO;
+import com.jmsc.app.common.dto.accounting.StockTransactionsRequest;
 import com.jmsc.app.common.dto.accounting.VoucherDTO;
 import com.jmsc.app.service.accounting.AccountingService;
 
@@ -57,9 +59,16 @@ public class AccountingEndPoint {
 		return ResponseEntity.ok(response);
 	}
 	
+	@GetMapping("/creditors/list/{clientId}")
+	public ResponseEntity<ListDTO> getAllCreditorsList(@PathVariable("clientId")Long clientId) {
+		ListDTO list = accountingService.getAllCreditorsList(clientId);
+		return ResponseEntity.ok(list);
+	}
+	
+	
 	@GetMapping("/creditors/{clientId}")
-	public ResponseEntity<ListDTO> getAllCreditors(@PathVariable("clientId")Long clientId) {
-		ListDTO list = accountingService.getAllCreditors(clientId);
+	public ResponseEntity<List<CreditorDTO>> getAllCreditors(@PathVariable("clientId")Long clientId) {
+		List<CreditorDTO> list = accountingService.getAllCreditors(clientId);
 		return ResponseEntity.ok(list);
 	}
 	
@@ -199,9 +208,26 @@ public class AccountingEndPoint {
 	}
 	
 	
+	
 	@GetMapping("/stocks/list/{clientId}")
 	public ResponseEntity<ListDTO> getStocksList(@PathVariable("clientId") Long clientId){
 		ListDTO stocks = accountingService.getAllStocksList(clientId);
 		return ResponseEntity.ok(stocks);
+	}
+	
+	
+	
+	@PostMapping("/stock/add_transaction")
+	public ResponseEntity<Boolean> addTransaction(@RequestBody StockTransactionDTO transaction) {
+		Boolean response = accountingService.addStockTransaction(transaction);
+		return ResponseEntity.ok(response);
+	}
+	
+	
+	
+	@PostMapping("/stock/transactions")
+	public ResponseEntity< List<StockTransactionDTO>> stockTransactions(@RequestBody StockTransactionsRequest req) {
+		 List<StockTransactionDTO> response = accountingService.getStockTransactions(req);
+		return ResponseEntity.ok(response);
 	}
 }
