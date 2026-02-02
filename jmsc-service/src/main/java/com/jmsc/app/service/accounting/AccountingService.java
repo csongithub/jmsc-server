@@ -28,6 +28,7 @@ import com.jmsc.app.common.dto.accounting.StockDTO;
 import com.jmsc.app.common.dto.accounting.StockTransactionDTO;
 import com.jmsc.app.common.dto.accounting.StockTransactionsRequest;
 import com.jmsc.app.common.dto.accounting.VoucherDTO;
+import com.jmsc.app.common.dto.accounting.VoucherItem;
 import com.jmsc.app.common.enums.EEntryType;
 import com.jmsc.app.common.util.Collections;
 import com.jmsc.app.common.util.DateUtils;
@@ -768,6 +769,7 @@ public class AccountingService extends AbstractService{
 	}
 	
 	
+	@Transactional
 	public VoucherDTO createVuocher(VoucherDTO dto) {
 		
 		if(isNull(dto.getClientId()) || Strings.isNullOrEmpty(dto.getVoucherNo())
@@ -791,7 +793,7 @@ public class AccountingService extends AbstractService{
 			final String accountName = account.getAccountName();
 			voucher = ObjectMapperUtil.map(dto, Voucher.class);
 			voucher = voucherRepository.save(voucher);
-			
+		
 			VoucherDTO voucherDTO = ObjectMapperUtil.map(voucher, VoucherDTO.class);
 			
 			//Block to update capital account entry
@@ -803,7 +805,6 @@ public class AccountingService extends AbstractService{
 				entry.setNote("VOUCHER-"+dto.getVoucherNo());
 				entry.setDebit(dto.getAmount());
 				entry.setCredit(0d);
-//				entry.setBalance(account.getBalance() - dto.getAmount());
 				entry.setEntryType(EEntryType.DEBIT);
 				entry.setTransactionRefNo(voucher.getId());
 				
@@ -817,12 +818,12 @@ public class AccountingService extends AbstractService{
 				}
 				
 			}
-			
+			double capitalToCapital = 0d;
 			//Block to update creditor ledger if any party.creditor payment is found
 			{
 				if(Collections.isNotNullOrEmpty(dto.getList())){
-					dto.getList().forEach(item -> {
-						if(isNotNull(item.getCreditorId()) && isNotNull(item.getLedgerId())) {
+					for(VoucherItem item: dto.getList()){
+						if(isNotNull(item.getCreditorId()) && isNotNull(item.getLedgerId()) && item.getGroup().equals("Advance")) {
 							LedgerEntry debitEntry = new LedgerEntry();
 							debitEntry.setClientId(dto.getClientId());
 							
@@ -837,28 +838,40 @@ public class AccountingService extends AbstractService{
 							debitEntry.setRemark("");
 							
 							entries.add(entryRepository.save(debitEntry).getId());
+						} else if(isNotNull(item.getToCapitalId()) && item.getGroup().equals("Transfer")) {
+							
+							CapitalAccountEntry toCapitalAccountEntry = new CapitalAccountEntry();
+							toCapitalAccountEntry.setClientId(dto.getClientId());
+							toCapitalAccountEntry.setAccountId(item.getToCapitalId());
+							toCapitalAccountEntry.setDate(dto.getDate());
+							toCapitalAccountEntry.setNote("Rcvd From " + accountName);
+							toCapitalAccountEntry.setDebit(0d);
+							toCapitalAccountEntry.setCredit(item.getAmount());			
+							toCapitalAccountEntry.setEntryType(EEntryType.CREDIT);
+							toCapitalAccountEntry.setTransactionRefNo(voucher.getId());
+							capitalAccountEntryRepository.save(toCapitalAccountEntry);
+							
+							CapitalAccount toAccount= capitalAccountRepository.findByClientIdAndId(dto.getClientId(), item.getToCapitalId()).orElseThrow(() ->new RuntimeException("Capital Account not Found"));
+							
+							if("CASH".equalsIgnoreCase(toAccount.getAccountType())) {
+								toAccount.setBalance(toAccount.getBalance() + item.getAmount());
+								toAccount.setLastUpdated(voucher.getDate());
+								capitalAccountRepository.save(toAccount);
+							}
+							
+							capitalToCapital = capitalToCapital + item.getAmount();
 						}
-					});
+					}
 				}
+				
 			}
-			
-			
+			if(capitalToCapital > 0) {
+				double vouchAmount = voucher.getAmount()  - capitalToCapital;
+				voucher.setAmount(vouchAmount);
+				voucherRepository.save(voucher);
+			}
 			return voucherDTO;
-		}catch(Exception e) {
-//			if(!isNull(voucher.getId()))
-//				voucherRepository.delete(voucher);
-//			
-//			if(!isNull(account.getId()))
-//				capitalAccountRepository.delete(account);
-//			
-//			if(!isNull(entry.getId()))
-//				capitalAccountEntryRepository.delete(entry);
-//			
-//			if(Collections.isNotNullOrEmpty(entries)) {
-//				entries.forEach(id ->{
-//					entryRepository.deleteById(id);
-//				});
-//			}			
+		}catch(Exception e) {		
 			throw new RuntimeException(e);
 		}
 	}
@@ -1152,5 +1165,13 @@ public class AccountingService extends AbstractService{
 	    
 	
 		return openingBalance;
+	}
+	
+	
+	public Double getCapitalAccountBalance(Long clientId, Long accountId) {
+		CapitalAccount account =  capitalAccountRepository.findByClientIdAndId(clientId, accountId)
+														.orElseThrow(() -> new RuntimeException("invalid request"));
+		
+		return account.getBalance();
 	}
 }

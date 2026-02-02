@@ -230,4 +230,12 @@ public class AccountingEndPoint {
 		 List<StockTransactionDTO> response = accountingService.getStockTransactions(req);
 		return ResponseEntity.ok(response);
 	}
+	
+	
+	
+	@GetMapping("/capital_account_balance/{clientId}/{accountId}")
+	public ResponseEntity<Double> capitalAccountBalance(@PathVariable("clientId") Long clientId, @PathVariable("accountId")Long accountId){
+		Double stocks = accountingService.getCapitalAccountBalance(clientId, accountId);
+		return ResponseEntity.ok(stocks);
+	}
 }

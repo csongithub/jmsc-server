@@ -48,4 +48,11 @@ public class VoucherItem implements Serializable{
 	private Long creditorId;
 	
 	private Long ledgerId;
+	
+	/**
+	 * This is set when the group type is selected as Transfer.
+	 * that means it enable user to transfer capital balance from one capital to another capital
+	 * enables capital to capital transfer
+	 */
+	private Long toCapitalId;
 }
