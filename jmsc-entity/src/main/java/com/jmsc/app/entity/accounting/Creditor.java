@@ -5,17 +5,20 @@ package com.jmsc.app.entity.accounting;
 
 import java.io.Serializable;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 import org.hibernate.annotations.Type;
 
+
 import com.jmsc.app.entity.BaseEntity;
-import com.sun.istack.NotNull;
+import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
+
+import jakarta.validation.constraints.NotNull;
 
 import lombok.Data;
 
@@ -53,7 +56,7 @@ public class Creditor extends BaseEntity implements Serializable{/**
 	private Long partyId;
 	
 	
-	@Type(type="jsonb")
+	@Type(JsonBinaryType.class)
 	@Column(name = "ITEMS")
 	private String items;
 	

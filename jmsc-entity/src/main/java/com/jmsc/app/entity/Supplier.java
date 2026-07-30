@@ -2,16 +2,17 @@ package com.jmsc.app.entity;
 
 import java.io.Serializable;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 import org.hibernate.annotations.Type;
+import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 
-import com.sun.istack.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 import lombok.Data;
 @Data
@@ -33,7 +34,7 @@ public class Supplier extends BaseEntity implements Serializable{
 	@Column(name = "PARTY_ID")
 	private Long partyId;
 	
-	@Type(type="jsonb")
+	@Type(JsonBinaryType.class)
 	@Column(name = "SUPPLY_CONFIG")
 	private String supplyConfig;
 	

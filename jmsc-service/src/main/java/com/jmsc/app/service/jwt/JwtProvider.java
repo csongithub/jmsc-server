@@ -3,17 +3,20 @@
  */
 package com.jmsc.app.service.jwt;
 
+import java.nio.charset.StandardCharsets;
+import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -55,8 +58,8 @@ public class JwtProvider {
 	@Value("${jwt.refresh.token.expiry.time}")
 	private String jwtRefreshTokenExpiryTime;
 	
-	@Value("${jwt.signature.algo}")
-	private SignatureAlgorithm signatureAlgorithm;
+//	@Value("${jwt.signature.algo}")
+//	private SignatureAlgorithm signatureAlgorithm;
 	
 	
 	private long tokenExpiryTime;
@@ -113,22 +116,45 @@ public class JwtProvider {
 	 * 3. According to JWS Compact Serialization(https://tools.ietf.org/html/draft-ietf-jose-json-web-signature-41#section-3.1)
 	 *	compaction of the JWT to a URL-safe string 
 	 */
+	
+	//JAVA 8 Version
+//	private String doGenerateToken(Map<String, Object> claims, String subject, long tokenExpiryTime) {
+//		long currentTimeMillis = System.currentTimeMillis();
+//		Date totalExpiryTime = new Date(currentTimeMillis + tokenExpiryTime);
+//		
+//		log.debug("Token Issuing Date: " + new Date(currentTimeMillis));
+//		log.debug("Token Expiry Date: " + totalExpiryTime);
+//		
+//		String token= Jwts.builder().setClaims(new HashMap<>())
+//				   					.setSubject(subject)
+//				   					.setIssuedAt(new Date(System.currentTimeMillis()))
+//				   					.setExpiration(totalExpiryTime)
+//				   					.signWith(signatureAlgorithm, jwtSecretKey).compact();
+//		return token;
+//	}
+	
+	//JAVA 21 Version
 	private String doGenerateToken(Map<String, Object> claims, String subject, long tokenExpiryTime) {
-		long currentTimeMillis = System.currentTimeMillis();
-		Date totalExpiryTime = new Date(currentTimeMillis + tokenExpiryTime);
-		
-		log.debug("Token Issuing Date: " + new Date(currentTimeMillis));
-		log.debug("Token Expiry Date: " + totalExpiryTime);
-		
-		String token= Jwts.builder().setClaims(new HashMap<>())
-				   					.setSubject(subject)
-				   					.setIssuedAt(new Date(System.currentTimeMillis()))
-				   					.setExpiration(totalExpiryTime)
-				   					.signWith(signatureAlgorithm, jwtSecretKey).compact();
-		return token;
+
+	    long currentTimeMillis = System.currentTimeMillis();
+	    Date totalExpiryTime = new Date(currentTimeMillis + tokenExpiryTime);
+
+	    log.debug("Token Issuing Date: {}", new Date(currentTimeMillis));
+	    log.debug("Token Expiry Date: {}", totalExpiryTime);
+
+	    // ✅ Create proper key (IMPORTANT)
+	    Key key = Keys.hmacShaKeyFor(jwtSecretKey.getBytes(StandardCharsets.UTF_8));
+
+	    String token = Jwts.builder()
+	            .setClaims(new HashMap<>())
+	            .setSubject(subject)
+	            .setIssuedAt(new Date(currentTimeMillis))
+	            .setExpiration(totalExpiryTime)
+	            .signWith(key)   // ✅ NEW METHOD
+	            .compact();
+
+	    return token;
 	}
-	
-	
 	
 	private long getExpiryTime(String jwtTokenExpiryTime) {
 		

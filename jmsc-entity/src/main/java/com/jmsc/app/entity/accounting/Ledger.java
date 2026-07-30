@@ -6,19 +6,21 @@ package com.jmsc.app.entity.accounting;
 import java.io.Serializable;
 import java.util.Date;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 
 import org.hibernate.annotations.Type;
 
 import com.jmsc.app.entity.BaseEntity;
-import com.sun.istack.NotNull;
+import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
+
+import jakarta.validation.constraints.NotNull;
 
 import lombok.Data;
 
@@ -74,7 +76,7 @@ public class Ledger extends BaseEntity implements Serializable{
 	
 	
 	@NotNull
-	@Type(type="jsonb")
+	@Type(JsonBinaryType.class)
 	@Column(name = "COLUMNS")
 	private String columns;
 	

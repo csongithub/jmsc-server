@@ -4,6 +4,8 @@
 package com.jmsc.app.service.jwt;
 
 import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
+import java.security.Key;
 import java.util.Date;
 import java.util.function.Function;
 
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Component;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
 
 /**
  * The JwtTokenUtil is responsible for performing JWT operations like creation and validation. 
@@ -58,10 +61,25 @@ public class JwtTokenUtil implements Serializable {
 	}
 	
 	
-	//for retrieveing any information from token we will need the secret key
+//	for retrieveing any information from token we will need the secret key
+	
 	private Claims getAllClaimsFromToken(String token) {
-		return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
+		
+//		Commented below code because it is was only for java 8
+//		return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
+		
+		
+//		Added below code to work in JAVA 21
+	    Key key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
+
+	    return Jwts.parserBuilder()
+	            .setSigningKey(key)
+	            .build()
+	            .parseClaimsJws(token)
+	            .getBody();
 	}
+	
+	
 
 	
 	//check if the token has expired

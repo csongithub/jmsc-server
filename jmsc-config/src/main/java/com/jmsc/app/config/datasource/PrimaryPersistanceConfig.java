@@ -6,7 +6,7 @@ package com.jmsc.app.config.datasource;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityManagerFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;

@@ -5,7 +5,7 @@ package com.jmsc.app.common.dto;
 
 import java.io.Serializable;
 
-import io.swagger.annotations.ApiModelProperty;
+//import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -23,43 +23,43 @@ public class BankAccountDTO implements Serializable{
 	 */
 	private static final long serialVersionUID = 4587765474863345206L;
 
-	@ApiModelProperty(name = "id", example = "1", notes = "Unique Id (Primary Key) of bank account", required = false)
+	//@ApiModelProperty(name = "id", example = "1", notes = "Unique Id (Primary Key) of bank account", required = false)
 	private Long id;
 
-	@ApiModelProperty(name = "clientId", example = "Client", notes = "ID of the client", required = true)
+	//@ApiModelProperty(name = "clientId", example = "Client", notes = "ID of the client", required = true)
 	private Long clientId;
 	
-	@ApiModelProperty(name = "accountHolder", example = "Siddhivinayak Fuel Center", notes = "Name of bank account holder", required = true)
+	//@ApiModelProperty(name = "accountHolder", example = "Siddhivinayak Fuel Center", notes = "Name of bank account holder", required = true)
 	private String accountHolder;
 	
-	@ApiModelProperty(name = "bankName", example = "State Bank Of India", notes = "Name of bank", required = false)
+	//@ApiModelProperty(name = "bankName", example = "State Bank Of India", notes = "Name of bank", required = false)
 	private String bankName;
 	
-	@ApiModelProperty(name = "branchName", example = "Aurangabad", notes = "Branch of the bank", required = false)
+	//@ApiModelProperty(name = "branchName", example = "Aurangabad", notes = "Branch of the bank", required = false)
 	private String branchName;
 	
-	@ApiModelProperty(name = "branchCode", example = "034567", notes = "Branch code of the bank", required = false)
+	//@ApiModelProperty(name = "branchCode", example = "034567", notes = "Branch code of the bank", required = false)
 	private String branchCode;
 	
-	@ApiModelProperty(name = "accountNumber", example = "20012693476", notes = "Account number", required = true)
+	//@ApiModelProperty(name = "accountNumber", example = "20012693476", notes = "Account number", required = true)
 	private String accountNumber;
 	
-	@ApiModelProperty(name = "ifscCode", example = "SBIN12576", notes = "IFSC code of the bank", required = true)
+	//@ApiModelProperty(name = "ifscCode", example = "SBIN12576", notes = "IFSC code of the bank", required = true)
 	private String ifscCode;
 	
-	@ApiModelProperty(name = "address", example = "Aurngabad, Bazar, Bihar-824101", notes = "Address of the bank", required = false)
+	//@ApiModelProperty(name = "address", example = "Aurngabad, Bazar, Bihar-824101", notes = "Address of the bank", required = false)
 	private String address;
 	
-	@ApiModelProperty(name = "mobileNo", example = "7250605658", notes = "Registred Mobile Number", required = true)
+	//@ApiModelProperty(name = "mobileNo", example = "7250605658", notes = "Registred Mobile Number", required = true)
 	private String mobileNo;
 	
-	@ApiModelProperty(name = "acccountType", example = "Current", notes = "Bank account type", required = true)
+	//@ApiModelProperty(name = "acccountType", example = "Current", notes = "Bank account type", required = true)
 	private String acccountType;
 	
-	@ApiModelProperty(name = "status", example = "Active", notes = "Bank account status", required = true)
+	//@ApiModelProperty(name = "status", example = "Active", notes = "Bank account status", required = true)
 	private String status;
 	
-	@ApiModelProperty(name = "displayName", example = "JMSC-INDB-45", notes = "Bank account display name", required = true)
+	//@ApiModelProperty(name = "displayName", example = "JMSC-INDB-45", notes = "Bank account display name", required = true)
 	private String displayName; 
 	
 	
